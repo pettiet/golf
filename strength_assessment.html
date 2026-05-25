@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 Evening — Strength Assessment</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #f97316;
+    --accent-dim: #c2410c;
+    --header-grad: linear-gradient(135deg, #c2410c 0%, #4a1505 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 90px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header {
+    background: var(--header-grad);
+    padding: 16px 16px 22px;
+  }
+  header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.9); margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .save-indicator { font-size: 11px; color: rgba(255,255,255,0.7); opacity: 0; transition: opacity 0.3s; }
+  .save-indicator.visible { opacity: 1; }
+
+  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .summary-card h2 { font-size: 12px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .summary-card p { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+  .summary-card p:last-child { margin-bottom: 0; }
+  .summary-card strong { color: var(--text); }
+
+  .block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .block-header {
+    padding: 12px 14px;
+    background: linear-gradient(180deg, rgba(249,115,22,0.08) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .block-num { font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+  .block-title { font-size: 16px; font-weight: 700; margin-top: 2px; }
+  .block-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .block-body { padding: 12px 14px; }
+
+  .exercise { padding: 10px 0; border-bottom: 1px solid rgba(48,54,61,0.5); }
+  .exercise:last-child { border-bottom: none; }
+
+  .ex-header { display: flex; align-items: flex-start; gap: 10px; }
+  .ex-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    background: transparent;
+  }
+  .ex-check:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .ex-check:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -2px; left: 3px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .ex-name { font-size: 15px; font-weight: 600; flex: 1; }
+  .ex-spec { font-size: 12px; color: var(--accent); margin-top: 2px; }
+
+  .info-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 32px;
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .info-toggle:active { background: var(--card-hover); }
+  .info-toggle .chev { transition: transform 0.2s; display: inline-block; font-size: 9px; }
+  .info-toggle.open .chev { transform: rotate(180deg); }
+
+  .info-panel {
+    display: none;
+    margin-left: 32px;
+    margin-top: 8px;
+    background: rgba(249,115,22,0.06);
+    border-left: 2px solid var(--accent-dim);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .info-panel.open { display: block; }
+  .info-panel strong { color: var(--text); }
+  .info-panel ol, .info-panel ul { padding-left: 18px; margin: 6px 0; }
+  .info-panel li { margin-bottom: 4px; }
+  .info-panel .tip {
+    color: #fcd34d;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+  .info-panel .alt {
+    color: #93c5fd;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  .ex-record {
+    margin-left: 32px;
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .ex-record label {
+    font-size: 10px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1px;
+    display: block; margin-bottom: 3px;
+  }
+  .ex-record input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 8px;
+    color: var(--text);
+    font-size: 14px;
+  }
+  .ex-record .full { grid-column: 1 / -1; }
+
+  .coach-note {
+    background: rgba(249,115,22,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #fcd34d;
+    font-style: italic;
+  }
+  .coach-note strong { font-style: normal; color: var(--accent); }
+
+  .footer-actions {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .footer-actions button {
+    flex: 1;
+    max-width: 220px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .footer-actions button.secondary {
+    background: var(--card-hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+    max-width: 100px;
+    flex: 0 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Hub</a>
+
+<header>
+  <div class="label">Week 0 · Day 1 · Evening</div>
+  <h1>Strength Assessment</h1>
+  <div class="sub">
+    <span>Home · ~30 min · Light only</span>
+    <span class="save-indicator" id="saveIndicator">✓ Saved</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="summary-card">
+    <h2>Why we're doing this</h2>
+    <p><strong>This is an assessment, not a workout.</strong> We're checking movement quality, finding any weak links, and seeing what loads make sense. <strong>Stop short of failure on every exercise.</strong></p>
+    <p>You already golfed today. Tonight is light. Real strength work starts Wednesday.</p>
+    <p style="margin-top: 10px;"><strong>Tap "How to" on any exercise</strong> for step-by-step instructions.</p>
+  </div>
+
+  <div class="coach-note">
+    <strong>Equipment available:</strong> 2× 15-lb dumbbells, 2× 5-lb dumbbells, 2× 3-lb dumbbells, band gym (platform + bar), ab wheel, 6-lb medicine ball.
+  </div>
+
+  <!-- WARMUP -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">Block 1 · Warmup</div>
+      <div class="block-title">Movement Prep</div>
+      <div class="block-meta">5 minutes · No equipment</div>
+    </div>
+    <div class="block-body">
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex1">
+          <div>
+            <div class="ex-name">Arm circles + shoulder rolls</div>
+            <div class="ex-spec">10 forward, 10 back, each direction</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex1">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex1">
+          <strong>How:</strong>
+          <ol>
+            <li>Stand tall, arms straight out to your sides at shoulder height (like a T).</li>
+            <li>Make slow controlled circles forward — small at first, gradually larger. 10 reps.</li>
+            <li>Reverse direction. 10 reps backward.</li>
+            <li>Drop arms to sides. Roll shoulders backward 10 times, then forward 10 times.</li>
+          </ol>
+          <div class="tip"><strong>Why:</strong> Wakes up the shoulder joints and rotator cuff. Cheap insurance against injury.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex2">
+          <div>
+            <div class="ex-name">Trunk rotations (standing)</div>
+            <div class="ex-spec">15 each side, slow &amp; controlled</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex2">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex2">
+          <strong>How:</strong>
+          <ol>
+            <li>Stand with feet shoulder-width apart.</li>
+            <li>Hold a club, broomstick, or just your arms across your chest at shoulder height.</li>
+            <li>Keep your hips facing forward — rotate your upper body to the right as far as comfortable.</li>
+            <li>Return to center. Rotate to the left.</li>
+            <li>That's 1 rep each side. Do 15 each direction, slow and controlled.</li>
+          </ol>
+          <div class="tip"><strong>Key:</strong> Rotation comes from the upper back (thoracic spine), not the lower back. Keep your belt buckle pointing forward the whole time.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex3">
+          <div>
+            <div class="ex-name">Bodyweight squats</div>
+            <div class="ex-spec">10 reps, controlled tempo</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex3">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex3">
+          <strong>How:</strong>
+          <ol>
+            <li>Stand with feet shoulder-width apart, toes slightly turned out.</li>
+            <li>Arms out in front for balance (or hands clasped at chest).</li>
+            <li>Sit back like you're sitting into a chair behind you. Knees stay tracking over your toes.</li>
+            <li>Lower until your thighs are at least parallel to the floor (or as low as comfortable).</li>
+            <li>Drive through your heels to stand up. Squeeze glutes at the top.</li>
+            <li>2 seconds down, 1 second up. 10 reps.</li>
+          </ol>
+          <div class="tip"><strong>Form check:</strong> Knees shouldn't cave inward. Chest stays up. Heels stay on the ground.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex4">
+          <div>
+            <div class="ex-name">World's greatest stretch</div>
+            <div class="ex-spec">5 reps each side</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex4">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex4">
+          <strong>How (this is one continuous movement):</strong>
+          <ol>
+            <li>Start in a high plank position (top of a pushup).</li>
+            <li>Step your right foot forward to the OUTSIDE of your right hand. You're now in a deep lunge.</li>
+            <li>Place your right hand on the ground inside your right foot. Reach your left hand straight up toward the ceiling, rotating your chest open to the left.</li>
+            <li>Hold for 1 second. Return left hand to the ground.</li>
+            <li>Step back to plank. That's 1 rep on the right.</li>
+            <li>Repeat with left foot forward. Alternate 5 each side.</li>
+          </ol>
+          <div class="tip"><strong>Why this matters for golf:</strong> Opens up hips, t-spine, shoulders, and hamstrings — all the things that limit a full backswing and follow-through.</div>
+          <div class="alt"><strong>Easier option:</strong> Just do 5 forward lunges each leg if the rotation is too much tonight.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MOVEMENT SCREEN -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">Block 2 · Movement Screen</div>
+      <div class="block-title">Find the Weak Links</div>
+      <div class="block-meta">10 minutes</div>
+    </div>
+    <div class="block-body">
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex5">
+          <div>
+            <div class="ex-name">Single-leg balance (eyes open)</div>
+            <div class="ex-spec">30 sec each leg</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex5">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex5">
+          <strong>How:</strong>
+          <ol>
+            <li>Stand barefoot or in socks on a flat floor.</li>
+            <li>Lift one foot off the ground — knee bent, foot held about 6 inches up.</li>
+            <li>Look at a fixed point on the wall in front of you.</li>
+            <li>Time how long you can hold steady without putting the foot down OR catching yourself with the wall/furniture.</li>
+            <li>If you make 30 seconds clean, you're good — stop there. Otherwise, record what you got.</li>
+            <li>Switch legs.</li>
+          </ol>
+          <div class="tip"><strong>Why golfers care:</strong> The downswing requires shifting your weight onto your lead leg and rotating around it. Poor single-leg balance = unstable contact and inconsistent strikes.</div>
+        </div>
+        <div class="ex-record">
+          <div><label>L leg (sec)</label><input type="text" id="bal_l" placeholder="30+ ok"></div>
+          <div><label>R leg (sec)</label><input type="text" id="bal_r" placeholder="30+ ok"></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex6">
+          <div>
+            <div class="ex-name">Overhead reach test (wall test)</div>
+            <div class="ex-spec">Hold 15 sec</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex6">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex6">
+          <strong>How:</strong>
+          <ol>
+            <li>Stand with your back against a wall. Heels about 6 inches out from the wall.</li>
+            <li>Press your lower back flat against the wall (no gap behind it). Keep it flat the whole test.</li>
+            <li>Raise both arms straight up overhead, palms facing each other.</li>
+            <li>Try to touch the backs of your hands to the wall above your head WITHOUT letting your lower back come off the wall.</li>
+            <li>Hold 15 seconds. Note any restriction.</li>
+          </ol>
+          <div class="tip"><strong>What it tells us:</strong> If your lower back arches off the wall when arms go up, you have tight lats or shoulders compensating. Common in tall golfers. Fixable, but we need to know it's there.</div>
+        </div>
+        <div class="ex-record">
+          <div class="full"><label>Notes</label><input type="text" id="oh_notes" placeholder="e.g. back arches, hands don't touch"></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex7">
+          <div>
+            <div class="ex-name">Plank hold</div>
+            <div class="ex-spec">Max time — cap at 90 sec</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex7">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex7">
+          <strong>How:</strong>
+          <ol>
+            <li>Get on the floor in a forearm plank position: forearms flat, elbows directly under shoulders, toes on the ground, body in a straight line from head to heels.</li>
+            <li>Squeeze your glutes and brace your core (like someone's about to punch your stomach).</li>
+            <li>Hold. Time it.</li>
+            <li><strong>Stop when form breaks</strong> — hips sag down OR pike up toward the ceiling. Don't grind through bad form.</li>
+            <li>Cap at 90 seconds even if you can go longer. We're assessing, not testing limits.</li>
+          </ol>
+          <div class="tip"><strong>What it tells us:</strong> Plank time reflects core endurance, which stabilizes the spine during the swing. A weak core leaks power and causes back pain.</div>
+        </div>
+        <div class="ex-record">
+          <div class="full"><label>Hold time (sec)</label><input type="text" id="plank" placeholder="e.g. 60"></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex8">
+          <div>
+            <div class="ex-name">Pushups (max in one set)</div>
+            <div class="ex-spec">Stop at form failure or 25</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex8">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex8">
+          <strong>How:</strong>
+          <ol>
+            <li>Start in a high plank: hands directly under shoulders, body in a straight line, core braced.</li>
+            <li>Lower yourself by bending elbows — they should track at about 45° from your body, not flared out wide.</li>
+            <li>Lower until your chest is about a fist's width from the floor.</li>
+            <li>Press back up. That's 1 rep.</li>
+            <li>Count reps. Stop when form breaks (hips sag, chest doesn't get low enough) OR when you hit 25.</li>
+          </ol>
+          <div class="alt"><strong>Easier option (record this):</strong> Drop to knees instead of toes. Same motion, easier load. Just note "knee" in the type field.</div>
+          <div class="tip"><strong>What it tells us:</strong> Upper body pressing strength. We don't need bodybuilder numbers — we need enough to support a stable upper body through the swing.</div>
+        </div>
+        <div class="ex-record">
+          <div><label>Reps</label><input type="text" id="pushups" placeholder="e.g. 18"></div>
+          <div><label>Type</label><input type="text" id="pushup_type" placeholder="full / knee"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ROTATION -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">Block 3 · Rotational</div>
+      <div class="block-title">Golf-Specific Movements</div>
+      <div class="block-meta">10 minutes · Light intensity</div>
+    </div>
+    <div class="block-body">
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex9">
+          <div>
+            <div class="ex-name">Med ball chest pass to wall</div>
+            <div class="ex-spec">2 sets × 8 reps, 6-lb ball</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex9">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex9">
+          <strong>How:</strong>
+          <ol>
+            <li>Find an open wall (concrete, brick, or garage door work; avoid drywall — it'll dent).</li>
+            <li>Stand 3-4 feet from the wall, feet shoulder-width apart.</li>
+            <li>Hold the 6-lb medicine ball with both hands at your chest, elbows out.</li>
+            <li>Throw the ball HARD straight into the wall (chest-pass style, like a basketball).</li>
+            <li>Catch the ball on the rebound at your chest.</li>
+            <li>That's 1 rep. Do 8 reps. Rest 60 seconds. Do another set of 8.</li>
+          </ol>
+          <div class="tip"><strong>Tonight only:</strong> ~70% effort. We're priming the pattern, not maxing out. Save the real power for later in the week.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex10">
+          <div>
+            <div class="ex-name">Med ball rotational throw</div>
+            <div class="ex-spec">2 sets × 6 each side, 70% effort</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex10">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex10">
+          <strong>This is the most golf-specific exercise we have:</strong>
+          <ol>
+            <li>Stand sideways to a sturdy wall (right shoulder pointing at the wall to start).</li>
+            <li>Position yourself about 3-4 feet from the wall.</li>
+            <li>Feet shoulder-width apart, knees soft.</li>
+            <li>Hold the 6-lb medicine ball with both hands at your right hip.</li>
+            <li>Quickly rotate your torso toward the wall (like swinging a baseball bat) and throw the ball HARD into the wall.</li>
+            <li>Catch the ball on rebound. Reset to starting position at the right hip.</li>
+            <li>Do 6 reps on the right side. Then turn around (left shoulder to wall) and do 6 on the left.</li>
+            <li>Rest 60 seconds. Do one more set each side.</li>
+          </ol>
+          <div class="tip"><strong>Key form points:</strong> Drive with your hips first, then the torso, then the arms — same sequence as the golf swing. Keep your eyes on the wall, not the ball.</div>
+          <div class="alt"><strong>Tonight only:</strong> 70% effort. We're learning the movement, not chasing power yet.</div>
+        </div>
+        <div class="ex-record">
+          <div class="full"><label>How did it feel? Any side stronger?</label><input type="text" id="rot_feel" placeholder="e.g. left side felt weaker"></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex11">
+          <div>
+            <div class="ex-name">Goblet squat</div>
+            <div class="ex-spec">2 sets × 8 reps, 15-lb dumbbell</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex11">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex11">
+          <strong>How:</strong>
+          <ol>
+            <li>Hold ONE 15-lb dumbbell vertically against your chest with both hands cupping the top end (so it's "hanging" in front of you like a goblet).</li>
+            <li>Keep elbows pointing down, dumbbell tight to your chest.</li>
+            <li>Feet shoulder-width apart, toes slightly turned out.</li>
+            <li>Squat down — sit back into your hips, keep chest up, knees track over toes.</li>
+            <li>Go as deep as you can with good form (ideally thighs parallel or lower).</li>
+            <li>Drive through heels to stand up. That's 1 rep.</li>
+            <li>Do 8 reps. Rest 90 seconds. Do another set of 8.</li>
+          </ol>
+          <div class="tip"><strong>Tonight is a feel-out set.</strong> If 15-lb feels heavy with bad form, drop to a 5-lb and note it. If it's easy, that tells us you need more weight in Week 1.</div>
+        </div>
+        <div class="ex-record">
+          <div><label>Weight used</label><input type="text" id="goblet_wt" placeholder="15-lb"></div>
+          <div><label>Felt</label><input type="text" id="goblet_feel" placeholder="easy/med/hard"></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex12">
+          <div>
+            <div class="ex-name">Band gym — light rotational pull</div>
+            <div class="ex-spec">1 set × 10 each side, lightest band</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex12">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex12">
+          <strong>Setting up the band gym (LalaHigh):</strong>
+          <ol>
+            <li>Set the platform down on the floor.</li>
+            <li>Attach the LIGHTEST band/resistance level only — tonight is about learning the device, not loading it up.</li>
+            <li>Stand on the platform with both feet to anchor it.</li>
+            <li>Hold the bar with both hands at hip height, parallel to the floor.</li>
+          </ol>
+          <strong>The exercise:</strong>
+          <ol>
+            <li>Stand sideways on the platform (right hip facing forward).</li>
+            <li>Hold the bar with both hands at your right hip.</li>
+            <li>Rotate your torso to the LEFT — pulling the bar across your body to your left side, like swinging a club through impact.</li>
+            <li>Slow return back to the right hip. That's 1 rep.</li>
+            <li>10 reps. Then turn around and do 10 from the left side rotating right.</li>
+          </ol>
+          <div class="tip"><strong>If anything feels weird or unstable about the band setup, stop and note it.</strong> Better to figure out the equipment now than mid-workout later this week.</div>
+        </div>
+        <div class="ex-record">
+          <div class="full"><label>Setup notes (what worked, what didn't)</label><input type="text" id="band_notes" placeholder="e.g. used 1 band, bar at hip"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COOLDOWN -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">Block 4 · Cooldown</div>
+      <div class="block-title">Reset for Tomorrow</div>
+      <div class="block-meta">5 minutes</div>
+    </div>
+    <div class="block-body">
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex13">
+          <div>
+            <div class="ex-name">Hip flexor stretch</div>
+            <div class="ex-spec">30 sec each side</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex13">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex13">
+          <strong>How:</strong>
+          <ol>
+            <li>Kneel on your right knee with your left foot flat on the ground in front of you (90° lunge position).</li>
+            <li>Cushion the right knee with a folded towel if it's uncomfortable.</li>
+            <li>Squeeze your right glute, tuck your pelvis under (like pulling your belt buckle up toward your ribs).</li>
+            <li>Gently push your hips forward until you feel a stretch in the front of the right hip/thigh.</li>
+            <li>Hold 30 seconds. Switch legs.</li>
+          </ol>
+          <div class="tip"><strong>Why golfers need this:</strong> Tight hip flexors limit hip rotation and force your lower back to do the work. Common in anyone who sits a lot.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex14">
+          <div>
+            <div class="ex-name">Doorway pec stretch</div>
+            <div class="ex-spec">30 sec each side</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex14">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex14">
+          <strong>How:</strong>
+          <ol>
+            <li>Find a doorway. Stand in the opening.</li>
+            <li>Bend your right elbow at 90° and place your forearm flat against the door frame, elbow at shoulder height.</li>
+            <li>Step forward with your right foot through the doorway, keeping the forearm pressed against the frame.</li>
+            <li>You should feel a stretch across the front of your right shoulder and chest.</li>
+            <li>Hold 30 seconds. Switch sides.</li>
+          </ol>
+          <div class="tip"><strong>Why:</strong> Tight pecs round the shoulders forward, killing your turn. This opens them up.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex15">
+          <div>
+            <div class="ex-name">Cat-cow + child's pose</div>
+            <div class="ex-spec">2 minutes total</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex15">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex15">
+          <strong>Cat-cow (8-10 reps, slow):</strong>
+          <ol>
+            <li>Get on your hands and knees. Hands under shoulders, knees under hips.</li>
+            <li><strong>Cow:</strong> Drop your belly toward the floor, lift your chest and chin up, arch your back. Inhale.</li>
+            <li><strong>Cat:</strong> Reverse — round your back toward the ceiling, tuck your chin to chest. Exhale.</li>
+            <li>Slow and smooth, 8-10 reps total.</li>
+          </ol>
+          <strong>Then child's pose (60 seconds):</strong>
+          <ol>
+            <li>From hands-and-knees, sit back onto your heels.</li>
+            <li>Reach your arms forward on the floor. Forehead down on the floor or a pillow.</li>
+            <li>Breathe slow. Hold for ~60 seconds.</li>
+          </ol>
+          <div class="tip"><strong>Why:</strong> Decompresses your spine after a day on the course. Calms the nervous system. Good last move before bed.</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header">
+          <input type="checkbox" class="ex-check" id="ex16">
+          <div>
+            <div class="ex-name">Water + protein within 30 min</div>
+            <div class="ex-spec">16-20 oz water, light protein snack</div>
+          </div>
+        </div>
+        <button class="info-toggle" data-toggle="info_ex16">What counts <span class="chev">▼</span></button>
+        <div class="info-panel" id="info_ex16">
+          <strong>Light protein options:</strong>
+          <ul>
+            <li>Glass of milk or chocolate milk</li>
+            <li>Greek yogurt</li>
+            <li>Protein shake (one scoop with water or milk)</li>
+            <li>Handful of nuts + a piece of fruit</li>
+            <li>Cheese stick + an apple</li>
+            <li>Half a turkey sandwich</li>
+          </ul>
+          <div class="tip"><strong>Why:</strong> You sweated a lot today. Rehydrating + a little protein in the next 30 minutes is the cheapest recovery move there is.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="coach-note">
+    <strong>Self-check before bed:</strong> Sore where? Tight where? Anything hurt (vs. just worked)? Add to "Notes" below before sharing.
+  </div>
+
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">End of session</div>
+      <div class="block-title">Final Notes</div>
+    </div>
+    <div class="block-body">
+      <div class="ex-record" style="margin-left: 0;">
+        <div class="full"><label>Anything that hurt (different from "just worked hard")</label><input type="text" id="pain_notes" placeholder="e.g. nothing / slight pull in left hip"></div>
+        <div class="full"><label>Overall energy after session (1-10)</label><input type="text" id="energy_after" placeholder="1-10"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-actions">
+  <button class="secondary" onclick="resetAll()">Reset</button>
+  <button onclick="shareResults()">📤 Share Results</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'training_day1_strength';
+  const checkboxes = document.querySelectorAll('.ex-check');
+  const inputs = document.querySelectorAll('input[type=text]');
+  const saveIndicator = document.getElementById('saveIndicator');
+  let saveTimer;
+
+  // Info toggle behavior
+  document.querySelectorAll('.info-toggle').forEach(btn => {
+    const labelNode = btn.firstChild;
+    const originalLabel = labelNode.nodeValue;
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.toggle;
+      const panel = document.getElementById(id);
+      const isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      labelNode.nodeValue = isOpen ? 'Hide ' : originalLabel;
+    });
+  });
+
+  function autoSave() {
+    const data = {};
+    checkboxes.forEach(c => data[c.id] = c.checked);
+    inputs.forEach(i => data[i.id] = i.value);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      saveIndicator.classList.add('visible');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveIndicator.classList.remove('visible'), 1200);
+    } catch(e) {}
+  }
+
+  function loadData() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      Object.keys(data).forEach(key => {
+        const el = document.getElementById(key);
+        if (!el) return;
+        if (el.type === 'checkbox') {
+          el.checked = data[key];
+          if (data[key]) el.closest('.exercise').style.opacity = '0.55';
+        } else {
+          el.value = data[key];
+        }
+      });
+    } catch(e) {}
+  }
+
+  function resetAll() {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    checkboxes.forEach(c => {
+      c.checked = false;
+      c.closest('.exercise').style.opacity = '1';
+    });
+    inputs.forEach(i => i.value = '');
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  }
+
+  function buildSummary() {
+    const v = id => {
+      const el = document.getElementById(id);
+      return (el && el.value) ? el.value : '-';
+    };
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    let s = '';
+    s += 'STRENGTH ASSESSMENT — ' + today + '\n';
+    s += '===================================\n\n';
+    s += 'MOVEMENT SCREEN\n';
+    s += '  Single-leg balance L: ' + v('bal_l') + ' sec\n';
+    s += '  Single-leg balance R: ' + v('bal_r') + ' sec\n';
+    s += '  Overhead reach notes: ' + v('oh_notes') + '\n';
+    s += '  Plank hold: ' + v('plank') + ' sec\n';
+    s += '  Pushups: ' + v('pushups') + ' (' + v('pushup_type') + ')\n\n';
+    s += 'ROTATIONAL\n';
+    s += '  Rotational throw feel: ' + v('rot_feel') + '\n';
+    s += '  Goblet squat: ' + v('goblet_wt') + ' — felt ' + v('goblet_feel') + '\n';
+    s += '  Band gym notes: ' + v('band_notes') + '\n\n';
+    s += 'END NOTES\n';
+    s += '  Pain/discomfort: ' + v('pain_notes') + '\n';
+    s += '  Energy after: ' + v('energy_after') + ' / 10\n';
+
+    // Check completion
+    const done = Array.from(checkboxes).filter(c => c.checked).length;
+    s += '\nExercises completed: ' + done + ' / ' + checkboxes.length + '\n';
+
+    return s;
+  }
+
+  async function shareResults() {
+    const text = buildSummary();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Strength Assessment Results', text: text });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('✓ Copied to clipboard.\n\nPaste into Messages, Mail, or Notes to send to Dad.');
+        return;
+      } catch(e) {}
+    }
+    showFallback(text);
+  }
+
+  function showFallback(text) {
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
+  }
+
+  checkboxes.forEach(c => {
+    c.addEventListener('change', () => {
+      c.closest('.exercise').style.opacity = c.checked ? '0.55' : '1';
+      autoSave();
+    });
+  });
+  inputs.forEach(i => {
+    i.addEventListener('input', autoSave);
+  });
+
+  loadData();
+</script>
+
+</body>
+</html>

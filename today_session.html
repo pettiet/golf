@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 — Baseline Assessment</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #2ea043;
+    --accent-dim: #1f6f33;
+    --warn: #d29922;
+    --header-grad: linear-gradient(135deg, #1f6f33 0%, #0d3018 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 100px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header {
+    background: var(--header-grad);
+    padding: 16px 20px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  header h1 { font-size: 22px; font-weight: 700; }
+  header .sub { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 6px; }
+  .progress-wrap { margin-top: 14px; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; height: 6px; }
+  .progress-bar { background: #4ade80; height: 100%; width: 0%; transition: width 0.3s ease; }
+  .progress-text { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 6px; display: flex; justify-content: space-between; }
+  .save-indicator { font-size: 11px; color: rgba(255,255,255,0.6); opacity: 0; transition: opacity 0.3s; }
+  .save-indicator.visible { opacity: 1; }
+
+  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  .summary-card, .station {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .summary-card { padding: 16px; margin-bottom: 20px; }
+  .summary-card h2 { font-size: 13px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .summary-card p { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+  .summary-card p:last-child { margin-bottom: 0; }
+  .summary-card strong { color: var(--text); }
+
+  .station-header {
+    padding: 14px 16px;
+    background: linear-gradient(180deg, rgba(46,160,67,0.08) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .station-num { font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+  .station-title { font-size: 17px; font-weight: 700; margin-top: 2px; }
+  .station-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .station-body { padding: 14px 16px; }
+  .station-body > p { font-size: 14px; color: var(--text-dim); margin-bottom: 10px; }
+
+  .check-block { padding: 10px 0; border-bottom: 1px solid rgba(48,54,61,0.5); }
+  .check-block:last-child { border-bottom: none; }
+
+  .check-row { display: flex; align-items: flex-start; gap: 12px; }
+  .check-row input[type=checkbox] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    margin-top: 1px;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    background: transparent;
+  }
+  .check-row input[type=checkbox]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check-row input[type=checkbox]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -2px; left: 3px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .check-label { font-size: 15px; flex: 1; cursor: pointer; }
+  .check-row.done .check-label { color: var(--text-dim); text-decoration: line-through; }
+
+  .info-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 32px;
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .info-toggle:active { background: var(--card-hover); }
+  .info-toggle .chev { transition: transform 0.2s; display: inline-block; font-size: 9px; }
+  .info-toggle.open .chev { transform: rotate(180deg); }
+
+  .info-panel {
+    display: none;
+    margin-left: 32px;
+    margin-top: 8px;
+    background: rgba(46,160,67,0.05);
+    border-left: 2px solid var(--accent-dim);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .info-panel.open { display: block; }
+  .info-panel strong { color: var(--text); }
+  .info-panel ol, .info-panel ul { padding-left: 18px; margin: 6px 0; }
+  .info-panel li { margin-bottom: 4px; }
+  .info-panel .tip {
+    color: #fcd34d;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  .record-box {
+    background: rgba(46,160,67,0.06);
+    border: 1px dashed var(--accent-dim);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 10px 0 0 32px;
+  }
+  .record-box label { display: block; font-size: 12px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .record-box input, .record-box textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .record-box textarea { min-height: 60px; resize: vertical; }
+  .record-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-left: 32px; margin-top: 10px; }
+  .record-row .record-box { margin: 0; }
+
+  .callout {
+    background: rgba(210,153,34,0.08);
+    border-left: 3px solid var(--warn);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin: 10px 0;
+    font-size: 13px;
+    color: #f0d27a;
+  }
+  .coach-note {
+    background: rgba(46,160,67,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin: 10px 0;
+    font-size: 13px;
+    color: #a0d9b0;
+    font-style: italic;
+  }
+  .coach-note strong { font-style: normal; color: var(--accent); }
+
+  .reflect-card .record-box { margin: 0 0 10px 0; }
+  .reflect-card .record-box:last-child { margin-bottom: 0; }
+
+  .footer-actions {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .footer-actions button {
+    flex: 1;
+    max-width: 220px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .footer-actions button.secondary {
+    background: var(--card-hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+    max-width: 100px;
+    flex: 0 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Hub</a>
+
+<header>
+  <div class="label">Week 0 · Day 1</div>
+  <h1>Baseline Assessment</h1>
+  <div class="sub">Afternoon · ~2 hrs · Range &amp; Short Game</div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-text">
+    <span id="progressText">0 of 0 complete</span>
+    <span class="save-indicator" id="saveIndicator">✓ Saved</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="summary-card">
+    <h2>Today's Mission</h2>
+    <p><strong>This is NOT a normal practice session.</strong> The goal today is to <strong>collect baseline data</strong> — not to fix anything, not to grind, not to beat balls. You're a scout gathering intel on your own game.</p>
+    <p>Record honest numbers. The plan we build all summer depends on what you write down today.</p>
+    <p style="margin-top: 10px;"><strong>Tap "How to" under any exercise</strong> if you need a step-by-step breakdown.</p>
+  </div>
+
+  <div class="callout">
+    <strong>⚠ Heat protocol:</strong> 32+ oz water, electrolytes, hat, sunscreen. Drink steadily, not just when thirsty.
+  </div>
+
+  <!-- STATION 1: WARMUP -->
+  <div class="station">
+    <div class="station-header">
+      <div class="station-num">Station 1</div>
+      <div class="station-title">Warmup</div>
+      <div class="station-meta">10 minutes · Putting Green</div>
+    </div>
+    <div class="station-body">
+      <p>Start every session here. Wake up the body, calibrate feel.</p>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c1"><label class="check-label" for="c1">Dynamic stretches: leg swings, arm circles, torso rotations, hip openers</label>
+        </div>
+        <button class="info-toggle" data-toggle="i1">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i1">
+          <strong>About 3-4 min total:</strong>
+          <ol>
+            <li><strong>Leg swings — 10 each leg, each direction.</strong> Stand next to a fence or post for balance. Swing one leg forward and back like a pendulum, then side to side. Switch legs.</li>
+            <li><strong>Arm circles — 10 forward, 10 backward.</strong> Both arms out to your sides, make slow controlled circles. Start small, get bigger.</li>
+            <li><strong>Torso rotations — 10 each side.</strong> Stand tall, hold a club across your chest. Rotate as far as you can each direction.</li>
+            <li><strong>Hip openers — 5 each side.</strong> Lift your knee up to waist height, then rotate it open to the side like opening a gate. Switch legs.</li>
+          </ol>
+          <div class="tip"><strong>Why:</strong> Cold muscles tear. This wakes everything up safely and gets the rotational range of motion you need for the swing.</div>
+        </div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c2"><label class="check-label" for="c2">20 short putts (3-6 ft) — just feel the roll, no scoring</label>
+        </div>
+        <button class="info-toggle" data-toggle="i2">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i2">
+          <strong>What to do:</strong>
+          <ul>
+            <li>Drop a few balls 3-6 feet from any hole.</li>
+            <li>Putt them. Don't keep score. Don't analyze stroke mechanics.</li>
+            <li>Goal: feel the green speed, hear the ball drop, get your putter moving freely.</li>
+          </ul>
+          <div class="tip"><strong>Why:</strong> Calibrates your touch before the actual test in Station 2.</div>
+        </div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c3"><label class="check-label" for="c3">10 lag putts from 30+ ft — feel only</label>
+        </div>
+        <button class="info-toggle" data-toggle="i3">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i3">
+          <strong>What to do:</strong>
+          <ul>
+            <li>Move to a spot at least 30 feet from a hole.</li>
+            <li>Putt 10 balls. Try to die them in.</li>
+            <li>No scoring, no counting. Just feel the distance.</li>
+          </ul>
+          <div class="tip"><strong>Why:</strong> Long putt feel is the hardest thing to dial in cold. Better to spend 2 minutes here than 3-putt the first hole of every round.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATION 2: PUTTING -->
+  <div class="station">
+    <div class="station-header">
+      <div class="station-num">Station 2</div>
+      <div class="station-title">Putting Baseline</div>
+      <div class="station-meta">20 minutes · Putting Green</div>
+    </div>
+    <div class="station-body">
+      <p>Measure where you actually are. Use one ball, hole it out style — like the course.</p>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c4"><label class="check-label" for="c4"><strong>3-foot test:</strong> 10 putts from 3 ft (clock face). Count makes.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i4">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i4">
+          <strong>The "clock face" drill:</strong>
+          <ol>
+            <li>Pick a hole. Place a tee or ball-marker 3 feet away at the 12 o'clock position.</li>
+            <li>Place markers at 3, 6, and 9 o'clock — all exactly 3 feet from the hole.</li>
+            <li>You now have a clock face around the hole at 3 ft.</li>
+            <li>Putt one ball from each position. Do it twice around plus 2 extras to hit 10 total.</li>
+            <li>Full pre-shot routine each time. Count how many of 10 you make.</li>
+          </ol>
+          <div class="tip"><strong>Why 3 feet:</strong> These are the "must makes." A tour pro makes ~96% of these. Every miss inside 5 feet is a stroke given away.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>3-ft makes (out of 10)</label>
+        <input type="number" id="putt3" max="10" placeholder="e.g. 8">
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c5"><label class="check-label" for="c5"><strong>6-foot test:</strong> 10 putts from 6 ft (clock face). Count makes.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i5">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i5">
+          <strong>Same idea, longer:</strong>
+          <ol>
+            <li>Set up a 6-foot clock face — markers at 12, 3, 6, 9 o'clock.</li>
+            <li>10 putts total, one ball at a time, full routine.</li>
+            <li>Count makes.</li>
+          </ol>
+          <div class="tip"><strong>Why 6 feet:</strong> This is the "make-or-break" range. Tour pros make ~70% from here. This is where putters become magicians or end up in the trees.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>6-ft makes (out of 10)</label>
+        <input type="number" id="putt6" max="10" placeholder="e.g. 5">
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c6"><label class="check-label" for="c6"><strong>Lag test:</strong> 5 putts each from 20ft, 30ft, 40ft. Goal: leave inside 3 ft.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i6">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i6">
+          <strong>What to do:</strong>
+          <ol>
+            <li>Pace off 20 feet from a hole. (One pace ≈ 3 feet for most people.)</li>
+            <li>Hit 5 putts. For each one, look at how close it stopped to the hole. Count how many stopped within a 3-foot radius (about half a putter length).</li>
+            <li>Move to 30 feet. Repeat. Then 40 feet.</li>
+            <li>Total: 15 putts. Write the number that finished inside 3 ft.</li>
+          </ol>
+          <div class="tip"><strong>Why:</strong> Lag putting is about distance control, not aim. Three-putts almost always come from leaving the first putt outside 3 feet.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>Lag putts inside 3 ft (out of 15)</label>
+        <input type="number" id="puttLag" max="15" placeholder="e.g. 10">
+      </div>
+
+      <div class="coach-note">
+        <strong>Coach's note:</strong> Don't compare yourself to tour numbers yet — just record honestly. We need the truth to build the plan.
+      </div>
+    </div>
+  </div>
+
+  <!-- STATION 3: SHORT GAME -->
+  <div class="station">
+    <div class="station-header">
+      <div class="station-num">Station 3</div>
+      <div class="station-title">Short Game Baseline</div>
+      <div class="station-meta">30 minutes · Chipping Green</div>
+    </div>
+    <div class="station-body">
+      <p>The scoring zone. 60% of strokes happen inside 100 yds. We need to know where you stand here more than anywhere else.</p>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c7"><label class="check-label" for="c7"><strong>10 standard chips</strong> from just off the green. Count how many land within 3 ft of the hole.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i7">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i7">
+          <strong>What to do:</strong>
+          <ol>
+            <li>Find a flat spot 10-15 feet off the edge of the green. Pick a hole that's about 20-30 feet away on the green.</li>
+            <li>Use ONE club for all 10 chips. Pick your 52° (gap wedge) or 56° (sand wedge).</li>
+            <li>Hit 10 chips. Walk up and look at how close each one finished.</li>
+            <li>Count how many ended within 3 feet of the hole (one putter length is a good visual).</li>
+          </ol>
+          <div class="tip"><strong>Why one club:</strong> We're measuring your current chipping reliability, not testing variety. Variety comes later.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>Chips inside 3 ft (out of 10)</label>
+        <input type="number" id="chip" max="10" placeholder="e.g. 4">
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c8"><label class="check-label" for="c8"><strong>10 pitches from 30 yds.</strong> Land within 6 ft.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i8">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i8">
+          <strong>Pitching = bigger swing than chipping:</strong>
+          <ol>
+            <li>Pace off 30 yards from a target green (about 30 normal strides).</li>
+            <li>Use your 56° or 60° (lob wedge) — whichever you usually grab from this distance.</li>
+            <li>Hit 10 balls. Full pre-shot routine each time.</li>
+            <li>Count how many finished within 6 feet of your target (about a 2-putter-length radius).</li>
+          </ol>
+          <div class="tip"><strong>Chip vs. pitch:</strong> Chip = low, mostly roll, short swing. Pitch = higher, mostly fly, longer swing. 30 yards is squarely pitch territory.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>30-yd pitches inside 6 ft (out of 10)</label>
+        <input type="number" id="pitch30" max="10" placeholder="e.g. 3">
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c9"><label class="check-label" for="c9"><strong>10 wedges from 50 yds.</strong> Land within 10 ft.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i9">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i9">
+          <strong>What to do:</strong>
+          <ol>
+            <li>Step off 50 yards from a green (about 50 normal strides).</li>
+            <li>Use whichever wedge you'd grab on the course from 50 yards — usually 56° but could be 52° or 60°.</li>
+            <li>Hit 10 balls with full routine.</li>
+            <li>Count how many finished within 10 feet of your target (about 3 putter lengths).</li>
+          </ol>
+          <div class="tip"><strong>Why 50 yards matters:</strong> This is "in-between" distance for most amateurs — not a full swing, not a chip. Getting good here is one of the biggest score-droppers in the game.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>50-yd wedges inside 10 ft (out of 10)</label>
+        <input type="number" id="wedge50" max="10" placeholder="e.g. 4">
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c10"><label class="check-label" for="c10"><strong>5 greenside bunker shots</strong> if a bunker is available.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i10">How to <span class="chev">▼</span></button>
+        <div class="info-panel" id="i10">
+          <strong>What to do:</strong>
+          <ol>
+            <li>Find a practice bunker next to a green.</li>
+            <li>Drop 5 balls in the sand, all from about the same lie (flat if possible).</li>
+            <li>Use your 56° or 58°. Standard greenside splash — hit the sand 2 inches behind the ball.</li>
+            <li>Count how many finished within 10 feet of the target.</li>
+            <li>If there's no bunker available, skip and leave blank.</li>
+          </ol>
+          <div class="tip"><strong>Note:</strong> If you don't usually practice bunker shots, this baseline number might be low. That's fine — it tells us we need to schedule bunker time.</div>
+        </div>
+      </div>
+      <div class="record-box">
+        <label>Bunker shots inside 10 ft (out of 5)</label>
+        <input type="number" id="bunker" max="5" placeholder="e.g. 2">
+      </div>
+    </div>
+  </div>
+
+  <!-- STATION 4: RANGE -->
+  <div class="station">
+    <div class="station-header">
+      <div class="station-num">Station 4</div>
+      <div class="station-title">Range — Distance &amp; Dispersion</div>
+      <div class="station-meta">45 minutes · Driving Range</div>
+    </div>
+    <div class="station-body">
+      <p><strong>Block-style:</strong> 10 quality balls per club. Don't rake-and-rip. Pick a target, full pre-shot routine, hit, evaluate, repeat. We need <em>real</em> distances and miss patterns.</p>
+
+      <button class="info-toggle" data-toggle="iRange" style="margin-left: 0; margin-bottom: 8px;">What "miss pattern" means + how to record <span class="chev">▼</span></button>
+      <div class="info-panel" id="iRange" style="margin-left: 0;">
+        <strong>For each club, record two things:</strong>
+        <ul>
+          <li><strong>Carry distance:</strong> How far the ball flies in the air before hitting the ground. Use the range markers (usually every 25 or 50 yards) to estimate. Take an average across the 10 balls (ignore outliers).</li>
+          <li><strong>Miss pattern:</strong> When you miss your target, which direction? Write one of: <em>left</em>, <em>right</em>, <em>short</em>, <em>long</em>, or a combo like <em>"short-right"</em>. If 7 of 10 missed left, write "mostly left."</li>
+        </ul>
+        <div class="tip"><strong>Why this matters:</strong> Your miss pattern tells me more about your swing than any distance number. Knowing your habitual miss = knowing what's actually wrong.</div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c11"><label class="check-label" for="c11"><strong>Pitching Wedge — 10 balls.</strong></label>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-box"><label>PW Carry (yds)</label><input type="text" id="pw_dist" placeholder="e.g. 110"></div>
+        <div class="record-box"><label>PW Miss</label><input type="text" id="pw_miss" placeholder="e.g. left"></div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c12"><label class="check-label" for="c12"><strong>9-iron — 10 balls.</strong></label>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-box"><label>9i Carry</label><input type="text" id="i9_dist" placeholder="yds"></div>
+        <div class="record-box"><label>9i Miss</label><input type="text" id="i9_miss" placeholder="L/R/S/L"></div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c13"><label class="check-label" for="c13"><strong>7-iron — 10 balls.</strong> This is the bellwether club. Pay close attention.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i13">Why 7-iron? <span class="chev">▼</span></button>
+        <div class="info-panel" id="i13">
+          The 7-iron is golf's bellwether — long enough that swing flaws show up, short enough that most golfers can hit it solidly. How you hit your 7-iron is a strong predictor of how well you swing overall. Pay extra attention to where misses go.
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-box"><label>7i Carry</label><input type="text" id="i7_dist" placeholder="yds"></div>
+        <div class="record-box"><label>7i Miss</label><input type="text" id="i7_miss" placeholder="L/R/S/L"></div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c14"><label class="check-label" for="c14"><strong>5-iron or hybrid — 10 balls.</strong> Whatever you carry in that range.</label>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-box"><label>5i/Hyb Carry</label><input type="text" id="i5_dist" placeholder="yds"></div>
+        <div class="record-box"><label>5i/Hyb Miss</label><input type="text" id="i5_miss" placeholder="L/R/S/L"></div>
+      </div>
+
+      <div class="check-block">
+        <div class="check-row">
+          <input type="checkbox" id="c15"><label class="check-label" for="c15"><strong>Driver — 10 balls.</strong> Don't try to crush. Stock swing.</label>
+        </div>
+        <button class="info-toggle" data-toggle="i15">What's "stock swing"? <span class="chev">▼</span></button>
+        <div class="info-panel" id="i15">
+          <strong>Stock swing = your normal, repeatable, in-the-fairway swing.</strong> Not your "rip it" swing. Not your "show off to your buddies" swing. The swing you'd actually use on the first tee of a tournament. Goal: 10 swings that all look the same. Record where they tend to go.
+          <div class="tip"><strong>Note shape too:</strong> Does it curve right-to-left (draw)? Left-to-right (fade)? Straight? Or a two-way miss?</div>
+        </div>
+      </div>
+      <div class="record-row">
+        <div class="record-box"><label>Driver Carry</label><input type="text" id="dr_dist" placeholder="yds"></div>
+        <div class="record-box"><label>Driver Shape</label><input type="text" id="dr_shape" placeholder="draw/fade/straight"></div>
+      </div>
+
+      <div class="coach-note">
+        <strong>Coach's note:</strong> If you don't know exact carry distances, that's the #1 data gap to fix this summer. Today, eyeball it from the range markers.
+      </div>
+    </div>
+  </div>
+
+  <!-- STATION 5: REFLECT -->
+  <div class="station">
+    <div class="station-header">
+      <div class="station-num">Station 5</div>
+      <div class="station-title">Self-Assessment</div>
+      <div class="station-meta">5 minutes · End of session</div>
+    </div>
+    <div class="station-body reflect-card">
+      <p>Before you leave the property. Honest answers.</p>
+
+      <div class="record-box">
+        <label>1. What part of your game felt the BEST today?</label>
+        <textarea id="best" placeholder="Putting? Iron play? Wedges?"></textarea>
+      </div>
+      <div class="record-box">
+        <label>2. What part felt the WORST?</label>
+        <textarea id="worst" placeholder="Be honest — this is where we focus."></textarea>
+      </div>
+      <div class="record-box">
+        <label>3. One thing you noticed about your swing or game?</label>
+        <textarea id="noticed" placeholder="Anything — pulled it left, hit it thin, putts breaking..."></textarea>
+      </div>
+      <div class="record-box">
+        <label>4. Energy level (1-10) at end of session</label>
+        <input type="number" id="energy" min="1" max="10" placeholder="1-10">
+      </div>
+
+      <div class="check-block" style="margin-top: 12px;">
+        <div class="check-row">
+          <input type="checkbox" id="c16"><label class="check-label" for="c16">Tap "Share Results" below and send to Dad.</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="coach-note" style="margin-top: 20px;">
+    <strong>After this session:</strong> Light strength assessment tonight (~30 min, separate plan). Tomorrow home course is closed — short game session at the alternate course + home strength. Wednesday is your first tracked round.
+  </div>
+
+</div>
+
+<div class="footer-actions">
+  <button class="secondary" onclick="resetAll()">Reset</button>
+  <button onclick="shareResults()">📤 Share Results</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'training_day1_baseline';
+  const checkboxes = document.querySelectorAll('input[type=checkbox]');
+  const inputs = document.querySelectorAll('input[type=number], input[type=text], textarea');
+  const saveIndicator = document.getElementById('saveIndicator');
+  let saveTimer;
+
+  // Info toggle behavior — robust label swap
+  document.querySelectorAll('.info-toggle').forEach(btn => {
+    const labelNode = btn.firstChild;
+    const originalLabel = labelNode.nodeValue;
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.toggle;
+      const panel = document.getElementById(id);
+      const isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      labelNode.nodeValue = isOpen ? 'Hide ' : originalLabel;
+    });
+  });
+
+  function updateProgress() {
+    const total = checkboxes.length;
+    const done = Array.from(checkboxes).filter(c => c.checked).length;
+    const pct = total ? (done / total) * 100 : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = done + ' of ' + total + ' complete';
+    checkboxes.forEach(c => {
+      c.closest('.check-row').classList.toggle('done', c.checked);
+    });
+  }
+
+  function autoSave() {
+    const data = {};
+    checkboxes.forEach(c => data[c.id] = c.checked);
+    inputs.forEach(i => data[i.id] = i.value);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      saveIndicator.classList.add('visible');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveIndicator.classList.remove('visible'), 1200);
+    } catch (e) {}
+  }
+
+  function loadData() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      Object.keys(data).forEach(key => {
+        const el = document.getElementById(key);
+        if (!el) return;
+        if (el.type === 'checkbox') el.checked = data[key];
+        else el.value = data[key];
+      });
+      updateProgress();
+    } catch(e) {}
+  }
+
+  function resetAll() {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    checkboxes.forEach(c => c.checked = false);
+    inputs.forEach(i => i.value = '');
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    updateProgress();
+  }
+
+  function buildSummary() {
+    const v = id => {
+      const el = document.getElementById(id);
+      return (el && el.value) ? el.value : '-';
+    };
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    let s = '';
+    s += 'BASELINE ASSESSMENT — ' + today + '\n';
+    s += '===================================\n\n';
+    s += 'PUTTING\n';
+    s += '  3-ft makes:    ' + v('putt3') + ' / 10\n';
+    s += '  6-ft makes:    ' + v('putt6') + ' / 10\n';
+    s += '  Lag <3ft:      ' + v('puttLag') + ' / 15\n\n';
+    s += 'SHORT GAME\n';
+    s += '  Chips <3ft:        ' + v('chip') + ' / 10\n';
+    s += '  30yd pitches <6ft: ' + v('pitch30') + ' / 10\n';
+    s += '  50yd wedges <10ft: ' + v('wedge50') + ' / 10\n';
+    s += '  Bunker <10ft:      ' + v('bunker') + ' / 5\n\n';
+    s += 'RANGE — CARRY & MISS\n';
+    s += '  PW:     ' + v('pw_dist') + ' yds — ' + v('pw_miss') + '\n';
+    s += '  9i:     ' + v('i9_dist') + ' yds — ' + v('i9_miss') + '\n';
+    s += '  7i:     ' + v('i7_dist') + ' yds — ' + v('i7_miss') + '\n';
+    s += '  5i/Hyb: ' + v('i5_dist') + ' yds — ' + v('i5_miss') + '\n';
+    s += '  Driver: ' + v('dr_dist') + ' yds — ' + v('dr_shape') + '\n\n';
+    s += 'SELF-ASSESSMENT\n';
+    s += '  Best today: ' + v('best') + '\n';
+    s += '  Worst today: ' + v('worst') + '\n';
+    s += '  Noticed: ' + v('noticed') + '\n';
+    s += '  End energy: ' + v('energy') + ' / 10\n';
+    return s;
+  }
+
+  async function shareResults() {
+    const text = buildSummary();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Baseline Assessment Results', text: text });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('✓ Copied to clipboard.\n\nPaste into Messages, Mail, or Notes to send to Dad.');
+        return;
+      } catch(e) {}
+    }
+    showFallback(text);
+  }
+
+  function showFallback(text) {
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
+  }
+
+  checkboxes.forEach(c => {
+    c.addEventListener('change', () => { updateProgress(); autoSave(); });
+  });
+  inputs.forEach(i => {
+    i.addEventListener('input', autoSave);
+    i.addEventListener('change', autoSave);
+  });
+
+  loadData();
+  updateProgress();
+</script>
+
+</body>
+</html>
