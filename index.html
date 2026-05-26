@@ -17,6 +17,7 @@
     --warn: #f97316;
     --info: #3b82f6;
     --purple: #a855f7;
+    --teal: #14b8a6;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -43,23 +44,9 @@
     background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
     pointer-events: none;
   }
-  header .label {
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 4px;
-  }
-  header h1 {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-  }
-  header .sub {
-    font-size: 14px;
-    color: rgba(255,255,255,0.8);
-    margin-top: 8px;
-  }
+  header .label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  header .sub { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 8px; }
   .countdown {
     margin-top: 16px;
     background: rgba(0,0,0,0.25);
@@ -82,6 +69,50 @@
     font-weight: 600;
   }
   .section-title:first-of-type { margin-top: 4px; }
+
+  .feedback-guide {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .feedback-guide-header {
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .feedback-guide-header strong { font-size: 13px; }
+  .feedback-guide-header .chev { color: var(--text-dim); transition: transform 0.2s; font-size: 12px; }
+  .feedback-guide.open .feedback-guide-header .chev { transform: rotate(180deg); }
+  .feedback-guide-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+  .feedback-guide.open .feedback-guide-body { display: block; }
+
+  .rhythm-row {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    align-items: flex-start;
+  }
+  .rhythm-row:last-child { border-bottom: none; }
+  .rhythm-who {
+    flex-shrink: 0;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 1px;
+  }
+  .rhythm-who.kid { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .rhythm-who.dad { background: rgba(59,130,246,0.15); color: var(--info); }
+  .rhythm-content { flex: 1; font-size: 13px; line-height: 1.5; }
+  .rhythm-content strong { color: var(--text); }
+  .rhythm-content .when { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
 
   .tile {
     display: block;
@@ -112,16 +143,8 @@
     margin-bottom: 4px;
     font-weight: 700;
   }
-  .tile .tile-title {
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .tile .tile-desc {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
+  .tile .tile-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .tile .tile-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
   .tile .tile-meta {
     display: inline-block;
     margin-top: 8px;
@@ -136,24 +159,23 @@
 
   .tile.tracker .tile-label { color: var(--info); }
   .tile.tracker::before { background: var(--info); }
-  .tile.tracker .tile-meta {
-    background: rgba(59,130,246,0.15);
-    color: var(--info);
-  }
+  .tile.tracker .tile-meta { background: rgba(59,130,246,0.15); color: var(--info); }
 
   .tile.strength .tile-label { color: var(--warn); }
   .tile.strength::before { background: var(--warn); }
-  .tile.strength .tile-meta {
-    background: rgba(249,115,22,0.15);
-    color: var(--warn);
-  }
+  .tile.strength .tile-meta { background: rgba(249,115,22,0.15); color: var(--warn); }
 
   .tile.week .tile-label { color: var(--purple); }
   .tile.week::before { background: var(--purple); }
-  .tile.week .tile-meta {
-    background: rgba(168,85,247,0.15);
-    color: var(--purple);
-  }
+  .tile.week .tile-meta { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+  .tile.notes .tile-label { color: var(--purple); }
+  .tile.notes::before { background: var(--purple); }
+  .tile.notes .tile-meta { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+  .tile.review .tile-label { color: var(--teal); }
+  .tile.review::before { background: var(--teal); }
+  .tile.review .tile-meta { background: rgba(20,184,166,0.15); color: var(--teal); }
 
   .footer-note {
     margin-top: 24px;
@@ -173,11 +195,56 @@
 <header>
   <div class="label">Training Hub</div>
   <h1>Summer 2026</h1>
-  <div class="sub">Daily plans · Round tracker · Strength</div>
+  <div class="sub">Daily plans · Tracker · Notes · Reviews</div>
   <div class="countdown" id="countdown"></div>
 </header>
 
 <div class="container">
+
+  <!-- FEEDBACK RHYTHM GUIDE -->
+  <div class="feedback-guide" id="feedbackGuide">
+    <div class="feedback-guide-header" onclick="document.getElementById('feedbackGuide').classList.toggle('open')">
+      <strong>📋 Feedback rhythm — when to submit what</strong>
+      <span class="chev">▼</span>
+    </div>
+    <div class="feedback-guide-body">
+      <div class="rhythm-row">
+        <span class="rhythm-who kid">KID</span>
+        <div class="rhythm-content">
+          <strong>Round Tracker — after EVERY round.</strong>
+          <div class="when">Within 30 min of finishing. Hit Share when done.</div>
+        </div>
+      </div>
+      <div class="rhythm-row">
+        <span class="rhythm-who kid">KID</span>
+        <div class="rhythm-content">
+          <strong>Session Notes — 2-3 times per week.</strong>
+          <div class="when">After tracked rounds + any session that felt notably good or bad. NOT every session.</div>
+        </div>
+      </div>
+      <div class="rhythm-row">
+        <span class="rhythm-who kid">KID</span>
+        <div class="rhythm-content">
+          <strong>Week 0 checkboxes — as you go.</strong>
+          <div class="when">Auto-saves. Just keeps the day organized.</div>
+        </div>
+      </div>
+      <div class="rhythm-row">
+        <span class="rhythm-who dad">DAD</span>
+        <div class="rhythm-content">
+          <strong>Weekly Review — Sunday night.</strong>
+          <div class="when">Once per week. Bundles everything for Claude. Plan next week from this.</div>
+        </div>
+      </div>
+      <div class="rhythm-row">
+        <span class="rhythm-who dad">DAD</span>
+        <div class="rhythm-content">
+          <strong>Mid-week — only if something changes.</strong>
+          <div class="when">Injury, equipment issue, schedule change, or red flag from his notes. Otherwise wait for Sunday.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="section-title">This Week</div>
 
@@ -188,54 +255,63 @@
     <span class="tile-meta">View Daily Plans</span>
   </a>
 
-  <div class="section-title">Tools</div>
+  <div class="section-title">Daily Tools (Kid)</div>
 
   <a href="round_tracker.html" class="tile tracker">
     <div class="tile-label">Round Tracker</div>
-    <div class="tile-title">Post-Round Entry Form</div>
-    <div class="tile-desc">Use after every round — practice or tournament. Auto-saves as you type. Share when done.</div>
-    <span class="tile-meta">Use After Every Round</span>
+    <div class="tile-title">Post-Round Entry</div>
+    <div class="tile-desc">Use after every round. Home course preset buttons auto-fill pars and yardages.</div>
+    <span class="tile-meta">After Every Round</span>
   </a>
 
-  <div class="section-title">Reference (Completed)</div>
+  <a href="session_notes.html" class="tile notes">
+    <div class="tile-label">Session Notes</div>
+    <div class="tile-title">Quick Post-Session Notes</div>
+    <div class="tile-desc">Rate, reflect, share. Use after meaningful sessions — 2-3 times per week.</div>
+    <span class="tile-meta">After Key Sessions</span>
+  </a>
+
+  <div class="section-title">Weekly (Dad)</div>
+
+  <a href="weekly_review.html" class="tile review">
+    <div class="tile-label">Weekly Review</div>
+    <div class="tile-title">Bundle &amp; Send to Coach</div>
+    <div class="tile-desc">Sunday night: combines rounds, notes, and your observations into one message for Claude.</div>
+    <span class="tile-meta">Sundays</span>
+  </a>
+
+  <div class="section-title">Reference</div>
 
   <a href="today_session.html" class="tile">
     <div class="tile-label">Day 1 Baseline · Done</div>
     <div class="tile-title">Baseline Assessment</div>
-    <div class="tile-desc">The original baseline session from May 25. Data captured.</div>
+    <div class="tile-desc">Original baseline session from May 25.</div>
   </a>
 
   <a href="strength_assessment.html" class="tile strength">
     <div class="tile-label">Day 1 Strength · Done</div>
     <div class="tile-title">Strength Assessment</div>
-    <div class="tile-desc">Movement screen results from May 25 evening.</div>
+    <div class="tile-desc">Movement screen results from May 25.</div>
   </a>
 
   <div class="footer-note">
-    <strong>How to use this site:</strong> Tap any tile to open. Your progress is saved automatically on your phone. To install as an app: Share → Add to Home Screen.
+    <strong>How to use this site:</strong> Tap any tile to open. Progress saves automatically. To install as an app: Share → Add to Home Screen.
   </div>
 
 </div>
 
 <script>
-  // Tournament countdown
   const tournamentDate = new Date('2026-06-02T07:00:00');
   function updateCountdown() {
     const now = new Date();
     const diff = tournamentDate - now;
     const el = document.getElementById('countdown');
     if (!el) return;
-    if (diff <= 0) {
-      el.innerHTML = '🏌️ Tournament is today!';
-      return;
-    }
+    if (diff <= 0) { el.innerHTML = '🏌️ Tournament is today!'; return; }
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    if (days > 0) {
-      el.innerHTML = '<strong>' + days + '</strong> day' + (days === 1 ? '' : 's') + ' until the tournament course';
-    } else {
-      el.innerHTML = '<strong>' + hours + '</strong> hours until the tournament course';
-    }
+    if (days > 0) el.innerHTML = '<strong>' + days + '</strong> day' + (days === 1 ? '' : 's') + ' until tournament';
+    else el.innerHTML = '<strong>' + hours + '</strong> hours until tournament';
   }
   updateCountdown();
   setInterval(updateCountdown, 60000);

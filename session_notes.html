@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Notes</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #2ea043;
+    --accent-dim: #1f6f33;
+    --info: #3b82f6;
+    --warn: #d29922;
+    --header-grad: linear-gradient(135deg, #6d28d9 0%, #2e1065 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 100px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header {
+    background: var(--header-grad);
+    padding: 16px 16px 22px;
+  }
+  header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.9); margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .save-indicator { font-size: 11px; color: rgba(255,255,255,0.7); opacity: 0; transition: opacity 0.3s; }
+  .save-indicator.visible { opacity: 1; }
+
+  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  .when-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .when-card h2 { font-size: 12px; color: #c4b5fd; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .when-card .when-list { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+  .when-card .when-list strong { color: var(--text); }
+  .when-card .when-list .yes { color: #4ade80; font-weight: 600; }
+  .when-card .when-list .no { color: #f87171; font-weight: 600; }
+
+  .selector {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .selector label { color: var(--text-dim); flex-shrink: 0; }
+  .selector select {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .selector button {
+    background: #a855f7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .info-card h2 { font-size: 12px; color: #c4b5fd; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .field textarea { min-height: 70px; resize: vertical; }
+
+  .rating-group {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .rating-group input[type=radio] { display: none; }
+  .rating-group label {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 0;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    transition: all 0.15s;
+  }
+  .rating-group input[type=radio]:checked + label {
+    background: #a855f7;
+    border-color: #a855f7;
+    color: white;
+  }
+  .rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    padding: 0 4px;
+  }
+
+  .footer-actions {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .footer-actions button {
+    flex: 1;
+    max-width: 220px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .footer-actions button.secondary {
+    background: var(--card-hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+    max-width: 100px;
+    flex: 0 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Hub</a>
+
+<header>
+  <div class="label">Quick Notes</div>
+  <h1>Session Notes</h1>
+  <div class="sub">
+    <span>Quick post-session capture</span>
+    <span class="save-indicator" id="saveIndicator">✓ Saved</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="when-card">
+    <h2>When to use this</h2>
+    <div class="when-list">
+      <p><span class="yes">✓ DO</span> use after:</p>
+      <ul style="padding-left: 24px; margin: 4px 0 10px;">
+        <li>A tracked round (in addition to Round Tracker)</li>
+        <li>A practice session where something felt off</li>
+        <li>A practice session where something clicked</li>
+        <li>A session that didn't match expectations (better or worse)</li>
+      </ul>
+      <p><span class="no">✗ DON'T</span> use after every session — just the meaningful ones. Two or three notes per week is the target.</p>
+    </div>
+  </div>
+
+  <!-- SELECTOR -->
+  <div class="selector">
+    <label>Note:</label>
+    <select id="noteSelect"></select>
+    <button onclick="newNote()">+ New</button>
+  </div>
+
+  <!-- NOTE FORM -->
+  <div class="info-card">
+    <h2>Session Info</h2>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="n_date">
+    </div>
+    <div class="field">
+      <label>Session Type</label>
+      <select id="n_type">
+        <option value="round">Tracked Round</option>
+        <option value="range">Range / Full Swing</option>
+        <option value="short_game">Short Game / Chipping</option>
+        <option value="putting">Putting</option>
+        <option value="strength">Strength</option>
+        <option value="mental">Mental / Indoor</option>
+        <option value="tournament">Tournament</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Brief description (optional)</label>
+      <input type="text" id="n_desc" placeholder="e.g. 40-yd wedge ladder drill">
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h2>How did it go?</h2>
+    <div class="field">
+      <label>Overall feeling (1 = bad, 5 = great)</label>
+      <div class="rating-group">
+        <input type="radio" name="rating" id="r1" value="1"><label for="r1">1</label>
+        <input type="radio" name="rating" id="r2" value="2"><label for="r2">2</label>
+        <input type="radio" name="rating" id="r3" value="3"><label for="r3">3</label>
+        <input type="radio" name="rating" id="r4" value="4"><label for="r4">4</label>
+        <input type="radio" name="rating" id="r5" value="5"><label for="r5">5</label>
+      </div>
+      <div class="rating-labels">
+        <span>bad</span>
+        <span>average</span>
+        <span>great</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h2>The questions</h2>
+    <div class="field">
+      <label>What worked?</label>
+      <textarea id="n_worked" placeholder="What felt good? What did you do well?"></textarea>
+    </div>
+    <div class="field">
+      <label>What didn't work?</label>
+      <textarea id="n_failed" placeholder="What missed? Where did time/strokes get lost?"></textarea>
+    </div>
+    <div class="field">
+      <label>Anything weird, new, or worth flagging?</label>
+      <textarea id="n_flag" placeholder="A new feel? A pain? An equipment issue? Something coach should know?"></textarea>
+    </div>
+    <div class="field">
+      <label>What do you want to work on next?</label>
+      <textarea id="n_next" placeholder="What would help most for tomorrow / this week?"></textarea>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-actions">
+  <button class="secondary" onclick="deleteCurrentNote()">Delete</button>
+  <button onclick="shareNote()">📤 Send to Dad</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'training_session_notes';
+  let notes = {};
+  let currentNoteId = null;
+  let saveTimer;
+  const saveIndicator = document.getElementById('saveIndicator');
+
+  function collectNoteData() {
+    const rating = document.querySelector('input[name="rating"]:checked');
+    return {
+      date: document.getElementById('n_date').value,
+      type: document.getElementById('n_type').value,
+      desc: document.getElementById('n_desc').value,
+      rating: rating ? rating.value : '',
+      worked: document.getElementById('n_worked').value,
+      failed: document.getElementById('n_failed').value,
+      flag: document.getElementById('n_flag').value,
+      next: document.getElementById('n_next').value
+    };
+  }
+
+  function populateForm(data) {
+    document.getElementById('n_date').value = data.date || '';
+    document.getElementById('n_type').value = data.type || 'round';
+    document.getElementById('n_desc').value = data.desc || '';
+    document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
+    if (data.rating) {
+      const r = document.getElementById('r' + data.rating);
+      if (r) r.checked = true;
+    }
+    document.getElementById('n_worked').value = data.worked || '';
+    document.getElementById('n_failed').value = data.failed || '';
+    document.getElementById('n_flag').value = data.flag || '';
+    document.getElementById('n_next').value = data.next || '';
+  }
+
+  function clearForm() {
+    document.querySelectorAll('input, textarea').forEach(i => {
+      if (i.type === 'checkbox' || i.type === 'radio') i.checked = false;
+      else i.value = '';
+    });
+    document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    document.getElementById('n_date').valueAsDate = new Date();
+  }
+
+  function saveAll() {
+    if (!currentNoteId) return;
+    notes[currentNoteId] = collectNoteData();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      saveIndicator.classList.add('visible');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveIndicator.classList.remove('visible'), 1200);
+    } catch(e) {}
+    refreshSelector();
+  }
+
+  function loadAll() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) notes = JSON.parse(saved);
+    } catch(e) { notes = {}; }
+    const ids = Object.keys(notes).sort();
+    if (ids.length === 0) {
+      newNote();
+    } else {
+      currentNoteId = ids[ids.length - 1];
+      populateForm(notes[currentNoteId]);
+      refreshSelector();
+    }
+  }
+
+  function refreshSelector() {
+    const sel = document.getElementById('noteSelect');
+    sel.innerHTML = '';
+    const ids = Object.keys(notes).sort();
+    ids.forEach(id => {
+      const n = notes[id];
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = (n.date || 'no-date') + ' — ' + (n.type || '') + (n.desc ? ' · ' + n.desc.substring(0, 30) : '');
+      if (id === currentNoteId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function newNote() {
+    const id = 'note_' + Date.now();
+    currentNoteId = id;
+    notes[id] = { date: '', type: 'round', desc: '', rating: '', worked: '', failed: '', flag: '', next: '' };
+    clearForm();
+    saveAll();
+  }
+
+  function deleteCurrentNote() {
+    if (!currentNoteId) return;
+    if (!confirm('Delete this note?')) return;
+    delete notes[currentNoteId];
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); } catch(e) {}
+    const ids = Object.keys(notes).sort();
+    if (ids.length === 0) newNote();
+    else {
+      currentNoteId = ids[ids.length - 1];
+      populateForm(notes[currentNoteId]);
+      refreshSelector();
+    }
+  }
+
+  function buildSummary() {
+    const d = collectNoteData();
+    let s = `SESSION NOTE — ${d.date || '-'}\n`;
+    s += `Type: ${d.type} ${d.desc ? '· ' + d.desc : ''}\n`;
+    s += `Rating: ${d.rating || '-'} / 5\n\n`;
+    s += `What worked:\n  ${d.worked || '-'}\n\n`;
+    s += `What didn't:\n  ${d.failed || '-'}\n\n`;
+    s += `Worth flagging:\n  ${d.flag || '-'}\n\n`;
+    s += `Want to work on next:\n  ${d.next || '-'}\n`;
+    return s;
+  }
+
+  async function shareNote() {
+    const text = buildSummary();
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Session Note', text: text }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
+    }
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('✓ Copied. Paste into Messages to send.');
+        return;
+      } catch(e) {}
+    }
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
+  }
+
+  document.querySelectorAll('input, textarea, select').forEach(el => {
+    if (el.id === 'noteSelect') return;
+    el.addEventListener('input', saveAll);
+    el.addEventListener('change', saveAll);
+  });
+
+  document.getElementById('noteSelect').addEventListener('change', (e) => {
+    currentNoteId = e.target.value;
+    if (notes[currentNoteId]) populateForm(notes[currentNoteId]);
+  });
+
+  loadAll();
+</script>
+
+</body>
+</html>

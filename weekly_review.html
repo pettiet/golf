@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Review</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #2ea043;
+    --accent-dim: #1f6f33;
+    --info: #3b82f6;
+    --header-grad: linear-gradient(135deg, #0369a1 0%, #082f49 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 90px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header {
+    background: var(--header-grad);
+    padding: 16px 16px 22px;
+  }
+  header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.9); margin-top: 4px; }
+
+  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  .when-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .when-card h2 { font-size: 12px; color: #7dd3fc; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .when-card .when-list { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+  .when-card .when-list strong { color: var(--text); }
+
+  .data-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .data-card h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .data-card .count {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 4px 0;
+  }
+  .data-card .count.empty { color: var(--text-dim); }
+  .data-card .desc {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .field textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .preview {
+    background: #050810;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.4;
+  }
+
+  .footer-actions {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .footer-actions button {
+    flex: 1;
+    max-width: 280px;
+    background: var(--info);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Hub</a>
+
+<header>
+  <div class="label">For Dad → Coach</div>
+  <h1>Weekly Review</h1>
+  <div class="sub">Sunday night: bundle the week and send</div>
+</header>
+
+<div class="container">
+
+  <div class="when-card">
+    <h2>When to use this</h2>
+    <div class="when-list">
+      <p><strong>Dad uses this once per week — Sunday night.</strong></p>
+      <p>This bundles everything from the week (rounds + session notes + the checkbox completion) into one organized text block.</p>
+      <p>You paste it into Claude (or copy it into the project knowledge) and we use it to design next week's plan.</p>
+      <p style="margin-top: 8px;"><strong>Mid-week emergencies (injury, equipment issue, major schedule change):</strong> Don't wait — message Claude right away.</p>
+    </div>
+  </div>
+
+  <h2 style="font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px;">What we have</h2>
+
+  <div class="data-grid">
+    <div class="data-card">
+      <h3>Rounds</h3>
+      <div class="count" id="roundCount">0</div>
+      <div class="desc" id="roundDesc">No rounds tracked</div>
+    </div>
+    <div class="data-card">
+      <h3>Notes</h3>
+      <div class="count" id="noteCount">0</div>
+      <div class="desc" id="noteDesc">No session notes</div>
+    </div>
+  </div>
+
+  <h2 style="font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px;">Dad's add-ons</h2>
+
+  <div class="data-card">
+    <div class="field">
+      <label>Anything Dad observed (not in the data)</label>
+      <textarea id="dad_observed" placeholder="e.g. He seemed frustrated mid-week. New grip felt weird through Wed but settled by Friday. Mentioned left wrist felt sore after Saturday range session."></textarea>
+    </div>
+    <div class="field">
+      <label>Questions for coach</label>
+      <textarea id="dad_questions" placeholder="e.g. Should we worry about the wrist soreness? Is the lefty miss with irons getting better or worse?"></textarea>
+    </div>
+    <div class="field">
+      <label>Logistics / schedule changes for next week</label>
+      <textarea id="dad_logistics" placeholder="e.g. We're out of town Thursday. Course closed for aerification Wednesday."></textarea>
+    </div>
+  </div>
+
+  <h2 style="font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin: 20px 0 10px;">Preview of what will be sent</h2>
+  <div class="preview" id="preview">Loading...</div>
+
+</div>
+
+<div class="footer-actions">
+  <button onclick="shareBundle()">📤 Send Full Bundle to Claude</button>
+</div>
+
+<script>
+  function getWeekRange() {
+    // Default: last 7 days
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 7);
+    return { start, end };
+  }
+
+  function loadRounds() {
+    try {
+      return JSON.parse(localStorage.getItem('training_rounds') || '{}');
+    } catch(e) { return {}; }
+  }
+
+  function loadNotes() {
+    try {
+      return JSON.parse(localStorage.getItem('training_session_notes') || '{}');
+    } catch(e) { return {}; }
+  }
+
+  function loadWeek0Progress() {
+    try {
+      return JSON.parse(localStorage.getItem('training_week0') || '{}');
+    } catch(e) { return {}; }
+  }
+
+  function loadStrengthAssessment() {
+    try {
+      return JSON.parse(localStorage.getItem('training_day1_strength') || '{}');
+    } catch(e) { return {}; }
+  }
+
+  function loadBaseline() {
+    try {
+      return JSON.parse(localStorage.getItem('training_day1_baseline') || '{}');
+    } catch(e) { return {}; }
+  }
+
+  function formatRound(r) {
+    let s = `\n--- ROUND: ${r.meta.date || '-'} — ${r.meta.course || '-'} ---\n`;
+    s += `Tees: ${r.meta.tees || '-'} | Conditions: ${r.meta.conditions || '-'}\n`;
+    s += `Type: ${r.meta.type || '-'} | ${r.meta.walk || '-'}\n\n`;
+    let score = 0, putts = 0, fir = 0, firTotal = 0, gir = 0;
+    s += `Hole|Par|Score|Putts|F|G|UD|Pen\n`;
+    (r.holes || []).forEach(h => {
+      s += `  ${String(h.hole).padStart(2)}|  ${h.par || '-'} |  ${h.score || '-'}  |  ${h.putts || '-'}  |${h.fir?'Y':'-'}|${h.gir?'Y':'-'}|${h.ud?'Y':'-'}| ${h.pen || 0}\n`;
+      if (h.score) score += parseInt(h.score);
+      if (h.putts) putts += parseInt(h.putts);
+      if (h.par && parseInt(h.par) >= 4) { firTotal++; if (h.fir) firHit = (firHit || 0) + 1; }
+      if (h.gir) gir++;
+      if (h.fir) fir++;
+    });
+    s += `\nTOTALS: Score ${score} | Putts ${putts} | FIR ${fir}/${firTotal} | GIR ${gir}/18\n`;
+    if (r.summary) {
+      s += `Driver: ${r.summary.driver || '-'}\n`;
+      s += `Approach: ${r.summary.approach || '-'}\n`;
+      s += `3-putts: ${r.summary.three_putts || '-'}\n`;
+      s += `Penalties: ${r.summary.penalties || '-'}\n`;
+    }
+    if (r.mental) {
+      s += `Mental mistakes: ${r.mental.mistakes || '-'}\n`;
+      s += `Routine (1-10): ${r.mental.routine || '-'}\n`;
+      s += `Focus loss: ${r.mental.focus_loss || '-'}\n`;
+    }
+    if (r.takeaways) {
+      s += `What worked: ${r.takeaways.worked || '-'}\n`;
+      s += `To fix: ${r.takeaways.fix || '-'}\n`;
+      s += `End energy: ${r.takeaways.end_energy || '-'}\n`;
+    }
+    return s;
+  }
+
+  function formatNote(n) {
+    let s = `\n--- NOTE: ${n.date || '-'} (${n.type || '-'}${n.desc ? ' · ' + n.desc : ''}) ---\n`;
+    s += `Rating: ${n.rating || '-'} / 5\n`;
+    s += `Worked: ${n.worked || '-'}\n`;
+    s += `Didn't: ${n.failed || '-'}\n`;
+    s += `Flag: ${n.flag || '-'}\n`;
+    s += `Next: ${n.next || '-'}\n`;
+    return s;
+  }
+
+  function buildBundle() {
+    const rounds = loadRounds();
+    const notes = loadNotes();
+    const weekProgress = loadWeek0Progress();
+    const strength = loadStrengthAssessment();
+    const baseline = loadBaseline();
+
+    const dadObserved = document.getElementById('dad_observed').value;
+    const dadQuestions = document.getElementById('dad_questions').value;
+    const dadLogistics = document.getElementById('dad_logistics').value;
+
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+    let s = `WEEKLY REVIEW — ${today}\n`;
+    s += `==================================\n\n`;
+
+    // Dad's add-ons first (most actionable)
+    if (dadObserved || dadQuestions || dadLogistics) {
+      s += `>>> FROM DAD <<<\n\n`;
+      if (dadObserved) s += `Observations:\n${dadObserved}\n\n`;
+      if (dadQuestions) s += `Questions for coach:\n${dadQuestions}\n\n`;
+      if (dadLogistics) s += `Schedule / logistics next week:\n${dadLogistics}\n\n`;
+    }
+
+    // Rounds
+    const roundIds = Object.keys(rounds).sort();
+    s += `>>> ROUNDS (${roundIds.length}) <<<\n`;
+    if (roundIds.length === 0) {
+      s += `(no rounds tracked this week)\n`;
+    } else {
+      roundIds.forEach(id => { s += formatRound(rounds[id]); });
+    }
+    s += `\n`;
+
+    // Notes
+    const noteIds = Object.keys(notes).sort();
+    s += `>>> SESSION NOTES (${noteIds.length}) <<<\n`;
+    if (noteIds.length === 0) {
+      s += `(no session notes this week)\n`;
+    } else {
+      noteIds.forEach(id => { s += formatNote(notes[id]); });
+    }
+    s += `\n`;
+
+    // Week progress
+    const progressKeys = Object.keys(weekProgress);
+    if (progressKeys.length > 0) {
+      const done = progressKeys.filter(k => weekProgress[k] === true).length;
+      s += `>>> WEEK PLAN COMPLETION <<<\n`;
+      s += `Tasks checked: ${done} / ${progressKeys.length}\n\n`;
+    }
+
+    // Reference data from baseline (only first weekly review)
+    if (Object.keys(baseline).length > 0) {
+      s += `>>> BASELINE REFERENCE (from Day 1) <<<\n`;
+      s += `Putting: 3ft ${baseline.putt3 || '-'}/10 | 6ft ${baseline.putt6 || '-'}/10 | Lag ${baseline.puttLag || '-'}/15\n`;
+      s += `Short Game: Chip ${baseline.chip || '-'}/10 | 30yd ${baseline.pitch30 || '-'}/10 | 50yd ${baseline.wedge50 || '-'}/10 | Bunker ${baseline.bunker || '-'}/5\n`;
+      s += `Range: PW ${baseline.pw_dist || '-'} | 9i ${baseline.i9_dist || '-'} | 7i ${baseline.i7_dist || '-'} | 5i/Hyb ${baseline.i5_dist || '-'} | Driver ${baseline.dr_dist || '-'}\n\n`;
+    }
+
+    return s;
+  }
+
+  function updateStats() {
+    const rounds = loadRounds();
+    const notes = loadNotes();
+    const roundCount = Object.keys(rounds).length;
+    const noteCount = Object.keys(notes).length;
+
+    document.getElementById('roundCount').textContent = roundCount;
+    document.getElementById('roundCount').className = 'count' + (roundCount === 0 ? ' empty' : '');
+    document.getElementById('roundDesc').textContent = roundCount === 0 ? 'No rounds tracked' : roundCount === 1 ? '1 round tracked' : `${roundCount} rounds tracked`;
+
+    document.getElementById('noteCount').textContent = noteCount;
+    document.getElementById('noteCount').className = 'count' + (noteCount === 0 ? ' empty' : '');
+    document.getElementById('noteDesc').textContent = noteCount === 0 ? 'No session notes' : noteCount === 1 ? '1 session note' : `${noteCount} session notes`;
+  }
+
+  function updatePreview() {
+    document.getElementById('preview').textContent = buildBundle();
+  }
+
+  async function shareBundle() {
+    const text = buildBundle();
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Weekly Review', text: text }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
+    }
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('✓ Full bundle copied to clipboard.\n\nPaste into Claude to start the weekly review.');
+        return;
+      } catch(e) {}
+    }
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
+  }
+
+  document.querySelectorAll('textarea').forEach(t => t.addEventListener('input', updatePreview));
+
+  updateStats();
+  updatePreview();
+</script>
+
+</body>
+</html>

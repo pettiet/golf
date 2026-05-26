@@ -70,6 +70,39 @@
     cursor: pointer;
   }
 
+  .preset-bar {
+    background: rgba(46,160,67,0.06);
+    border: 1px dashed var(--accent-dim);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .preset-bar h3 {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .preset-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .preset-buttons button {
+    background: var(--bg);
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .preset-buttons button:active { background: var(--card-hover); }
+  .preset-note { font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.4; }
+
   .info-toggle {
     background: transparent;
     border: 1px solid var(--border);
@@ -155,7 +188,12 @@
     color: var(--text-dim);
     font-weight: 600;
     font-size: 12px;
-    width: 36px;
+    width: 30px;
+  }
+  table.hole-table td.yds {
+    font-size: 10px;
+    color: var(--text-dim);
+    width: 38px;
   }
   table.hole-table input, table.hole-table select {
     width: 100%;
@@ -167,6 +205,11 @@
     font-size: 13px;
     text-align: center;
     font-family: inherit;
+  }
+  table.hole-table input.par {
+    background: rgba(46,160,67,0.05);
+    border-color: rgba(46,160,67,0.2);
+    color: #a0d9b0;
   }
 
   .section-title {
@@ -238,29 +281,39 @@
 
 <div class="container">
 
-  <!-- ROUND SELECTOR -->
   <div class="round-selector">
     <label>Round:</label>
     <select id="roundSelect"></select>
     <button onclick="newRound()">+ New</button>
   </div>
 
+  <!-- HOME COURSE PRESETS -->
+  <div class="preset-bar">
+    <h3>Home course quick-fill</h3>
+    <div class="preset-buttons">
+      <button onclick="applyPreset('east_gold')">East · Gold (7,116y)</button>
+      <button onclick="applyPreset('east_blue')">East · Blue (6,439y)</button>
+      <button onclick="applyPreset('west_gold')">West · Gold (6,752y)</button>
+      <button onclick="applyPreset('west_blue')">West · Blue (6,234y)</button>
+    </div>
+    <div class="preset-note">Tap to fill par, yardage, and course info. You can still edit anything.</div>
+  </div>
+
   <button class="info-toggle" data-toggle="howto">How to fill this out <span class="chev">▼</span></button>
   <div class="info-panel" id="howto">
     <strong>Quick legend:</strong>
     <ul>
-      <li><strong>Par:</strong> Par of the hole (3, 4, or 5).</li>
+      <li><strong>Par/Yds:</strong> Auto-filled from preset if you tap one. Otherwise enter manually.</li>
       <li><strong>Score:</strong> Strokes taken on the hole.</li>
-      <li><strong>Putts:</strong> Number of strokes once on the green (or chip-ins putted from the fringe — your call, be consistent).</li>
-      <li><strong>F (Fairway):</strong> Tick if your tee shot landed in the fairway. Only count on par 4s and par 5s (par 3s don't count).</li>
-      <li><strong>GIR (Green in Regulation):</strong> Tick if you got on the green in regulation strokes. Par 3 = 1 shot, par 4 = 2, par 5 = 3.</li>
-      <li><strong>UD (Up &amp; Down):</strong> Tick if you missed the green BUT got down in 2 (one chip + one putt). Only relevant when GIR is not ticked.</li>
-      <li><strong>Pen (Penalty):</strong> Number of penalty strokes on the hole (OB, water, lost ball, drop).</li>
+      <li><strong>Putts:</strong> Number of strokes once on the green.</li>
+      <li><strong>F (Fairway):</strong> Tick if your tee shot landed in the fairway. Par 4s and par 5s only.</li>
+      <li><strong>GIR:</strong> Tick if you got on the green in regulation. Par 3 = 1 shot, par 4 = 2, par 5 = 3.</li>
+      <li><strong>UD (Up &amp; Down):</strong> Tick if you missed the green BUT got down in 2.</li>
+      <li><strong>Pen:</strong> Number of penalty strokes on the hole.</li>
     </ul>
-    <strong>Best practice:</strong> Fill in after each hole if you can, or at the turn and end. Filling out hours later from memory loses too much detail.
+    <strong>Best practice:</strong> Fill in after each hole or at the turn/end. Filling out hours later loses too much detail.
   </div>
 
-  <!-- ROUND INFO -->
   <div class="info-card">
     <h2>Round Info</h2>
     <div class="info-grid">
@@ -277,6 +330,10 @@
         <input type="text" id="r_tees" placeholder="Blue / 6,400">
       </div>
       <div class="field">
+        <label>Course Rating / Slope</label>
+        <input type="text" id="r_rating" placeholder="74.6 / 140">
+      </div>
+      <div class="field">
         <label>Conditions</label>
         <input type="text" id="r_conditions" placeholder="Sunny, 85°, wind 15mph">
       </div>
@@ -289,14 +346,6 @@
           <option value="casual">Casual</option>
         </select>
       </div>
-      <div class="field">
-        <label>Walking or Cart?</label>
-        <select id="r_walk">
-          <option value="walk">Walking</option>
-          <option value="cart">Cart</option>
-          <option value="push">Push cart</option>
-        </select>
-      </div>
     </div>
   </div>
 
@@ -305,11 +354,12 @@
     <thead>
       <tr>
         <th>#</th>
+        <th>Yds</th>
         <th>Par</th>
         <th>Score</th>
         <th>Putts</th>
         <th>F</th>
-        <th>GIR</th>
+        <th>G</th>
         <th>UD</th>
         <th>Pen</th>
       </tr>
@@ -384,6 +434,42 @@
 </div>
 
 <script>
+  // Home course preset data
+  const PRESETS = {
+    east_gold: {
+      course: 'Home Course — East',
+      tees: 'Gold / 7,116',
+      rating: '76.3 / 137',
+      pars:  [4,4,4,5,4,3,4,3,4, 4,4,5,4,3,4,4,3,4],
+      yards: [411,458,442,560,437,194,433,178,467, 374,436,562,398,236,431,455,207,437],
+      hcps:  [5,1,15,7,9,13,11,17,3, 18,10,16,8,2,12,4,14,6]
+    },
+    east_blue: {
+      course: 'Home Course — East',
+      tees: 'Blue / 6,439',
+      rating: '79.5 / 147',
+      pars:  [4,5,4,5,4,3,4,3,4, 4,4,5,4,3,4,4,3,4],
+      yards: [400,432,402,520,423,178,402,159,436, 319,399,512,336,186,389,393,162,391],
+      hcps:  [3,13,7,1,11,15,9,17,5, 14,12,2,6,16,10,4,18,8]
+    },
+    west_gold: {
+      course: 'Home Course — West',
+      tees: 'Gold / 6,752',
+      rating: '74.6 / 140',
+      pars:  [4,3,4,4,4,3,5,4,4, 3,4,4,4,3,4,5,4,4],
+      yards: [380,204,470,333,432,150,576,462,393, 192,371,405,350,174,469,536,399,456],
+      hcps:  [11,3,1,17,9,13,7,5,15, 16,4,8,12,6,2,14,18,10]
+    },
+    west_blue: {
+      course: 'Home Course — West',
+      tees: 'Blue / 6,234',
+      rating: '71.4 / 132',
+      pars:  [4,3,4,4,4,3,5,4,4, 3,4,4,4,3,4,5,4,4],
+      yards: [343,166,444,327,372,138,518,431,370, 155,367,380,337,170,433,520,374,389],
+      hcps:  [11,3,1,17,9,13,7,5,15, 16,4,8,12,6,2,14,18,10]
+    }
+  };
+
   const STORAGE_KEY = 'training_rounds';
   let rounds = {};
   let currentRoundId = null;
@@ -410,6 +496,7 @@
     if (i === 10) row.style.borderTop = '2px solid #2ea043';
     row.innerHTML = `
       <td class="hole-num">${i}</td>
+      <td class="yds" data-yds="${i}">-</td>
       <td><input type="number" min="3" max="5" class="par" data-hole="${i}" placeholder="-"></td>
       <td><input type="number" min="1" max="12" class="score" data-hole="${i}" placeholder="-"></td>
       <td><input type="number" min="0" max="6" class="putts" data-hole="${i}" placeholder="-"></td>
@@ -420,6 +507,23 @@
     `;
     tbody.appendChild(row);
   }
+
+  function applyPreset(key) {
+    const p = PRESETS[key];
+    if (!p) return;
+    document.getElementById('r_course').value = p.course;
+    document.getElementById('r_tees').value = p.tees;
+    document.getElementById('r_rating').value = p.rating;
+    p.pars.forEach((par, idx) => {
+      document.querySelector(`.par[data-hole="${idx+1}"]`).value = par;
+    });
+    p.yards.forEach((yds, idx) => {
+      document.querySelector(`[data-yds="${idx+1}"]`).textContent = yds;
+    });
+    updateTotals();
+    saveAll();
+  }
+  window.applyPreset = applyPreset;
 
   function updateTotals() {
     let score = 0, putts = 0, fir = 0, firTotal = 0, gir = 0;
@@ -444,32 +548,50 @@
     document.getElementById('t_gir').textContent = `${gir}/18`;
   }
 
+  function collectYards() {
+    const yds = [];
+    for (let i = 1; i <= 18; i++) {
+      const cell = document.querySelector(`[data-yds="${i}"]`);
+      yds.push(cell ? cell.textContent : '-');
+    }
+    return yds;
+  }
+
+  function populateYards(yds) {
+    if (!yds) return;
+    yds.forEach((y, idx) => {
+      const cell = document.querySelector(`[data-yds="${idx+1}"]`);
+      if (cell) cell.textContent = y || '-';
+    });
+  }
+
   function collectRoundData() {
     const data = {
       meta: {
         date: document.getElementById('r_date').value,
         course: document.getElementById('r_course').value,
         tees: document.getElementById('r_tees').value,
+        rating: document.getElementById('r_rating').value,
         conditions: document.getElementById('r_conditions').value,
-        type: document.getElementById('r_type').value,
-        walk: document.getElementById('r_walk').value,
+        type: document.getElementById('r_type').value
       },
+      yards: collectYards(),
       holes: [],
       summary: {
         driver: document.getElementById('drv_summary').value,
         approach: document.getElementById('app_summary').value,
         three_putts: document.getElementById('three_putts').value,
-        penalties: document.getElementById('penalties_detail').value,
+        penalties: document.getElementById('penalties_detail').value
       },
       mental: {
         mistakes: document.getElementById('mental_mistakes').value,
         routine: document.getElementById('routine').value,
-        focus_loss: document.getElementById('focus_loss').value,
+        focus_loss: document.getElementById('focus_loss').value
       },
       takeaways: {
         worked: document.getElementById('worked').value,
         fix: document.getElementById('fix').value,
-        end_energy: document.getElementById('end_energy').value,
+        end_energy: document.getElementById('end_energy').value
       }
     };
     for (let i = 1; i <= 18; i++) {
@@ -481,7 +603,7 @@
         fir: document.querySelector(`.fir[data-hole="${i}"]`).checked,
         gir: document.querySelector(`.gir[data-hole="${i}"]`).checked,
         ud: document.querySelector(`.ud[data-hole="${i}"]`).checked,
-        pen: document.querySelector(`.pen[data-hole="${i}"]`).value || 0,
+        pen: document.querySelector(`.pen[data-hole="${i}"]`).value || 0
       });
     }
     return data;
@@ -491,9 +613,9 @@
     document.getElementById('r_date').value = data.meta.date || '';
     document.getElementById('r_course').value = data.meta.course || '';
     document.getElementById('r_tees').value = data.meta.tees || '';
+    document.getElementById('r_rating').value = data.meta.rating || '';
     document.getElementById('r_conditions').value = data.meta.conditions || '';
     document.getElementById('r_type').value = data.meta.type || 'practice';
-    document.getElementById('r_walk').value = data.meta.walk || 'walk';
     document.getElementById('drv_summary').value = data.summary.driver || '';
     document.getElementById('app_summary').value = data.summary.approach || '';
     document.getElementById('three_putts').value = data.summary.three_putts || '';
@@ -504,6 +626,7 @@
     document.getElementById('worked').value = data.takeaways.worked || '';
     document.getElementById('fix').value = data.takeaways.fix || '';
     document.getElementById('end_energy').value = data.takeaways.end_energy || '';
+    populateYards(data.yards);
     (data.holes || []).forEach(h => {
       const i = h.hole;
       document.querySelector(`.par[data-hole="${i}"]`).value = h.par || '';
@@ -526,6 +649,7 @@
       if (i.tagName === 'SELECT') i.selectedIndex = 0;
       else i.value = '';
     });
+    document.querySelectorAll('[data-yds]').forEach(c => c.textContent = '-');
     document.getElementById('r_date').valueAsDate = new Date();
     updateTotals();
   }
@@ -548,9 +672,8 @@
       if (saved) rounds = JSON.parse(saved);
     } catch(e) { rounds = {}; }
     const ids = Object.keys(rounds).sort();
-    if (ids.length === 0) {
-      newRound();
-    } else {
+    if (ids.length === 0) newRound();
+    else {
       currentRoundId = ids[ids.length - 1];
       populateForm(rounds[currentRoundId]);
       refreshRoundSelector();
@@ -560,13 +683,11 @@
   function refreshRoundSelector() {
     const sel = document.getElementById('roundSelect');
     sel.innerHTML = '';
-    const ids = Object.keys(rounds).sort();
-    ids.forEach(id => {
+    Object.keys(rounds).sort().forEach(id => {
       const r = rounds[id];
       const opt = document.createElement('option');
       opt.value = id;
-      const label = (r.meta.date || 'no-date') + ' — ' + (r.meta.course || 'untitled');
-      opt.textContent = label;
+      opt.textContent = (r.meta.date || 'no-date') + ' — ' + (r.meta.course || 'untitled');
       if (id === currentRoundId) opt.selected = true;
       sel.appendChild(opt);
     });
@@ -575,26 +696,19 @@
   function newRound() {
     const id = 'round_' + Date.now();
     currentRoundId = id;
-    rounds[id] = {
-      meta: { date: '', course: '', tees: '', conditions: '', type: 'practice', walk: 'walk' },
-      holes: [],
-      summary: {},
-      mental: {},
-      takeaways: {}
-    };
+    rounds[id] = { meta: { type: 'practice' }, holes: [], summary: {}, mental: {}, takeaways: {} };
     clearForm();
     saveAll();
   }
 
   function deleteCurrentRound() {
     if (!currentRoundId) return;
-    if (!confirm('Delete this round? This cannot be undone.')) return;
+    if (!confirm('Delete this round?')) return;
     delete rounds[currentRoundId];
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rounds)); } catch(e) {}
     const ids = Object.keys(rounds).sort();
-    if (ids.length === 0) {
-      newRound();
-    } else {
+    if (ids.length === 0) newRound();
+    else {
       currentRoundId = ids[ids.length - 1];
       populateForm(rounds[currentRoundId]);
       refreshRoundSelector();
@@ -604,22 +718,20 @@
   function buildSummary() {
     const d = collectRoundData();
     let s = `ROUND: ${d.meta.date || '-'} — ${d.meta.course || '-'}\n`;
-    s += `Tees: ${d.meta.tees || '-'} | Conditions: ${d.meta.conditions || '-'}\n`;
-    s += `Type: ${d.meta.type} | ${d.meta.walk}\n\n`;
-    s += `Hole | Par | Score | Putts | F | G | UD | Pen\n`;
-    s += `-----|-----|-------|-------|---|---|----|----\n`;
-    d.holes.forEach(h => {
-      s += `  ${String(h.hole).padStart(2)} |  ${h.par || '-'}  |   ${h.score || '-'}   |   ${h.putts || '-'}   | ${h.fir?'Y':'-'} | ${h.gir?'Y':'-'} | ${h.ud?'Y':'-'} |  ${h.pen}\n`;
+    s += `Tees: ${d.meta.tees || '-'} (Rating ${d.meta.rating || '-'})\n`;
+    s += `Conditions: ${d.meta.conditions || '-'}\n`;
+    s += `Type: ${d.meta.type}\n\n`;
+    s += `Hole|Yds |Par|Score|Putts|F|G|UD|Pen\n`;
+    s += `----|----|---|-----|-----|-|-|--|----\n`;
+    d.holes.forEach((h, idx) => {
+      const yds = (d.yards && d.yards[idx]) || '-';
+      s += `  ${String(h.hole).padStart(2)}|${String(yds).padStart(4)}| ${h.par || '-'} |  ${h.score || '-'}  |  ${h.putts || '-'}  |${h.fir?'Y':'-'}|${h.gir?'Y':'-'}|${h.ud?'Y':'-'}| ${h.pen}\n`;
     });
-    // Totals
     let totalScore = 0, totalPutts = 0, firTotal = 0, firHit = 0, girHit = 0;
     d.holes.forEach(h => {
       if (h.score) totalScore += parseInt(h.score);
       if (h.putts) totalPutts += parseInt(h.putts);
-      if (h.par && parseInt(h.par) >= 4) {
-        firTotal++;
-        if (h.fir) firHit++;
-      }
+      if (h.par && parseInt(h.par) >= 4) { firTotal++; if (h.fir) firHit++; }
       if (h.gir) girHit++;
     });
     s += `\nTOTALS: Score ${totalScore || '-'} | Putts ${totalPutts || '-'} | FIR ${firTotal ? firHit+'/'+firTotal : '-'} | GIR ${girHit}/18\n\n`;
@@ -639,29 +751,20 @@
   async function shareResults() {
     const text = buildSummary();
     if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Round Data', text: text });
-        return;
-      } catch (err) {
-        if (err.name === 'AbortError') return;
-      }
+      try { await navigator.share({ title: 'Round Data', text: text }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
     }
     if (navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(text);
-        alert('✓ Copied to clipboard.\n\nPaste into Messages, Mail, or Notes to send to Dad.');
+        alert('✓ Copied. Paste into Messages to send to Dad.');
         return;
       } catch(e) {}
     }
-    showFallback(text);
-  }
-
-  function showFallback(text) {
     const w = window.open('', '_blank');
     w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
   }
 
-  // Wire auto-save
   document.querySelectorAll('input, textarea, select').forEach(el => {
     if (el.id === 'roundSelect') return;
     const handler = () => { updateTotals(); saveAll(); };
