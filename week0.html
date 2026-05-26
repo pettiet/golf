@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 0 — Tournament Prep</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #2ea043;
+    --accent-dim: #1f6f33;
+    --warn: #d29922;
+    --info: #3b82f6;
+    --danger: #f97316;
+    --header-grad: linear-gradient(135deg, #1f6f33 0%, #0d3018 100%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 80px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header {
+    background: var(--header-grad);
+    padding: 16px 20px 24px;
+  }
+  header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+  .priority-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .priority-card h2 { font-size: 12px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .priority-card ol { padding-left: 20px; }
+  .priority-card li { font-size: 14px; color: var(--text); margin-bottom: 6px; }
+  .priority-card li strong { color: var(--accent); }
+
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .day-card.tournament { border-color: var(--accent); }
+  .day-card.washout { border-color: var(--danger); }
+  .day-card.off { opacity: 0.7; }
+
+  .day-header {
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .day-header:active { background: rgba(255,255,255,0.02); }
+
+  .day-progress {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .day-progress.partial { border-color: var(--warn); color: var(--warn); }
+  .day-progress.complete { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .day-name-block { flex: 1; min-width: 0; }
+  .day-name {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .day-date {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .day-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .day-tag.outdoor { background: rgba(46,160,67,0.15); color: var(--accent); }
+  .day-tag.indoor { background: rgba(249,115,22,0.15); color: var(--danger); }
+  .day-tag.tournament { background: rgba(46,160,67,0.25); color: var(--accent); }
+  .day-tag.off { background: rgba(139,148,158,0.15); color: var(--text-dim); }
+  .day-tag.travel { background: rgba(59,130,246,0.15); color: var(--info); }
+
+  .day-chev {
+    font-size: 14px;
+    color: var(--text-dim);
+    transition: transform 0.2s;
+  }
+  .day-card.open .day-chev { transform: rotate(180deg); }
+
+  .day-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .day-card.open .day-body { display: block; }
+
+  .day-summary {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    line-height: 1.6;
+  }
+  .day-summary strong { color: var(--text); }
+
+  .session {
+    margin-top: 12px;
+    padding-top: 4px;
+  }
+  .session-title {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .session-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .task {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.3);
+  }
+  .task:last-child { border-bottom: none; }
+
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .task-row input[type=checkbox] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    margin-top: 1px;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    background: transparent;
+  }
+  .task-row input[type=checkbox]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .task-row input[type=checkbox]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -3px; left: 2px;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+  }
+  .task-label { font-size: 14px; flex: 1; cursor: pointer; }
+  .task-row.done .task-label { color: var(--text-dim); text-decoration: line-through; }
+  .task-spec {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: 30px;
+    margin-top: 2px;
+    line-height: 1.5;
+  }
+
+  .info-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-left: 30px;
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .info-toggle .chev { transition: transform 0.2s; font-size: 8px; }
+  .info-toggle.open .chev { transform: rotate(180deg); }
+
+  .info-panel {
+    display: none;
+    margin-left: 30px;
+    margin-top: 6px;
+    background: rgba(46,160,67,0.05);
+    border-left: 2px solid var(--accent-dim);
+    border-radius: 0 4px 4px 0;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .info-panel.open { display: block; }
+  .info-panel strong { color: var(--text); }
+  .info-panel ol, .info-panel ul { padding-left: 16px; margin: 4px 0; }
+  .info-panel li { margin-bottom: 3px; }
+  .info-panel .tip {
+    color: #fcd34d;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  .alt-plan {
+    background: rgba(249,115,22,0.06);
+    border-left: 3px solid var(--danger);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 12px;
+    margin: 12px 0;
+    font-size: 12px;
+    color: #fcd34d;
+  }
+  .alt-plan strong { color: var(--danger); }
+
+  .coach-note {
+    background: rgba(46,160,67,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 8px 10px;
+    margin: 12px 0;
+    font-size: 12px;
+    color: #a0d9b0;
+    font-style: italic;
+  }
+  .coach-note strong { font-style: normal; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Hub</a>
+
+<header>
+  <div class="label">Week 0 · Tournament Prep</div>
+  <h1>May 26 – June 2</h1>
+  <div class="sub">Tap any day to expand · Auto-saves as you check off</div>
+</header>
+
+<div class="container">
+
+  <div class="priority-card">
+    <h2>This Week's Priorities</h2>
+    <ol>
+      <li><strong>Lag putting</strong> — three 3-putts on Monday. Biggest scoring opportunity.</li>
+      <li><strong>50-yard wedges</strong> — 0/10 inside 10 ft. Critical scoring zone.</li>
+      <li><strong>Tee ball reliability</strong> — 3/14 fairways. Need a "fairway-finder" you trust.</li>
+      <li><strong>Settle the new grip</strong> — don't fight it, just get reps.</li>
+      <li><strong>Tournament readiness</strong> — arrive at the tournament course loose, rested, confident.</li>
+    </ol>
+  </div>
+
+  <div class="coach-note">
+    <strong>Weather reality:</strong> Tue likely OK before 1pm. Wed/Thu likely washouts (80%/70% storms). Fri/Sat/Sun mostly playable. Mon = off (birthday + closed). Tue = tournament.
+  </div>
+
+  <!-- TUESDAY -->
+  <div class="day-card" data-day="tue">
+    <div class="day-header" onclick="toggleDay('tue')">
+      <div class="day-progress" id="prog-tue">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Tuesday — Short Game Focus</div>
+        <div class="day-date">May 26 · Home course closed</div>
+        <span class="day-tag outdoor">Outdoor AM · Indoor PM</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>Strategy:</strong> Storms come in after 1pm. Get to the alternate course early — chipping area only. Focus 50-yd wedges + lag putting. Home strength session in the evening.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Morning Session</div>
+        <div class="session-meta">Alternate course chipping/putting area · 90 min · Before 12pm</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_1"><label class="task-label" for="t_tue_1"><strong>Warmup</strong> — same dynamic stretches as yesterday</label>
+          </div>
+          <div class="task-spec">5 min. You know the drill now.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_2"><label class="task-label" for="t_tue_2"><strong>50-yard wedge ladder drill</strong> — 30 balls</label>
+          </div>
+          <div class="task-spec">⏱ ~30 min · The big one. Yesterday was 0/10 inside 10 ft.</div>
+          <button class="info-toggle" data-toggle="info_tue_2">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_2">
+            <strong>The ladder drill:</strong>
+            <ol>
+              <li>Pace off 40 yards. Hit 10 balls to a target. Note where the ball lands relative to the target (short/long/left/right).</li>
+              <li>Move to 50 yards. Hit 10 balls.</li>
+              <li>Move to 60 yards. Hit 10 balls.</li>
+            </ol>
+            <strong>What we're solving:</strong>
+            <ul>
+              <li>Most amateurs miss 50-yarders short. Yesterday everything was LEFT. So today: focus on starting the ball at the right-half of the target.</li>
+              <li>For a LEFTY pushing left = open clubface at impact. Try gripping the club slightly stronger (more knuckles visible on top hand) and see if that brings the face square.</li>
+              <li>Don't try to fix mechanics — just get the ball starting at your line.</li>
+            </ul>
+            <div class="tip"><strong>Count results:</strong> How many of 30 finished within 15 feet? Within 10? Record in share button.</div>
+          </div>
+          <div class="task" style="border: none; padding: 6px 0 0 30px;">
+            <div class="task-row">
+              <input type="checkbox" id="t_tue_2a"><label class="task-label" for="t_tue_2a">Recorded results from ladder drill</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_3"><label class="task-label" for="t_tue_3"><strong>Lag putting — "ladder of putters" drill</strong></label>
+          </div>
+          <div class="task-spec">⏱ ~20 min · 3-putt killer drill</div>
+          <button class="info-toggle" data-toggle="info_tue_3">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_3">
+            <strong>The drill:</strong>
+            <ol>
+              <li>Place tees at 20, 30, 40, 50 feet from a hole.</li>
+              <li>Put your putter head flat on the ground, 3 feet PAST the hole — this is the "danger zone."</li>
+              <li>Hit 3 putts from each distance. Goal: stop the ball BETWEEN the hole and the putter (3-foot window past the hole).</li>
+              <li>If you leave it short, that's worse than going long. We never want to leave a putt short on a lag.</li>
+            </ol>
+            <div class="tip"><strong>Mental cue:</strong> "Past the hole" — every lag putt's job is to reach the hole, not die to it.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_4"><label class="task-label" for="t_tue_4"><strong>Chipping — vary the lies</strong></label>
+          </div>
+          <div class="task-spec">⏱ ~20 min · 15 chips, mix of lies</div>
+          <button class="info-toggle" data-toggle="info_tue_4">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_4">
+            <ol>
+              <li>5 chips from clean fairway lie (just off the green)</li>
+              <li>5 chips from deeper grass / rough</li>
+              <li>5 chips from a "tweener" lie (downhill, sidehill, etc.)</li>
+            </ol>
+            <strong>Goal:</strong> Land each one in a 6-foot circle around the hole. Score yourself out of 15.
+            <div class="tip">If chipping was rated your "worst today" yesterday, this is the work that fixes it.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_5"><label class="task-label" for="t_tue_5"><strong>Get off the course before 1pm</strong> — storms incoming</label>
+          </div>
+          <div class="task-spec">Hydrate, eat, rest in the afternoon.</div>
+        </div>
+      </div>
+
+      <div class="alt-plan">
+        <strong>⚠ If storms come early:</strong> Get the lag putting and 50-yd wedges done first (in that order). Skip chipping if time runs out — we can hit chips at home on the carpet later.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Evening Session</div>
+        <div class="session-meta">Home · 30 min · Light strength</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_6"><label class="task-label" for="t_tue_6"><strong>Same warmup as Monday</strong></label>
+          </div>
+          <div class="task-spec">Dynamic stretches + trunk rotations (5 min)</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_7"><label class="task-label" for="t_tue_7"><strong>Goblet squat — 3 sets of 8</strong></label>
+          </div>
+          <div class="task-spec">Two 15-lb dumbbells held at chest (30 lb total), since 15 felt easy.</div>
+          <button class="info-toggle" data-toggle="info_tue_7">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_7">
+            Hold BOTH 15-lb dumbbells vertically against your chest, side by side. Same goblet position as Monday — chest up, elbows down, sit back into the squat. 3 sets of 8, rest 90 sec between sets.
+            <div class="tip">If 30 lb total feels too heavy with one hand on each, go back to one DB and we'll progress differently.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_8"><label class="task-label" for="t_tue_8"><strong>Med ball rotational throws — 3 sets of 8 each side</strong></label>
+          </div>
+          <div class="task-spec">85% effort. Focus on the weaker (right) side.</div>
+          <button class="info-toggle" data-toggle="info_tue_8">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_8">
+            Same as Monday's setup, but harder effort and focus on the weaker right side. Do all 3 sets on the right first, then 3 sets on the left. Rest 60 sec between sets.
+            <div class="tip">For a lefty golfer, the right side is the trail side — getting it stronger helps drive the downswing.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_9"><label class="task-label" for="t_tue_9"><strong>Single-arm DB row — 3 sets of 10 each side</strong></label>
+          </div>
+          <div class="task-spec">15-lb DB, support hand on a chair/bench</div>
+          <button class="info-toggle" data-toggle="info_tue_9">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_9">
+            <ol>
+              <li>Put one knee and one hand on a sturdy chair or low bench.</li>
+              <li>Other foot on the floor, holding the 15-lb DB in the free hand.</li>
+              <li>Pull the DB up to your hip, elbow tight to your side. Squeeze the back muscle.</li>
+              <li>Slow lower. 10 reps. Switch sides.</li>
+              <li>3 sets of 10 each side.</li>
+            </ol>
+            <div class="tip">Builds the back muscles that stabilize the upper body through impact.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_10"><label class="task-label" for="t_tue_10"><strong>Plank — 2× 45 sec</strong> + <strong>Side plank — 2× 20 sec each side</strong></label>
+          </div>
+          <div class="task-spec">Core finisher. Don't go to failure.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_tue_11"><label class="task-label" for="t_tue_11"><strong>Cool-down: HAMSTRING FOCUS</strong></label>
+          </div>
+          <div class="task-spec">5 min — hamstrings were tight yesterday</div>
+          <button class="info-toggle" data-toggle="info_tue_11">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_tue_11">
+            <strong>Three hamstring stretches, 30 sec each, each leg:</strong>
+            <ol>
+              <li><strong>Standing toe touch</strong> — feet hip-width, slow fold forward, hang from the hips. Let head drop.</li>
+              <li><strong>Seated single-leg reach</strong> — sit on the floor, one leg straight, other bent in. Reach for toes on the straight leg.</li>
+              <li><strong>Lying hamstring stretch</strong> — lie on back, lift one leg straight up, gently pull toward chest.</li>
+            </ol>
+            <div class="tip">Then hip flexor stretch + doorway pec stretch + child's pose (like Monday).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEDNESDAY -->
+  <div class="day-card washout" data-day="wed">
+    <div class="day-header" onclick="toggleDay('wed')">
+      <div class="day-progress" id="prog-wed">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Wednesday — Indoor Focus</div>
+        <div class="day-date">May 27 · 80% storms</div>
+        <span class="day-tag indoor">Likely Indoor</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>Assume washout.</strong> If a window opens, great — use it. But plan as if you're stuck inside all day.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Morning Block</div>
+        <div class="session-meta">Home · 45 min</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_wed_1"><label class="task-label" for="t_wed_1"><strong>Carpet putting — 10 min</strong></label>
+          </div>
+          <div class="task-spec">Get the new grip feeling on the putter</div>
+          <button class="info-toggle" data-toggle="info_wed_1">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_wed_1">
+            <ol>
+              <li>Find a flat hallway or carpet stretch.</li>
+              <li>Put a quarter or small target down 8 feet away.</li>
+              <li>Hit putts at the quarter. Goal: ball stops within an inch of it.</li>
+              <li>50 putts total. Focus on starting line + speed.</li>
+            </ol>
+            <div class="tip">If you have a putting mirror or alignment aid, use it. Otherwise just track how many of 50 stop within a putter-head's width of the quarter.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_wed_2"><label class="task-label" for="t_wed_2"><strong>Grip work — 15 min</strong></label>
+          </div>
+          <div class="task-spec">Build muscle memory for the overlap grip</div>
+          <button class="info-toggle" data-toggle="info_wed_2">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_wed_2">
+            <ol>
+              <li>Take any iron. Set up in front of a mirror.</li>
+              <li>Practice taking your grip from scratch — bottom hand first, then top hand overlapping properly.</li>
+              <li>Check in the mirror: knuckles visible on top hand, V's pointing toward your trail shoulder.</li>
+              <li>Make slow, half-speed swings checking that the grip stays neutral through impact.</li>
+              <li>Do this for 15 minutes. Reps build the new pattern.</li>
+            </ol>
+            <div class="tip"><strong>This is the most valuable thing you can do today.</strong> A new grip needs 1000+ reps before it feels automatic. Every rep counts.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_wed_3"><label class="task-label" for="t_wed_3"><strong>Mental game — pre-shot routine review</strong></label>
+          </div>
+          <div class="task-spec">⏱ ~20 min · Define your routine</div>
+          <button class="info-toggle" data-toggle="info_wed_3">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_wed_3">
+            <strong>Write down your pre-shot routine, step by step.</strong> Then practice it 20 times in your living room with any club.
+            <strong>A good routine has 5-7 steps. Example:</strong>
+            <ol>
+              <li>Stand behind ball, pick exact target</li>
+              <li>Visualize the shot shape</li>
+              <li>Take 1-2 practice swings, feeling the shot</li>
+              <li>Walk into the ball, set the clubface to target first</li>
+              <li>Set your feet</li>
+              <li>One look at target, one look at ball</li>
+              <li>Pull the trigger — no second-guessing</li>
+            </ol>
+            <div class="tip">Then text Dad the routine you wrote — we'll use it as your tournament routine on June 2.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="session">
+        <div class="session-title">Afternoon Block</div>
+        <div class="session-meta">Home · 40 min</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_wed_4"><label class="task-label" for="t_wed_4"><strong>Strength — full session</strong></label>
+          </div>
+          <div class="task-spec">Same as Tuesday evening's session</div>
+          <button class="info-toggle" data-toggle="info_wed_4">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_wed_4">
+            Repeat Tuesday's strength: goblet squats 3×8, med ball rotational 3×8 each side, DB row 3×10 each side, plank 2×45 + side plank 2×20.
+            <div class="tip">This is the LAST strength session before the tournament. Thursday will be lighter, Friday-Mon are tournament prep.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_wed_5"><label class="task-label" for="t_wed_5"><strong>Watch / study: the tournament course</strong></label>
+          </div>
+          <div class="task-spec">⏱ ~15 min · Strategic prep</div>
+          <button class="info-toggle" data-toggle="info_wed_5">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_wed_5">
+            <ol>
+              <li>Pull up the course's scorecard / yardage book online if available.</li>
+              <li>For each hole: identify the safe play off the tee (not always driver).</li>
+              <li>Note any hazards on holes 1, 18, and the par 3s.</li>
+              <li>Write down 3 holes you want to play conservatively.</li>
+            </ol>
+            <div class="tip">Knowing the course in advance reduces decision fatigue under tournament pressure.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alt-plan">
+        <strong>If a weather window opens:</strong> Drop the home strength and get to the course for as long as you can. Priorities: lag putting (10 min) → 50-yd wedges (20 min) → done. Don't push it.
+      </div>
+    </div>
+  </div>
+
+  <!-- THURSDAY -->
+  <div class="day-card washout" data-day="thu">
+    <div class="day-header" onclick="toggleDay('thu')">
+      <div class="day-progress" id="prog-thu">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Thursday — Mental Game &amp; Light Movement</div>
+        <div class="day-date">May 28 · 70% storms</div>
+        <span class="day-tag indoor">Likely Indoor</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>Recovery day disguised as a rain day.</strong> No heavy strength (Wed was the last big lift). Focus on grip reps, putting feel, and mental prep.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Morning</div>
+        <div class="session-meta">Home · 30 min</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_thu_1"><label class="task-label" for="t_thu_1"><strong>Mobility flow — 15 min</strong></label>
+          </div>
+          <div class="task-spec">No strength today. Just move.</div>
+          <button class="info-toggle" data-toggle="info_thu_1">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_thu_1">
+            <ol>
+              <li>5 min dynamic warmup (same as always)</li>
+              <li>World's greatest stretch — 5 each side</li>
+              <li>Cat-cow — 10 reps</li>
+              <li>90/90 hip stretch — 1 min each side</li>
+              <li>Hamstring stretches — 1 min each leg</li>
+              <li>Doorway pec stretch — 1 min each side</li>
+            </ol>
+            <div class="tip">Keep the body loose without taxing it. Tournament's 5 days away.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_thu_2"><label class="task-label" for="t_thu_2"><strong>Grip reps — 15 min</strong></label>
+          </div>
+          <div class="task-spec">Same drill as Wednesday. Reps reps reps.</div>
+        </div>
+      </div>
+
+      <div class="session">
+        <div class="session-title">Afternoon</div>
+        <div class="session-meta">Home · 30 min</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_thu_3"><label class="task-label" for="t_thu_3"><strong>Carpet putting — 20 min</strong></label>
+          </div>
+          <div class="task-spec">50 short putts (5-8 feet) + 50 lag attempts (longer carpet stretch)</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_thu_4"><label class="task-label" for="t_thu_4"><strong>Tournament visualization — 10 min</strong></label>
+          </div>
+          <div class="task-spec">Mental rehearsal of Tuesday's round</div>
+          <button class="info-toggle" data-toggle="info_thu_4">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_thu_4">
+            <ol>
+              <li>Find a quiet spot. Close your eyes.</li>
+              <li>Imagine arriving at the tournament course Tuesday morning. The walk to the first tee.</li>
+              <li>Mentally play the first 3 holes — visualize each shot landing where you want it.</li>
+              <li>Imagine a bad shot happening (because it will). See yourself respond calmly, walk to the next shot, execute your routine.</li>
+              <li>End the visualization by walking off 18 having played within yourself.</li>
+            </ol>
+            <div class="tip"><strong>This isn't woo-woo stuff.</strong> Sports psychology research is clear: mental reps build neural pathways the same way physical ones do.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRIDAY -->
+  <div class="day-card" data-day="fri">
+    <div class="day-header" onclick="toggleDay('fri')">
+      <div class="day-progress" id="prog-fri">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Friday — Full Course Day</div>
+        <div class="day-date">May 29 · 30% storms · Probably playable</div>
+        <span class="day-tag outdoor">Outdoor</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>This is the most important day of the week.</strong> Last full outdoor practice before the tournament. Play 18 as a tracked round, build confidence with the new grip, find your tournament tee shot.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Pre-round Warmup</div>
+        <div class="session-meta">Home course · 45 min before tee time</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_1"><label class="task-label" for="t_fri_1"><strong>10 min on putting green</strong> — short putts + lag putts</label>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_2"><label class="task-label" for="t_fri_2"><strong>10 min chipping green</strong> — 15 chips, different lies</label>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_3"><label class="task-label" for="t_fri_3"><strong>25 min range</strong> — abbreviated bag warmup</label>
+          </div>
+          <div class="task-spec">PW → 9i → 7i → 5i → driver. 5-8 balls each.</div>
+          <button class="info-toggle" data-toggle="info_fri_3">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_fri_3">
+            <strong>Tournament-style warmup:</strong>
+            <ol>
+              <li>Don't grind on mechanics. You're warming up, not practicing.</li>
+              <li>Full pre-shot routine on every ball. This trains tournament habit.</li>
+              <li>Finish the warmup with the club you'll hit off the first tee — driver or 3-wood.</li>
+            </ol>
+            <div class="tip">This is the warmup pattern you'll use Tuesday at the tournament course. Treat today as a dress rehearsal.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="session">
+        <div class="session-title">The Round — 18 Holes</div>
+        <div class="session-meta">Tracked · Use Round Tracker in the Hub</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_4"><label class="task-label" for="t_fri_4"><strong>Use Round Tracker for every hole</strong></label>
+          </div>
+          <div class="task-spec">Fill in real-time at the green. Don't trust memory at the end.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_5"><label class="task-label" for="t_fri_5"><strong>Find your "fairway-finder" off the tee</strong></label>
+          </div>
+          <div class="task-spec">Tournament strategy decision</div>
+          <button class="info-toggle" data-toggle="info_fri_5">How to <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_fri_5">
+            <strong>The decision today:</strong> Driver hit 3/14 fairways Monday. That's not a tournament-ready number.
+            <ul>
+              <li>On every par 4 and par 5, ask yourself: "Driver or 3-wood?"</li>
+              <li>Try hitting 3-wood off the tee on a couple holes where driver would normally come out.</li>
+              <li>Note: which club gives you a higher % of fairways hit?</li>
+              <li>Find the club that gives you 60%+ fairways at your stock distance. That's your tournament tee club.</li>
+            </ul>
+            <div class="tip"><strong>Coach's truth:</strong> A 3-wood in the fairway beats a driver in the woods every time.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_6"><label class="task-label" for="t_fri_6"><strong>Use your written pre-shot routine on every shot</strong></label>
+          </div>
+          <div class="task-spec">The one you wrote down Wednesday</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_fri_7"><label class="task-label" for="t_fri_7"><strong>Submit round via Share button</strong></label>
+          </div>
+          <div class="task-spec">Within 30 min of finishing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SATURDAY -->
+  <div class="day-card" data-day="sat">
+    <div class="day-header" onclick="toggleDay('sat')">
+      <div class="day-progress" id="prog-sat">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Saturday — Short &amp; Sharp</div>
+        <div class="day-date">May 30 · Limited time (family)</div>
+        <span class="day-tag outdoor">Outdoor · 60-90 min</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>Whatever time you have, here's the priority order.</strong> Even 45 min is enough — just do the top items.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Quick Session</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sat_1"><label class="task-label" for="t_sat_1"><strong>15 min — Lag putting</strong></label>
+          </div>
+          <div class="task-spec">Most important. Don't skip.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sat_2"><label class="task-label" for="t_sat_2"><strong>20 min — 50-yard wedges</strong></label>
+          </div>
+          <div class="task-spec">15 balls. Track results.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sat_3"><label class="task-label" for="t_sat_3"><strong>15 min — Chipping (different lies)</strong></label>
+          </div>
+          <div class="task-spec">10-12 chips</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sat_4"><label class="task-label" for="t_sat_4"><strong>20 min — Range (only if time)</strong></label>
+          </div>
+          <div class="task-spec">Your tournament tee club (driver or 3-wood from Friday's decision) + wedges</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sat_5"><label class="task-label" for="t_sat_5"><strong>Evening: hydrate, eat well, early sleep</strong></label>
+          </div>
+          <div class="task-spec">Tournament is 3 days away. Recovery starts now.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUNDAY -->
+  <div class="day-card" data-day="sun">
+    <div class="day-header" onclick="toggleDay('sun')">
+      <div class="day-progress" id="prog-sun">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Sunday — Final Tune-up</div>
+        <div class="day-date">May 31 · 30% storms</div>
+        <span class="day-tag outdoor">Outdoor · 60 min</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>Trust your preparation.</strong> Today is about sharpening feel, not finding answers. No experiments. Whatever you have works — you go play it Tuesday.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Tune-up Session</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sun_1"><label class="task-label" for="t_sun_1"><strong>Putting — 20 min</strong></label>
+          </div>
+          <div class="task-spec">Short putts (3-6 ft) + 10 lag putts. Build confidence.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sun_2"><label class="task-label" for="t_sun_2"><strong>Short game — 20 min</strong></label>
+          </div>
+          <div class="task-spec">10 chips + 10 wedges from 50 yards</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sun_3"><label class="task-label" for="t_sun_3"><strong>Range — 20 min, low volume</strong></label>
+          </div>
+          <div class="task-spec">No more than 30 balls total. Find your tournament tee club, hit it 5 times.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sun_4"><label class="task-label" for="t_sun_4"><strong>Pack the bag for Tuesday</strong></label>
+          </div>
+          <div class="task-spec">Logistics done Sunday = no stress Monday/Tuesday</div>
+          <button class="info-toggle" data-toggle="info_sun_4">Checklist <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_sun_4">
+            <ul>
+              <li>Clean clubs, check grips, count clubs (14 max)</li>
+              <li>Tees, ball markers, divot tool</li>
+              <li>At least 6 balls (same model)</li>
+              <li>Glove (+ spare)</li>
+              <li>Rangefinder (charged) or yardage book</li>
+              <li>Snacks: trail mix, banana, granola bar, maybe a protein bar</li>
+              <li>2 water bottles + electrolytes</li>
+              <li>Hat, sunscreen, sunglasses</li>
+              <li>Umbrella, light rain jacket (just in case)</li>
+              <li>Spare socks</li>
+              <li>Towel for clubs</li>
+            </ul>
+            <div class="tip">Pack everything Sunday night. Less to think about Monday.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_sun_5"><label class="task-label" for="t_sun_5"><strong>5 min mobility before bed</strong></label>
+          </div>
+          <div class="task-spec">Hamstrings + hip flexors + child's pose</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONDAY -->
+  <div class="day-card off" data-day="mon">
+    <div class="day-header" onclick="toggleDay('mon')">
+      <div class="day-progress" id="prog-mon">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Monday — Birthday &amp; Rest</div>
+        <div class="day-date">June 1 · 🎂 16th Birthday · Course closed</div>
+        <span class="day-tag off">Off Day</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>Happy Birthday.</strong> Today is mostly off. Enjoy it. The tournament is tomorrow — the work is already done.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Optional: 10-min routine</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_mon_1"><label class="task-label" for="t_mon_1"><strong>5 min stretching / mobility</strong></label>
+          </div>
+          <div class="task-spec">Just to stay loose</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_mon_2"><label class="task-label" for="t_mon_2"><strong>5 min carpet putting</strong></label>
+          </div>
+          <div class="task-spec">Touch the putter. Keep the feel. That's it.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_mon_3"><label class="task-label" for="t_mon_3"><strong>Hydrate well today</strong></label>
+          </div>
+          <div class="task-spec">Birthday food is great. Just sneak in plenty of water too.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_mon_4"><label class="task-label" for="t_mon_4"><strong>Bed by 10pm</strong></label>
+          </div>
+          <div class="task-spec">Tomorrow's an early morning. Sleep matters more than any drill.</div>
+        </div>
+      </div>
+
+      <div class="coach-note">
+        <strong>Trust your prep.</strong> You did the work this week. Tomorrow is just showing up and playing the game you've been playing for years.
+      </div>
+    </div>
+  </div>
+
+  <!-- TUESDAY: TOURNAMENT -->
+  <div class="day-card tournament" data-day="tournament">
+    <div class="day-header" onclick="toggleDay('tournament')">
+      <div class="day-progress" id="prog-tournament">0</div>
+      <div class="day-name-block">
+        <div class="day-name">Tuesday — TOURNAMENT</div>
+        <div class="day-date">June 2 · Tournament Venue</div>
+        <span class="day-tag tournament">Game Day</span>
+      </div>
+      <div class="day-chev">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="day-summary">
+        <strong>It's game day.</strong> Eat well, arrive early, warm up like Friday's session. Trust your preparation.
+      </div>
+
+      <div class="session">
+        <div class="session-title">Morning Of</div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_t_1"><label class="task-label" for="t_t_1"><strong>Breakfast: carbs + protein, no surprises</strong></label>
+          </div>
+          <div class="task-spec">What you'd eat any other golf morning</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_t_2"><label class="task-label" for="t_t_2"><strong>Arrive 60 min before tee time</strong></label>
+          </div>
+          <div class="task-spec">Time for check-in, range, putting, restroom — no rushing</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_t_3"><label class="task-label" for="t_t_3"><strong>Warmup — same as Friday</strong></label>
+          </div>
+          <div class="task-spec">10 putts → 10 chips → 25 min range. Don't change anything.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_t_4"><label class="task-label" for="t_t_4"><strong>One swing thought for the round</strong></label>
+          </div>
+          <div class="task-spec">Pick ONE — write it down Sunday night</div>
+          <button class="info-toggle" data-toggle="info_t_4">Examples <span class="chev">▼</span></button>
+          <div class="info-panel" id="info_t_4">
+            <strong>Examples of good tournament swing thoughts:</strong>
+            <ul>
+              <li>"Smooth tempo"</li>
+              <li>"Finish balanced"</li>
+              <li>"Hit it solid"</li>
+              <li>"Target, swing, accept"</li>
+            </ul>
+            <strong>Bad tournament swing thoughts:</strong>
+            <ul>
+              <li>"Keep the right elbow tucked at the top while shifting weight to the left side and..."</li>
+            </ul>
+            <div class="tip">Tournament golf is NO time for mechanics. Pick one simple thought. Stick with it all 18 holes.</div>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_t_5"><label class="task-label" for="t_t_5"><strong>Play your game. Tee club &gt; driver if needed.</strong></label>
+          </div>
+          <div class="task-spec">Fairway > distance. Always.</div>
+        </div>
+
+        <div class="task">
+          <div class="task-row">
+            <input type="checkbox" id="t_t_6"><label class="task-label" for="t_t_6"><strong>POST-ROUND: Submit via Round Tracker</strong></label>
+          </div>
+          <div class="task-spec">Within 30 min of finishing. We use it to plan Week 1.</div>
+        </div>
+      </div>
+
+      <div class="coach-note">
+        <strong>Final coach's note:</strong> 40 mph winds at the tournament course gave you a 79. With a real prep week behind you, you're better prepared than you were two weeks ago. Go play.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'training_week0';
+  const checkboxes = document.querySelectorAll('input[type=checkbox]');
+
+  // Info toggles
+  document.querySelectorAll('.info-toggle').forEach(btn => {
+    const labelNode = btn.firstChild;
+    const originalLabel = labelNode.nodeValue;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.toggle;
+      const panel = document.getElementById(id);
+      const isOpen = panel.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      labelNode.nodeValue = isOpen ? 'Hide ' : originalLabel;
+    });
+  });
+
+  // Day expand/collapse
+  function toggleDay(day) {
+    const card = document.querySelector(`.day-card[data-day="${day}"]`);
+    card.classList.toggle('open');
+    saveOpenStates();
+  }
+  window.toggleDay = toggleDay;
+
+  function saveOpenStates() {
+    const open = Array.from(document.querySelectorAll('.day-card.open')).map(c => c.dataset.day);
+    try { localStorage.setItem(STORAGE_KEY + '_open', JSON.stringify(open)); } catch(e) {}
+  }
+
+  function loadOpenStates() {
+    try {
+      const open = JSON.parse(localStorage.getItem(STORAGE_KEY + '_open') || '[]');
+      open.forEach(day => {
+        const card = document.querySelector(`.day-card[data-day="${day}"]`);
+        if (card) card.classList.add('open');
+      });
+    } catch(e) {}
+  }
+
+  // Save checkboxes
+  function autoSave() {
+    const data = {};
+    checkboxes.forEach(c => data[c.id] = c.checked);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+    updateAllDayProgress();
+  }
+
+  function loadData() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      Object.keys(data).forEach(key => {
+        const el = document.getElementById(key);
+        if (el && el.type === 'checkbox') el.checked = data[key];
+      });
+    } catch(e) {}
+    checkboxes.forEach(c => {
+      if (c.checked) c.closest('.task-row').classList.add('done');
+    });
+    updateAllDayProgress();
+  }
+
+  function updateAllDayProgress() {
+    document.querySelectorAll('.day-card').forEach(card => {
+      const day = card.dataset.day;
+      const dayBoxes = card.querySelectorAll('input[type=checkbox]');
+      const done = Array.from(dayBoxes).filter(c => c.checked).length;
+      const total = dayBoxes.length;
+      const indicator = document.getElementById('prog-' + day);
+      if (!indicator) return;
+      if (total === 0) return;
+      if (done === 0) {
+        indicator.textContent = total;
+        indicator.className = 'day-progress';
+      } else if (done < total) {
+        indicator.textContent = done + '/' + total;
+        indicator.className = 'day-progress partial';
+      } else {
+        indicator.textContent = '✓';
+        indicator.className = 'day-progress complete';
+      }
+    });
+  }
+
+  checkboxes.forEach(c => {
+    c.addEventListener('change', () => {
+      c.closest('.task-row').classList.toggle('done', c.checked);
+      autoSave();
+    });
+  });
+
+  loadOpenStates();
+  loadData();
+</script>
+
+</body>
+</html>

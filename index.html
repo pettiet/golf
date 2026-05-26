@@ -16,6 +16,7 @@
     --accent-dim: #1f6f33;
     --warn: #f97316;
     --info: #3b82f6;
+    --purple: #a855f7;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -59,6 +60,16 @@
     color: rgba(255,255,255,0.8);
     margin-top: 8px;
   }
+  .countdown {
+    margin-top: 16px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: inline-block;
+    color: white;
+    font-size: 13px;
+  }
+  .countdown strong { font-size: 18px; font-weight: 700; }
 
   .container { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
 
@@ -70,6 +81,7 @@
     margin: 20px 0 12px;
     font-weight: 600;
   }
+  .section-title:first-of-type { margin-top: 4px; }
 
   .tile {
     display: block;
@@ -136,6 +148,13 @@
     color: var(--warn);
   }
 
+  .tile.week .tile-label { color: var(--purple); }
+  .tile.week::before { background: var(--purple); }
+  .tile.week .tile-meta {
+    background: rgba(168,85,247,0.15);
+    color: var(--purple);
+  }
+
   .footer-note {
     margin-top: 24px;
     padding: 14px;
@@ -155,24 +174,18 @@
   <div class="label">Training Hub</div>
   <h1>Summer 2026</h1>
   <div class="sub">Daily plans · Round tracker · Strength</div>
+  <div class="countdown" id="countdown"></div>
 </header>
 
 <div class="container">
 
-  <div class="section-title">This Week (Week 0)</div>
+  <div class="section-title">This Week</div>
 
-  <a href="today_session.html" class="tile active">
-    <div class="tile-label">Day 1 · Monday</div>
-    <div class="tile-title">Baseline Assessment — Range &amp; Short Game</div>
-    <div class="tile-desc">Structured data collection at the course. Putting, short game, range distances. ~2 hours.</div>
-    <span class="tile-meta">In Progress</span>
-  </a>
-
-  <a href="strength_assessment.html" class="tile strength">
-    <div class="tile-label">Day 1 · Monday Evening</div>
-    <div class="tile-title">Strength Assessment — Home</div>
-    <div class="tile-desc">Movement screen + light intro to the band gym. 30 minutes, light intensity only.</div>
-    <span class="tile-meta">Tonight</span>
+  <a href="week0.html" class="tile week active">
+    <div class="tile-label">Week 0 · Tournament Prep</div>
+    <div class="tile-title">May 26 – June 2</div>
+    <div class="tile-desc">Daily plan with weather contingencies, tournament prep, and strength work. Tap any day to expand.</div>
+    <span class="tile-meta">View Daily Plans</span>
   </a>
 
   <div class="section-title">Tools</div>
@@ -180,15 +193,53 @@
   <a href="round_tracker.html" class="tile tracker">
     <div class="tile-label">Round Tracker</div>
     <div class="tile-title">Post-Round Entry Form</div>
-    <div class="tile-desc">Use after every round — practice or tournament. Auto-saves as you type. Export when done.</div>
+    <div class="tile-desc">Use after every round — practice or tournament. Auto-saves as you type. Share when done.</div>
     <span class="tile-meta">Use After Every Round</span>
   </a>
 
+  <div class="section-title">Reference (Completed)</div>
+
+  <a href="today_session.html" class="tile">
+    <div class="tile-label">Day 1 Baseline · Done</div>
+    <div class="tile-title">Baseline Assessment</div>
+    <div class="tile-desc">The original baseline session from May 25. Data captured.</div>
+  </a>
+
+  <a href="strength_assessment.html" class="tile strength">
+    <div class="tile-label">Day 1 Strength · Done</div>
+    <div class="tile-title">Strength Assessment</div>
+    <div class="tile-desc">Movement screen results from May 25 evening.</div>
+  </a>
+
   <div class="footer-note">
-    <strong>How to use this site:</strong> Tap any tile to open. Your progress is saved automatically on your phone — you can close the tab and come back later. To install as an app: Share → Add to Home Screen.
+    <strong>How to use this site:</strong> Tap any tile to open. Your progress is saved automatically on your phone. To install as an app: Share → Add to Home Screen.
   </div>
 
 </div>
+
+<script>
+  // Tournament countdown
+  const tournamentDate = new Date('2026-06-02T07:00:00');
+  function updateCountdown() {
+    const now = new Date();
+    const diff = tournamentDate - now;
+    const el = document.getElementById('countdown');
+    if (!el) return;
+    if (diff <= 0) {
+      el.innerHTML = '🏌️ Tournament is today!';
+      return;
+    }
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    if (days > 0) {
+      el.innerHTML = '<strong>' + days + '</strong> day' + (days === 1 ? '' : 's') + ' until the tournament course';
+    } else {
+      el.innerHTML = '<strong>' + hours + '</strong> hours until the tournament course';
+    }
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+</script>
 
 </body>
 </html>
