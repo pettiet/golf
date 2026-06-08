@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Today</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card-hover: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #2ea043;
+    --accent-dim: #1f6f33;
+    --info: #3b82f6;
+    --warn: #f97316;
+    --purple: #a855f7;
+    --teal: #14b8a6;
+    --red: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 0 80px 0;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header {
+    background: linear-gradient(135deg, #1f6f33 0%, #0d3018 100%);
+    padding: 16px 20px 22px;
+  }
+  header .date-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+  header .score-strip {
+    margin-top: 12px; background: rgba(0,0,0,0.25); border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; color: white;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  header .score-strip strong { font-size: 16px; font-weight: 700; }
+
+  .container { padding: 14px; max-width: 600px; margin: 0 auto; }
+
+  .day-selector {
+    display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding: 4px 0;
+    scrollbar-width: none;
+  }
+  .day-selector::-webkit-scrollbar { display: none; }
+  .day-pill {
+    flex-shrink: 0; background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); padding: 6px 12px; border-radius: 16px; font-size: 12px;
+    font-family: inherit; cursor: pointer; white-space: nowrap;
+  }
+  .day-pill.active {
+    background: var(--accent); border-color: var(--accent); color: white; font-weight: 600;
+  }
+  .day-pill.has-progress { border-color: var(--accent-dim); }
+
+  .schedule-tag {
+    display: inline-block; background: rgba(239,68,68,0.15); color: var(--red);
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .section {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .section.morning { border-left: 4px solid var(--warn); }
+  .section.rooms { border-left: 4px solid var(--purple); }
+  .section.workout { border-left: 4px solid var(--red); }
+  .section.golf { border-left: 4px solid var(--accent); }
+  .section.evening { border-left: 4px solid var(--info); }
+
+  .section-header {
+    padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; user-select: none;
+  }
+  .section-header h2 {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .section.morning .section-header h2 { color: var(--warn); }
+  .section.rooms .section-header h2 { color: var(--purple); }
+  .section.workout .section-header h2 { color: var(--red); }
+  .section.golf .section-header h2 { color: var(--accent); }
+  .section.evening .section-header h2 { color: var(--info); }
+  .section-header .right {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .section-progress {
+    font-size: 11px; color: var(--text-dim); padding: 3px 8px; border-radius: 4px; background: var(--bg);
+  }
+  .section-progress.complete { background: rgba(46,160,67,0.15); color: var(--accent); font-weight: 600; }
+  .section-chev { color: var(--text-dim); transition: transform 0.2s; font-size: 11px; }
+  .section.collapsed .section-chev { transform: rotate(-90deg); }
+
+  .section-body { padding: 0 14px 12px; }
+  .section.collapsed .section-body { display: none; }
+  .section-intro {
+    font-size: 12px; color: var(--text-dim); margin-bottom: 10px; line-height: 1.5;
+    background: rgba(255,255,255,0.02); padding: 8px 10px; border-radius: 6px;
+  }
+  .section-intro strong { color: var(--text); }
+
+  .subsection-title {
+    font-size: 11px; color: var(--text-dim); letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 600;
+    margin: 12px 0 6px; padding-bottom: 4px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .subsection-title:first-child { margin-top: 0; }
+
+  .task {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.4);
+  }
+  .task:last-child { border-bottom: none; }
+  .task-row { display: flex; align-items: flex-start; gap: 12px; }
+  .task-row input[type=checkbox] {
+    appearance: none; -webkit-appearance: none;
+    width: 24px; height: 24px;
+    border: 2px solid var(--border);
+    border-radius: 6px; margin-top: 0px;
+    cursor: pointer; flex-shrink: 0;
+    position: relative; background: transparent;
+  }
+  .task-row input[type=checkbox]:checked {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .task-row input[type=checkbox]:checked::after {
+    content: '✓'; position: absolute; top: -2px; left: 3px;
+    color: white; font-weight: bold; font-size: 17px;
+  }
+  .task-label { font-size: 15px; flex: 1; cursor: pointer; line-height: 1.4; }
+  .task-row.done .task-label { color: var(--text-dim); text-decoration: line-through; }
+  .task-spec {
+    font-size: 12px; color: var(--text-dim);
+    margin-left: 36px; margin-top: 2px; line-height: 1.5;
+  }
+  .task-time {
+    display: inline-block; background: var(--bg); color: var(--text-dim);
+    padding: 1px 6px; border-radius: 3px; font-size: 10px;
+    margin-left: 6px; font-weight: 600;
+  }
+
+  .info-toggle {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    border-radius: 5px; padding: 3px 8px; font-size: 11px; cursor: pointer;
+    margin-left: 36px; margin-top: 6px;
+    display: inline-flex; align-items: center; gap: 5px; font-family: inherit;
+  }
+  .info-toggle .chev { transition: transform 0.2s; font-size: 8px; }
+  .info-toggle.open .chev { transform: rotate(180deg); }
+  .info-panel {
+    display: none; margin-left: 36px; margin-top: 6px;
+    background: rgba(46,160,67,0.05); border-left: 2px solid var(--border);
+    border-radius: 0 4px 4px 0; padding: 10px 12px;
+    font-size: 12px; color: var(--text-dim); line-height: 1.6;
+  }
+  .info-panel.open { display: block; }
+  .info-panel strong { color: var(--text); }
+  .info-panel ol, .info-panel ul { padding-left: 16px; margin: 4px 0; }
+  .info-panel li { margin-bottom: 4px; }
+  .info-panel .tip { color: #fcd34d; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); }
+  .info-panel table { width: 100%; margin: 6px 0; border-collapse: collapse; font-size: 11px; }
+  .info-panel th, .info-panel td { padding: 4px 6px; text-align: left; border-bottom: 1px solid rgba(48,54,61,0.5); }
+  .info-panel th { color: var(--text); }
+
+  .quick-actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
+  }
+  .quick-link {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    padding: 10px; border-radius: 8px; text-decoration: none;
+    font-size: 13px; font-weight: 600; text-align: center;
+  }
+  .quick-link:active { background: var(--card-hover); }
+  .quick-link .ico { font-size: 16px; display: block; margin-bottom: 2px; }
+
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .field input, .field textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 14px; font-family: inherit;
+  }
+  .field textarea { min-height: 60px; resize: vertical; }
+
+  .rating-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .rating-group button {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 10px 0; border-radius: 6px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .rating-group button.selected { background: var(--info); border-color: var(--info); color: white; }
+
+  .footer-actions {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--card); border-top: 1px solid var(--border);
+    padding: 10px 14px; display: flex; gap: 8px; justify-content: center;
+  }
+  .footer-actions button {
+    flex: 1; max-width: 240px; background: var(--accent); color: white;
+    border: none; border-radius: 8px; padding: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Hub</a>
+
+<header>
+  <div class="date-label" id="dateLabel">—</div>
+  <h1 id="dayTitle">Today's Plan</h1>
+  <div class="sub" id="daySub">Built for accountability</div>
+  <div class="score-strip">
+    <span>Today's progress</span>
+    <strong id="todayProgress">0 / 0</strong>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="day-selector" id="daySelector"></div>
+
+  <div id="scheduleTagContainer"></div>
+
+  <div id="sectionsContainer"></div>
+
+</div>
+
+<div class="footer-actions">
+  <button onclick="shareToday()">📤 Send Today's Progress to Dad</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'training_daily_v1';
+  let allData = {};
+
+  // ===== STANDARD ROUTINES =====
+  // Wake times vary by day. Bed by 11pm every night.
+
+  function morningTasks(wakeTime) {
+    return [
+      { id: 'm_wake', label: `Wake up by ${wakeTime}`, time: wakeTime },
+      { id: 'm_bed', label: 'Make bed' },
+      { id: 'm_water', label: 'Drink 16 oz of water first thing' },
+      { id: 'm_breakfast', label: 'Real breakfast (protein + carbs)',
+        spec: 'Eggs, oatmeal, yogurt + fruit, toast with peanut butter, etc.' },
+      { id: 'm_mobility', label: '10 min mobility / stretching', info: 'mobility' },
+      { id: 'm_plan', label: 'Open this page, review today\'s plan',
+        spec: 'Know what you\'re doing before leaving the house' }
+    ];
+  }
+
+  const STANDARD_ROOMS = [
+    { id: 'r_bed', label: 'Bedroom: bed made, clothes off floor, surfaces clear' },
+    { id: 'r_bath', label: 'Bathroom: counter wiped, towels hung, floor clear' },
+    { id: 'r_game', label: 'Game room: floor clear, controllers put away, trash out' }
+  ];
+
+  function eveningTasks() {
+    return [
+      { id: 'e_review', label: 'Review today — what went well, what didn\'t' },
+      { id: 'e_share', label: 'Send today\'s progress to Dad' },
+      { id: 'e_clothes', label: 'Tomorrow\'s clothes / clubs ready' },
+      { id: 'e_bed', label: 'In bed by 11:00 PM' }
+    ];
+  }
+
+  // ===== WEEK 1: June 8 → June 14 =====
+
+  const WEEK = {
+    '2026-06-08': {
+      title: 'Monday — Workout + Kickingbird',
+      sub: 'Oak Tree closed · Ortho 10:30 AM · Kickingbird 4:30 PM',
+      wakeTime: '8:30 AM',
+      scheduleTag: '⏰ Orthodontist appointment 10:30 AM',
+      includeWorkout: true,
+      workout: {
+        title: '💪 Workout — Mondays only',
+        intro: 'Oak Tree is closed Mondays. Use the time for cardio + strength. This is your hardest workout day of the week.',
+        tasks: [
+          { id: 'w_run', label: 'Neighborhood run — 20-25 minutes', time: 'AM',
+            info: 'monday_run',
+            spec: 'Easy pace. Not a sprint. Goal is heart and lungs, not a PR.' },
+          { id: 'w_strength', label: 'Full home strength session — 45 min', time: 'AM',
+            info: 'monday_strength',
+            spec: 'After the run. Hydrate first. Equipment: 15-lb DBs, med ball, body weight.' },
+          { id: 'w_cooldown', label: 'Cool-down stretching — 10 min',
+            spec: 'Hamstrings, hip flexors, pec stretches.' }
+        ]
+      },
+      golf: {
+        intro: 'Tee time at 4:30 PM at Kickingbird. Use Round Tracker to log every hole — this is a tracked round and an important data point (HS tryouts venue). Plan: leave home by 3:30 PM to arrive 45 min early for warmup.',
+        tasks: [
+          { id: 'g_drive', label: 'Leave for Kickingbird', time: '3:30 PM' },
+          { id: 'g_arrive', label: 'Arrive 3:45 PM — check in, settle' },
+          { id: 'g_warmup', label: 'Pre-round warmup (45 min)', time: '3:45 PM',
+            info: 'tournament_warmup' },
+          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE in Round Tracker', time: '4:30 PM' },
+          { id: 'g_focus', label: 'Round focus: course management',
+            info: 'mgmt_focus',
+            spec: 'Smart shot over hero shot. Driver only when fairway is realistic. Aim middle of greens.' },
+          { id: 'g_share', label: 'Share round within 30 min of finishing' },
+          { id: 'g_note', label: 'Session Note: how the new course felt' }
+        ]
+      }
+    },
+
+    '2026-06-09': {
+      title: 'Tuesday — Big Practice Day',
+      sub: 'Oak Tree · ~3.5 hours of structured practice',
+      wakeTime: '8:00 AM',
+      golf: {
+        intro: 'No playing today. Today is the most important practice day of the week — structured, intentional reps. The leak from Saturday was par 3 / long iron play. We work that.',
+        tasks: [
+          { id: 'g_arrive', label: 'At Oak Tree by 10:00 AM', time: '10:00 AM' },
+          { id: 'g_warmup', label: 'Putting green warmup (15 min)', time: '10:00',
+            info: 'putt_warmup',
+            spec: '20 short putts (3-6 ft) + 10 lag putts (30+ ft) to feel the speed.' },
+
+          { id: 'g_putt_block', label: 'BLOCK 1: Putting station work (45 min)', time: '10:15',
+            info: 'putt_block_detailed',
+            spec: '3-ft clock face → 6-ft clock face → 10-ft makes → lag ladder. Count makes at each station.' },
+
+          { id: 'g_short_block', label: 'BLOCK 2: Short game station work (60 min)', time: '11:00',
+            info: 'short_block_detailed',
+            spec: 'Chip ladder + pitch ladder + bunker. Specific scoring criteria.' },
+
+          { id: 'g_lunch', label: 'Lunch + 30 min rest', time: '12:00' },
+
+          { id: 'g_range_block', label: 'BLOCK 3: Range — full bag (75 min)', time: '12:30',
+            info: 'range_block_detailed',
+            spec: '15 min wedges → 25 min mid-irons (the leak) → 15 min long irons/hybrid → 20 min tee clubs. Quality over quantity.' },
+
+          { id: 'g_short_close', label: 'BLOCK 4: Short game closer (30 min)', time: '1:45',
+            info: 'short_close',
+            spec: '10 chips + 10 putts to end on success.' },
+
+          { id: 'g_done', label: 'Done by 2:15 PM. Hydrate, eat, rest the rest of the day.' },
+          { id: 'g_log', label: 'Open Session Notes, log how blocks went' }
+        ]
+      }
+    },
+
+    '2026-06-10': {
+      title: 'Wednesday — Tracked Round (East)',
+      sub: 'Oak Tree East · Tracked 18 · 1:00 PM tee time',
+      wakeTime: '8:00 AM',
+      golf: {
+        intro: 'Play 18 holes at Oak Tree East (Gold tees). This is a TRACKED round — fill in Round Tracker hole by hole, real time, every hole. Last time you played East, you shot 85 with the new grip. Goal today: under 80.',
+        tasks: [
+          { id: 'g_arrive', label: 'At Oak Tree by 12:00 PM', time: '12:00 PM' },
+          { id: 'g_warmup', label: 'Full pre-round warmup (45 min)', time: '12:00',
+            info: 'tournament_warmup' },
+          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE', time: '1:00 PM',
+            info: 'tracking_emphasis',
+            spec: 'No exceptions. Score, putts, FIR, GIR, UD, penalty — every hole.' },
+          { id: 'g_share', label: 'Share round within 30 min of finishing' },
+          { id: 'g_post', label: 'After round: 30 min short game (work on whatever broke)' },
+          { id: 'g_note', label: 'Add a Session Note about the round' }
+        ]
+      }
+    },
+
+    '2026-06-11': {
+      title: 'Thursday — Strength + Practice',
+      sub: 'AM strength · PM short game / range',
+      wakeTime: '8:00 AM',
+      includeWorkout: true,
+      workout: {
+        title: '💪 Strength Session',
+        intro: 'Full home strength. Med ball, dumbbells. After the morning routine.',
+        tasks: [
+          { id: 'w_warmup', label: 'Movement warmup (5 min)' },
+          { id: 'w_strength', label: 'Full strength circuit', info: 'thu_strength_detailed',
+            spec: 'Goblet squat 4×10, med ball rot 4×8/side, DB row 4×10/side, plank 3×60.' },
+          { id: 'w_cooldown', label: 'Cool-down stretching (5 min)' }
+        ]
+      },
+      golf: {
+        intro: 'Afternoon at Oak Tree. Three structured blocks. About 3 hours.',
+        tasks: [
+          { id: 'g_arrive', label: 'At Oak Tree by 1:30 PM', time: '1:30 PM' },
+          { id: 'g_warmup', label: 'Putting green warmup (15 min)' },
+          { id: 'g_chip', label: 'BLOCK 1: Chipping (45 min)', info: 'chip_block_detailed',
+            spec: '30 chips from varied lies. Score yourself.' },
+          { id: 'g_bunker', label: 'BLOCK 2: Bunker work (30 min)', info: 'bunker_detailed',
+            spec: '15 greenside shots. Different lies.' },
+          { id: 'g_putt', label: 'BLOCK 3: Putting (45 min)', info: 'putt_block_detailed' },
+          { id: 'g_range', label: 'BLOCK 4: Range (45 min) — wedges + 7i focus',
+            info: 'range_focus_wedges' },
+          { id: 'g_done', label: 'Done by 5:00 PM.' },
+          { id: 'g_log', label: 'Session Notes if anything stood out' }
+        ]
+      }
+    },
+
+    '2026-06-12': {
+      title: 'Friday — Tracked Round (West)',
+      sub: 'Oak Tree West · Tracked 18 · 1:00 PM tee time',
+      wakeTime: '8:00 AM',
+      golf: {
+        intro: 'Second tracked round of the week. Oak Tree West this time (Gold tees) for variety. Goal: keep the new grip consistent across two different courses. Focus on the 40-yard wedge — it was a baseline weakness.',
+        tasks: [
+          { id: 'g_arrive', label: 'At Oak Tree by 12:00 PM', time: '12:00 PM' },
+          { id: 'g_warmup', label: 'Full pre-round warmup (45 min)', info: 'tournament_warmup' },
+          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE', time: '1:00 PM' },
+          { id: 'g_share', label: 'Share round within 30 min' },
+          { id: 'g_post', label: 'After round: 20 min lag putting (no full swing)' },
+          { id: 'g_note', label: 'Session Note about the round' }
+        ]
+      }
+    },
+
+    '2026-06-13': {
+      title: 'Saturday — Lighter Day',
+      sub: 'Sleep in OK · Range focus + optional 9',
+      wakeTime: '9:30 AM',
+      golf: {
+        intro: 'Lighter load today. Focus block + optional 9. About 2-3 hours total.',
+        tasks: [
+          { id: 'g_arrive', label: 'At Oak Tree by 11:30 AM', time: '11:30 AM' },
+          { id: 'g_warmup', label: 'Putting/chip warmup (15 min)' },
+          { id: 'g_range', label: 'Range focus session — 60 min', info: 'sat_range_focus',
+            spec: 'Pick the BIGGEST leak from this week\'s rounds. Just work that.' },
+          { id: 'g_short', label: 'Short game (30 min) — chips + wedges' },
+          { id: 'g_optional', label: 'Optional: play 9 holes (track if you do)' },
+          { id: 'g_done', label: 'Off the course by 3:30 PM' }
+        ]
+      }
+    },
+
+    '2026-06-14': {
+      title: 'Sunday — Rest + Review',
+      sub: 'Sleep in · Light mobility · Dad runs Weekly Review tonight',
+      wakeTime: '9:30 AM',
+      golf: {
+        intro: 'Recovery day. Light putting/mobility only. No range, no 18 holes. Sleep is when skills consolidate.',
+        tasks: [
+          { id: 'g_mobility', label: '15 min full mobility / stretching' },
+          { id: 'g_putt', label: 'Optional: 20 min carpet putting (only if you feel like it)' },
+          { id: 'g_rest', label: 'REST. No range. No 18 holes. Day off the course.' },
+          { id: 'g_reflect', label: 'Reflect on the week — what got better, what didn\'t' },
+          { id: 'g_dad_review', label: 'Dad runs Weekly Review tonight' }
+        ]
+      }
+    }
+  };
+
+  // ===== INFO PANELS — Detailed practice instructions =====
+
+  const INFO_PANELS = {
+    mobility: `<strong>10-min mobility routine:</strong>
+      <ol>
+        <li>Leg swings — 10 each leg, each direction</li>
+        <li>Arm circles — 10 fwd, 10 back</li>
+        <li>Trunk rotations — 15 each side</li>
+        <li>Hip openers — 5 each side</li>
+        <li>World's greatest stretch — 3 each side</li>
+        <li>Hamstring stretch — 30 sec each leg</li>
+        <li>Cat/cow — 8 reps</li>
+      </ol>`,
+
+    monday_run: `<strong>Neighborhood run:</strong>
+      <ol>
+        <li>5 min walk warmup</li>
+        <li>20 min easy-pace run — conversational pace, you should be able to talk in short sentences</li>
+        <li>5 min walk cool-down</li>
+      </ol>
+      <strong>Goal:</strong> Aerobic base. NOT a sprint workout. Your heart rate should feel sustainable.
+      <div class="tip"><strong>Why:</strong> Cardiovascular endurance helps you walk 18 holes without losing focus on the back nine. Tournament golf rewards stamina.</div>`,
+
+    monday_strength: `<strong>Monday strength circuit (45 min):</strong>
+      <p><strong>Warmup (5 min):</strong> Dynamic stretches.</p>
+      <strong>Main circuit — 4 rounds of:</strong>
+      <ol>
+        <li><strong>Goblet squat</strong> — 10 reps. Both 15-lb DBs at chest, full depth, drive through heels.</li>
+        <li><strong>Med ball rotational throws</strong> — 8 reps each side. Side-on to wall, 6-lb ball, hip-led rotation.</li>
+        <li><strong>DB row</strong> — 10 reps each side. 15-lb DB, hand on chair for support.</li>
+        <li><strong>Pushups</strong> — max reps (stop at 15 if it's easy).</li>
+        <li><strong>Plank</strong> — 60 sec hold.</li>
+        <li><strong>Rest 90 sec</strong> between rounds.</li>
+      </ol>
+      <strong>Finisher (5 min):</strong> Ab wheel rollouts — 3 sets of 6-8 reps.
+      <div class="tip">Total: ~35 min main work, 10 min stretching. Build progressively over the summer.</div>`,
+
+    putt_warmup: `<strong>Putting warmup (15 min):</strong>
+      <ol>
+        <li>10 min: 20 short putts (3-6 ft) — feel the roll, no scoring</li>
+        <li>5 min: 10 lag putts from 30+ ft — feel only</li>
+      </ol>`,
+
+    putt_block_detailed: `<strong>Putting station block (45 min):</strong>
+      <p><strong>Station 1 — 3-foot clock face (10 min)</strong></p>
+      <ul>
+        <li>Place 4 balls around hole at 12, 3, 6, 9 o'clock positions, all 3 ft away.</li>
+        <li>Hit 10 putts total, going around the clock 2.5 times.</li>
+        <li>Goal: 9 or 10 makes. <strong>Record your score.</strong></li>
+        <li>If under 9, repeat with focus on a clean strike.</li>
+      </ul>
+      <p><strong>Station 2 — 6-foot clock face (10 min)</strong></p>
+      <ul>
+        <li>Same setup at 6 ft. 10 putts.</li>
+        <li>Goal: 6 or 7 makes. Record.</li>
+      </ul>
+      <p><strong>Station 3 — 10-foot makes (10 min)</strong></p>
+      <ul>
+        <li>10 putts from 10 ft to a single hole.</li>
+        <li>Goal: 4-5 makes. Record.</li>
+      </ul>
+      <p><strong>Station 4 — Lag ladder (15 min)</strong></p>
+      <ul>
+        <li>5 putts each from 20, 30, 40 feet.</li>
+        <li>Place a putter 3 ft past the hole as "danger zone."</li>
+        <li>Goal: stop ball BETWEEN hole and putter (within 3 ft past).</li>
+        <li>Count: of 15 putts, how many landed in that 3-ft zone past the hole?</li>
+        <li>Short is worse than long.</li>
+      </ul>
+      <div class="tip">Write your station scores in Session Notes after the block. We track these week to week.</div>`,
+
+    short_block_detailed: `<strong>Short game block (60 min):</strong>
+      <p><strong>Station 1 — Standard chips, easy lie (15 min)</strong></p>
+      <ul>
+        <li>10 chips from clean fairway lie, 10-15 ft off green.</li>
+        <li>Use 52° or 56° — whichever you trust.</li>
+        <li>Goal: 6+ within 3 ft of hole. <strong>Record.</strong></li>
+      </ul>
+      <p><strong>Station 2 — Chip from rough (15 min)</strong></p>
+      <ul>
+        <li>10 chips from rough/longer grass.</li>
+        <li>Adjust technique — open face, slightly steeper angle of attack.</li>
+        <li>Goal: 4+ within 6 ft. Record.</li>
+      </ul>
+      <p><strong>Station 3 — 40-yard wedge ladder (20 min)</strong></p>
+      <ul>
+        <li>10 balls at 30 yards. Land within 6 ft.</li>
+        <li>10 balls at 40 yards. Land within 10 ft.</li>
+        <li>Record both scores.</li>
+        <li>The 40-yd wedge was 0/10 at baseline. We're rebuilding this.</li>
+      </ul>
+      <p><strong>Station 4 — Bunker (10 min)</strong></p>
+      <ul>
+        <li>10 greenside bunker shots from flat lies.</li>
+        <li>Goal: 6+ on the green, 3+ inside 10 ft.</li>
+      </ul>`,
+
+    range_block_detailed: `<strong>Range block (75 min) — block practice, not rake-and-rip:</strong>
+      <p><strong>Wedges (15 min) — warmup + control</strong></p>
+      <ul>
+        <li>15 balls with PW. Pick a target. Full pre-shot routine on every ball.</li>
+        <li>Note: are misses going left or right? Short or long?</li>
+      </ul>
+      <p><strong>Mid-irons (25 min) — THE LEAK</strong></p>
+      <ul>
+        <li>10 balls with 9-iron.</li>
+        <li>20 balls with 7-iron. This is the bellwether club.</li>
+        <li>Track misses meticulously. If 8 of 20 missed left, write it down.</li>
+        <li>Try: stronger grip (more knuckles visible) on a few to see if face squares up.</li>
+      </ul>
+      <p><strong>Long irons / hybrid (15 min)</strong></p>
+      <ul>
+        <li>15 balls with 5-iron or hybrid (whatever you carry).</li>
+        <li>This is the club you hit into long par 3s. Tournament priority.</li>
+      </ul>
+      <p><strong>Tee clubs (20 min) — FAIRWAY FINDER TEST</strong></p>
+      <ul>
+        <li>Hit 10 drivers, 10 three-woods at the same fairway target.</li>
+        <li>Count: out of 10 with each, how many landed in fairway width?</li>
+        <li>Whichever club gets you a higher % is your tournament tee club.</li>
+      </ul>
+      <div class="tip">After block: record stats in Session Notes. Miss patterns, percentage in fairway, etc.</div>`,
+
+    short_close: `<strong>End on success (30 min):</strong>
+      <ol>
+        <li>10 chips to a hole 25 ft away. End when you put 5 within 3 ft in a row.</li>
+        <li>10 putts from 6 ft. End when you make 5 in a row.</li>
+      </ol>
+      <div class="tip">Always end practice on a made putt. Tour pros do this — last image of the day matters.</div>`,
+
+    thu_strength_detailed: `<strong>Strength circuit (35 min main work):</strong>
+      <p>4 rounds of:</p>
+      <ol>
+        <li>Goblet squat — 10 reps (both 15-lb DBs)</li>
+        <li>Med ball rotational throws — 8/side, 6-lb ball</li>
+        <li>DB row — 10/side, 15-lb</li>
+        <li>Plank — 60 sec</li>
+        <li>Rest 90 sec between rounds</li>
+      </ol>
+      <p><strong>Finisher:</strong> Ab wheel 3×6-8 reps + side plank 2×30 sec each side.</p>`,
+
+    chip_block_detailed: `<strong>Chipping block (45 min):</strong>
+      <ul>
+        <li>10 chips from clean lie — 1 club (56°)</li>
+        <li>10 chips from clean lie — 1 club (PW)</li>
+        <li>10 chips from rough — 56°</li>
+        <li>Score yourself out of 30: how many within 3 ft? Within 6 ft?</li>
+      </ul>
+      <div class="tip">Two clubs same lie shows you which is more reliable for you.</div>`,
+
+    bunker_detailed: `<strong>Bunker block (30 min):</strong>
+      <ul>
+        <li>5 splash shots — flat lie</li>
+        <li>5 splash shots — slightly downhill</li>
+        <li>5 splash shots — uphill</li>
+        <li>Goal: all 15 on the green. 5+ within 10 ft.</li>
+      </ul>
+      <strong>Technique reminder:</strong> Open face, ball forward in stance, hit 2 inches behind the ball, accelerate through the sand.`,
+
+    range_focus_wedges: `<strong>Range — wedges + 7i (45 min):</strong>
+      <ul>
+        <li>15 balls PW at a target — track miss pattern</li>
+        <li>15 balls 56° at a closer target</li>
+        <li>20 balls 7-iron — full pre-shot routine on EVERY ball</li>
+      </ul>`,
+
+    sat_range_focus: `<strong>Saturday range focus block:</strong>
+      <p>Look at this week's tracked rounds. Where did you lose the most strokes?</p>
+      <ul>
+        <li>Tee shots not in fairway → 30 balls driver + 3-wood, alternating, target line</li>
+        <li>Approaches too left/right → mid-iron block, 30 balls, full routine</li>
+        <li>Wedges (60-100 yd) → ladder drill, 30 balls</li>
+        <li>Putting → carpet at home is fine, or putting green here</li>
+      </ul>
+      <strong>Don't try to fix everything in one session.</strong> Pick ONE leak. 60 minutes on it.`,
+
+    tournament_warmup: `<strong>Pre-round warmup template (45 min):</strong>
+      <ol>
+        <li><strong>10 min putting:</strong> 20 short putts (3-6 ft), then 10 lag putts (30+ ft)</li>
+        <li><strong>10 min chipping:</strong> 15 chips from varied lies, focus on landing spot</li>
+        <li><strong>25 min range:</strong> PW → 9i → 7i → 5i/hybrid → driver/3-wood. 5-8 balls each. Full pre-shot routine on every ball.</li>
+      </ol>
+      <strong>Finish</strong> with the club you'll hit off #1.`,
+
+    mgmt_focus: `<strong>Course management focus:</strong>
+      <ul>
+        <li>Every par 4/5 tee: ask "driver or 3-wood?" — whatever gives more fairways</li>
+        <li>Approaches: aim middle of green, not the pin</li>
+        <li>Par 3s with trouble: club up, swing easier</li>
+        <li>In trouble: pitch out sideways, not the hero shot</li>
+      </ul>`,
+
+    tracking_emphasis: `<strong>This is non-negotiable:</strong>
+      <ul>
+        <li>Open Round Tracker before the round starts</li>
+        <li>Tap a course preset</li>
+        <li>After every hole, before walking to next tee, log: score, putts, FIR (if par 4+), GIR, UD (if missed GIR), penalty</li>
+        <li>If you don't track it, the round doesn't help you improve</li>
+      </ul>
+      <strong>Dad sees the data either way</strong> — better to be honest than to skip it.`
+  };
+
+  // ===== Date helpers =====
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function formatDateLabel(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  }
+
+  function getWeekDates() {
+    return Object.keys(WEEK).sort();
+  }
+
+  let viewDate = todayStr();
+  if (!WEEK[viewDate]) {
+    const weekDates = getWeekDates();
+    viewDate = weekDates[0];
+  }
+
+  function getDayData(date) {
+    if (!allData[date]) allData[date] = {};
+    return allData[date];
+  }
+
+  function load() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) allData = JSON.parse(saved);
+    } catch(e) { allData = {}; }
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allData)); } catch(e) {}
+  }
+
+  // ===== Render =====
+  function renderDaySelector() {
+    const sel = document.getElementById('daySelector');
+    sel.innerHTML = '';
+    getWeekDates().forEach(date => {
+      const d = new Date(date + 'T12:00:00');
+      const day = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayNum = d.getDate();
+      const pill = document.createElement('button');
+      pill.className = 'day-pill' + (date === viewDate ? ' active' : '');
+      pill.textContent = `${day} ${dayNum}`;
+      const dayData = allData[date] || {};
+      const hasProgress = Object.entries(dayData).some(([k,v]) => v === true && !k.startsWith('_'));
+      if (hasProgress && date !== viewDate) pill.classList.add('has-progress');
+      pill.onclick = () => { viewDate = date; render(); };
+      sel.appendChild(pill);
+    });
+  }
+
+  function renderSection(sectionClass, title, intro, tasks, dayData, defaultOpen = true) {
+    let html = `<div class="section ${sectionClass}${defaultOpen ? '' : ' collapsed'}" data-section="${sectionClass}">`;
+    const completed = tasks.filter(t => dayData[t.id]).length;
+    const total = tasks.length;
+    const isComplete = completed === total && total > 0;
+    html += `<div class="section-header" onclick="toggleSection('${sectionClass}')">
+      <h2>${title}</h2>
+      <div class="right">
+        <span class="section-progress ${isComplete ? 'complete' : ''}">${isComplete ? '✓ Done' : completed + '/' + total}</span>
+        <span class="section-chev">▼</span>
+      </div>
+    </div>`;
+    html += `<div class="section-body">`;
+    if (intro) html += `<div class="section-intro">${intro}</div>`;
+    tasks.forEach(t => {
+      const checked = !!dayData[t.id];
+      html += `<div class="task">
+        <div class="task-row ${checked ? 'done' : ''}">
+          <input type="checkbox" id="${t.id}" ${checked ? 'checked' : ''} onchange="toggleTask('${t.id}', this.checked)">
+          <label class="task-label" for="${t.id}">${t.label}${t.time ? ' <span class="task-time">' + t.time + '</span>' : ''}</label>
+        </div>`;
+      if (t.spec) html += `<div class="task-spec">${t.spec}</div>`;
+      if (t.info) {
+        html += `<button class="info-toggle" onclick="toggleInfo('info_${t.id}', this)">How to <span class="chev">▼</span></button>
+                 <div class="info-panel" id="info_${t.id}">${INFO_PANELS[t.info] || ''}</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  }
+
+  function render() {
+    const dayPlan = WEEK[viewDate];
+    const dayData = getDayData(viewDate);
+
+    document.getElementById('dateLabel').textContent = formatDateLabel(viewDate);
+    if (dayPlan) {
+      document.getElementById('dayTitle').textContent = dayPlan.title;
+      document.getElementById('daySub').textContent = dayPlan.sub;
+    } else {
+      document.getElementById('dayTitle').textContent = 'No plan';
+      document.getElementById('daySub').textContent = '';
+    }
+
+    renderDaySelector();
+
+    // Schedule tag (orthodontist, etc.)
+    const tagContainer = document.getElementById('scheduleTagContainer');
+    if (dayPlan && dayPlan.scheduleTag) {
+      tagContainer.innerHTML = `<div class="schedule-tag">${dayPlan.scheduleTag}</div>`;
+    } else {
+      tagContainer.innerHTML = '';
+    }
+
+    const container = document.getElementById('sectionsContainer');
+    if (!dayPlan) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim);">No plan scheduled for this date.</div>';
+      updateTodayProgress();
+      return;
+    }
+
+    let html = '';
+
+    // Morning routine with day-specific wake time
+    html += renderSection('morning', `🌅 Morning Routine — Wake ${dayPlan.wakeTime}`, '', morningTasks(dayPlan.wakeTime), dayData);
+
+    // Rooms
+    html += renderSection('rooms', '🏠 Rooms Check', 'Bedroom, bathroom, game room. Discipline transfers.', STANDARD_ROOMS, dayData);
+
+    // Workout (Monday + Thursday)
+    if (dayPlan.includeWorkout && dayPlan.workout) {
+      html += renderSection('workout', dayPlan.workout.title, dayPlan.workout.intro, dayPlan.workout.tasks, dayData);
+    }
+
+    // Golf
+    html += renderSection('golf', '⛳ Golf Plan', dayPlan.golf.intro, dayPlan.golf.tasks, dayData);
+
+    // Quick links
+    html += `<div class="section">
+      <div class="section-header" style="cursor: default;"><h2 style="color: var(--text-dim);">⚡ Quick Actions</h2></div>
+      <div class="section-body">
+        <div class="quick-actions">
+          <a href="round_tracker.html" class="quick-link"><span class="ico">📋</span>Round Tracker</a>
+          <a href="session_notes.html" class="quick-link"><span class="ico">📝</span>Session Notes</a>
+        </div>
+      </div>
+    </div>`;
+
+    // Evening
+    html += renderSection('evening', '🌙 Evening', 'Wind down. Tomorrow starts when you go to bed tonight.', eveningTasks(), dayData);
+
+    // Notes
+    html += `<div class="section">
+      <div class="section-header" style="cursor: default;"><h2 style="color: var(--text-dim);">📓 Today's Quick Note</h2></div>
+      <div class="section-body">
+        <div class="field">
+          <label>Anything worth flagging? (optional)</label>
+          <textarea id="dailyNote" oninput="saveDailyNote(this.value)" placeholder="">${dayData._note || ''}</textarea>
+        </div>
+        <div class="field">
+          <label>How was today overall? (1-5)</label>
+          <div class="rating-group">
+            ${[1,2,3,4,5].map(n => `<button onclick="setDayRating(${n})" class="${dayData._rating == n ? 'selected' : ''}" id="rating_${n}">${n}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    container.innerHTML = html;
+    updateTodayProgress();
+  }
+
+  function toggleSection(sectionClass) {
+    const el = document.querySelector(`[data-section="${sectionClass}"]`);
+    if (el) el.classList.toggle('collapsed');
+  }
+  window.toggleSection = toggleSection;
+
+  function toggleTask(id, checked) {
+    const dayData = getDayData(viewDate);
+    dayData[id] = checked;
+    save();
+    render();
+  }
+  window.toggleTask = toggleTask;
+
+  function toggleInfo(id, btn) {
+    event.stopPropagation();
+    const panel = document.getElementById(id);
+    const labelNode = btn.firstChild;
+    const isOpen = panel.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    labelNode.nodeValue = isOpen ? 'Hide ' : 'How to ';
+  }
+  window.toggleInfo = toggleInfo;
+
+  function saveDailyNote(val) {
+    const dayData = getDayData(viewDate);
+    dayData._note = val;
+    save();
+  }
+  window.saveDailyNote = saveDailyNote;
+
+  function setDayRating(n) {
+    const dayData = getDayData(viewDate);
+    dayData._rating = n;
+    save();
+    [1,2,3,4,5].forEach(i => {
+      document.getElementById('rating_' + i)?.classList.toggle('selected', i === n);
+    });
+  }
+  window.setDayRating = setDayRating;
+
+  function getAllTaskIds(dayPlan) {
+    let ids = [...morningTasks(dayPlan.wakeTime).map(t => t.id),
+               ...STANDARD_ROOMS.map(t => t.id),
+               ...dayPlan.golf.tasks.map(t => t.id),
+               ...eveningTasks().map(t => t.id)];
+    if (dayPlan.includeWorkout && dayPlan.workout) {
+      ids = [...ids, ...dayPlan.workout.tasks.map(t => t.id)];
+    }
+    return ids;
+  }
+
+  function updateTodayProgress() {
+    const dayPlan = WEEK[viewDate];
+    if (!dayPlan) {
+      document.getElementById('todayProgress').textContent = '—';
+      return;
+    }
+    const dayData = getDayData(viewDate);
+    const ids = getAllTaskIds(dayPlan);
+    const total = ids.length;
+    const done = ids.filter(id => dayData[id]).length;
+    document.getElementById('todayProgress').textContent = `${done} / ${total}`;
+  }
+
+  async function shareToday() {
+    const dayPlan = WEEK[viewDate];
+    if (!dayPlan) { alert('No plan for this date'); return; }
+    const dayData = getDayData(viewDate);
+    let text = `DAILY PROGRESS — ${formatDateLabel(viewDate)}\n`;
+    text += `${dayPlan.title}\n`;
+    text += `========================================\n\n`;
+
+    function block(title, tasks) {
+      let s = `${title}\n`;
+      tasks.forEach(t => {
+        const checked = dayData[t.id] ? '✓' : '✗';
+        s += `  ${checked} ${t.label}\n`;
+      });
+      return s + '\n';
+    }
+
+    text += block(`🌅 MORNING (wake ${dayPlan.wakeTime})`, morningTasks(dayPlan.wakeTime));
+    text += block('🏠 ROOMS', STANDARD_ROOMS);
+    if (dayPlan.includeWorkout) text += block('💪 WORKOUT', dayPlan.workout.tasks);
+    text += block('⛳ GOLF', dayPlan.golf.tasks);
+    text += block('🌙 EVENING', eveningTasks());
+
+    if (dayData._rating) text += `Day rating: ${dayData._rating} / 5\n`;
+    if (dayData._note) text += `Note: ${dayData._note}\n`;
+
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Daily Progress', text: text }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
+    }
+    if (navigator.clipboard) {
+      try { await navigator.clipboard.writeText(text); alert('✓ Copied. Paste into Messages.'); return; } catch(e) {}
+    }
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
+  }
+  window.shareToday = shareToday;
+
+  load();
+  render();
+</script>
+
+</body>
+</html>

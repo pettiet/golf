@@ -6,108 +6,50 @@
 <title>Training Hub</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --card: #161b22;
-    --card-hover: #1c2330;
-    --border: #30363d;
-    --text: #e6edf3;
-    --text-dim: #8b949e;
-    --accent: #2ea043;
-    --accent-dim: #1f6f33;
-    --warn: #f97316;
-    --info: #3b82f6;
-    --purple: #a855f7;
-    --teal: #14b8a6;
+    --bg: #0d1117; --card: #161b22; --card-hover: #1c2330; --border: #30363d;
+    --text: #e6edf3; --text-dim: #8b949e; --accent: #2ea043; --info: #3b82f6;
+    --warn: #f97316; --purple: #a855f7; --teal: #14b8a6;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 0 0 40px 0;
-    font-size: 16px;
-    line-height: 1.5;
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding: 0 0 40px 0; font-size: 16px; line-height: 1.5; min-height: 100vh;
   }
   header {
     background: linear-gradient(135deg, #1f6f33 0%, #0d3018 100%);
-    padding: 32px 20px 36px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    padding: 30px 20px 32px; text-align: center; position: relative; overflow: hidden;
   }
   header::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
-    pointer-events: none;
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none;
   }
   header .label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
-  header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-  header .sub { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 8px; }
-  .countdown {
-    margin-top: 16px;
-    background: rgba(0,0,0,0.25);
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: inline-block;
-    color: white;
-    font-size: 13px;
+  header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 6px; }
+  header .date-strip {
+    margin-top: 14px; background: rgba(0,0,0,0.25); border-radius: 8px;
+    padding: 8px 14px; display: inline-block; color: white; font-size: 12px;
   }
-  .countdown strong { font-size: 18px; font-weight: 700; }
+  header .date-strip strong { font-size: 15px; font-weight: 700; }
 
   .container { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
-
   .section-title {
-    font-size: 12px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 20px 0 12px;
-    font-weight: 600;
+    font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 2px; margin: 18px 0 10px; font-weight: 600;
   }
   .section-title:first-of-type { margin-top: 4px; }
 
-  .feedback-guide {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  .feedback-guide-header {
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .feedback-guide-header strong { font-size: 13px; }
-  .feedback-guide-header .chev { color: var(--text-dim); transition: transform 0.2s; font-size: 12px; }
-  .feedback-guide.open .feedback-guide-header .chev { transform: rotate(180deg); }
-  .feedback-guide-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
-  .feedback-guide.open .feedback-guide-body { display: block; }
-
-  .rhythm-row {
-    display: flex;
-    gap: 10px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(48,54,61,0.5);
-    align-items: flex-start;
-  }
+  .rhythm-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 18px; overflow: hidden; }
+  .rhythm-header { padding: 12px 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .rhythm-header strong { font-size: 13px; }
+  .rhythm-header .chev { color: var(--text-dim); transition: transform 0.2s; font-size: 12px; }
+  .rhythm-card.open .rhythm-header .chev { transform: rotate(180deg); }
+  .rhythm-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); }
+  .rhythm-card.open .rhythm-body { display: block; }
+  .rhythm-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(48,54,61,0.5); align-items: flex-start; }
   .rhythm-row:last-child { border-bottom: none; }
-  .rhythm-who {
-    flex-shrink: 0;
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-top: 1px;
-  }
+  .rhythm-who { flex-shrink: 0; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 700; letter-spacing: 1px; margin-top: 1px; }
   .rhythm-who.kid { background: rgba(168,85,247,0.15); color: var(--purple); }
   .rhythm-who.dad { background: rgba(59,130,246,0.15); color: var(--info); }
   .rhythm-content { flex: 1; font-size: 13px; line-height: 1.5; }
@@ -115,77 +57,44 @@
   .rhythm-content .when { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
 
   .tile {
-    display: block;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 12px;
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.15s ease;
-    position: relative;
-    overflow: hidden;
+    display: block; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; margin-bottom: 10px;
+    text-decoration: none; color: var(--text); position: relative; overflow: hidden;
   }
   .tile:active { transform: scale(0.98); }
-  .tile.active::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: var(--accent);
+  .tile.primary {
+    background: linear-gradient(135deg, rgba(46,160,67,0.18) 0%, rgba(46,160,67,0.04) 100%);
+    border-color: var(--accent-dim);
   }
+  .tile::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  }
+  .tile.primary::before { background: var(--accent); }
+  .tile.tracker::before { background: var(--info); }
+  .tile.notes::before { background: var(--purple); }
+  .tile.review::before { background: var(--teal); }
   .tile .tile-label {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 4px;
-    font-weight: 700;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 4px; font-weight: 700;
   }
+  .tile.primary .tile-label { color: var(--accent); }
+  .tile.tracker .tile-label { color: var(--info); }
+  .tile.notes .tile-label { color: var(--purple); }
+  .tile.review .tile-label { color: var(--teal); }
   .tile .tile-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
   .tile .tile-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-  .tile .tile-meta {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 11px;
-    background: rgba(46,160,67,0.15);
-    color: var(--accent);
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+  .tile .tile-cta {
+    display: inline-block; margin-top: 8px; font-size: 11px; padding: 3px 8px;
+    border-radius: 4px; font-weight: 600; letter-spacing: 0.5px;
   }
-
-  .tile.tracker .tile-label { color: var(--info); }
-  .tile.tracker::before { background: var(--info); }
-  .tile.tracker .tile-meta { background: rgba(59,130,246,0.15); color: var(--info); }
-
-  .tile.strength .tile-label { color: var(--warn); }
-  .tile.strength::before { background: var(--warn); }
-  .tile.strength .tile-meta { background: rgba(249,115,22,0.15); color: var(--warn); }
-
-  .tile.week .tile-label { color: var(--purple); }
-  .tile.week::before { background: var(--purple); }
-  .tile.week .tile-meta { background: rgba(168,85,247,0.15); color: var(--purple); }
-
-  .tile.notes .tile-label { color: var(--purple); }
-  .tile.notes::before { background: var(--purple); }
-  .tile.notes .tile-meta { background: rgba(168,85,247,0.15); color: var(--purple); }
-
-  .tile.review .tile-label { color: var(--teal); }
-  .tile.review::before { background: var(--teal); }
-  .tile.review .tile-meta { background: rgba(20,184,166,0.15); color: var(--teal); }
+  .tile.primary .tile-cta { background: rgba(46,160,67,0.2); color: var(--accent); }
+  .tile.tracker .tile-cta { background: rgba(59,130,246,0.15); color: var(--info); }
+  .tile.notes .tile-cta { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .tile.review .tile-cta { background: rgba(20,184,166,0.15); color: var(--teal); }
 
   .footer-note {
-    margin-top: 24px;
-    padding: 14px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
+    margin-top: 20px; padding: 12px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 12px; color: var(--text-dim); line-height: 1.6;
   }
   .footer-note strong { color: var(--text); }
 </style>
@@ -195,38 +104,37 @@
 <header>
   <div class="label">Training Hub</div>
   <h1>Summer 2026</h1>
-  <div class="sub">Daily plans · Tracker · Notes · Reviews</div>
-  <div class="countdown" id="countdown"></div>
+  <div class="sub">Daily structure · Tracking · Reviews</div>
+  <div class="date-strip" id="dateStrip"></div>
 </header>
 
 <div class="container">
 
-  <!-- FEEDBACK RHYTHM GUIDE -->
-  <div class="feedback-guide" id="feedbackGuide">
-    <div class="feedback-guide-header" onclick="document.getElementById('feedbackGuide').classList.toggle('open')">
-      <strong>📋 Feedback rhythm — when to submit what</strong>
+  <div class="rhythm-card" id="rhythmCard">
+    <div class="rhythm-header" onclick="document.getElementById('rhythmCard').classList.toggle('open')">
+      <strong>📋 Who does what, when</strong>
       <span class="chev">▼</span>
     </div>
-    <div class="feedback-guide-body">
+    <div class="rhythm-body">
+      <div class="rhythm-row">
+        <span class="rhythm-who kid">KID</span>
+        <div class="rhythm-content">
+          <strong>Daily — open "Today" every morning.</strong>
+          <div class="when">Morning routine, rooms, golf plan, evening. Check things off as you go.</div>
+        </div>
+      </div>
       <div class="rhythm-row">
         <span class="rhythm-who kid">KID</span>
         <div class="rhythm-content">
           <strong>Round Tracker — after EVERY round.</strong>
-          <div class="when">Within 30 min of finishing. Hit Share when done.</div>
+          <div class="when">Hole by hole, real time. Tap your score, putts, fairway/green. Share to Dad when done.</div>
         </div>
       </div>
       <div class="rhythm-row">
         <span class="rhythm-who kid">KID</span>
         <div class="rhythm-content">
           <strong>Session Notes — 2-3 times per week.</strong>
-          <div class="when">After tracked rounds + any session that felt notably good or bad. NOT every session.</div>
-        </div>
-      </div>
-      <div class="rhythm-row">
-        <span class="rhythm-who kid">KID</span>
-        <div class="rhythm-content">
-          <strong>Week 0 checkboxes — as you go.</strong>
-          <div class="when">Auto-saves. Just keeps the day organized.</div>
+          <div class="when">After tracked rounds and notably good or bad sessions. Not every session.</div>
         </div>
       </div>
       <div class="rhythm-row">
@@ -236,85 +144,57 @@
           <div class="when">Once per week. Bundles everything for Claude. Plan next week from this.</div>
         </div>
       </div>
-      <div class="rhythm-row">
-        <span class="rhythm-who dad">DAD</span>
-        <div class="rhythm-content">
-          <strong>Mid-week — only if something changes.</strong>
-          <div class="when">Injury, equipment issue, schedule change, or red flag from his notes. Otherwise wait for Sunday.</div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <div class="section-title">This Week</div>
+  <div class="section-title">Today</div>
 
-  <a href="week0.html" class="tile week active">
-    <div class="tile-label">Week 0 · Tournament Prep</div>
-    <div class="tile-title">May 26 – June 2</div>
-    <div class="tile-desc">Daily plan with weather contingencies, tournament prep, and strength work. Tap any day to expand.</div>
-    <span class="tile-meta">View Daily Plans</span>
+  <a href="daily.html" class="tile primary">
+    <div class="tile-label">Daily Plan</div>
+    <div class="tile-title">Today's Plan</div>
+    <div class="tile-desc">Morning routine, rooms check, golf plan for today, evening wind-down. Start here every day.</div>
+    <span class="tile-cta">Open Today</span>
   </a>
 
-  <div class="section-title">Daily Tools (Kid)</div>
+  <div class="section-title">Tools</div>
 
   <a href="round_tracker.html" class="tile tracker">
     <div class="tile-label">Round Tracker</div>
-    <div class="tile-title">Post-Round Entry</div>
-    <div class="tile-desc">Use after every round. Home course preset buttons auto-fill pars and yardages.</div>
-    <span class="tile-meta">After Every Round</span>
+    <div class="tile-title">Track a Round</div>
+    <div class="tile-desc">Course presets for Oak Tree East/West and Kickingbird. Tap your score, hole by hole.</div>
+    <span class="tile-cta">After Every Round</span>
   </a>
 
   <a href="session_notes.html" class="tile notes">
     <div class="tile-label">Session Notes</div>
-    <div class="tile-title">Quick Post-Session Notes</div>
-    <div class="tile-desc">Rate, reflect, share. Use after meaningful sessions — 2-3 times per week.</div>
-    <span class="tile-meta">After Key Sessions</span>
+    <div class="tile-title">Quick Reflection</div>
+    <div class="tile-desc">5-star rating + 4 prompts. Use after meaningful sessions only.</div>
+    <span class="tile-cta">2-3 times per week</span>
   </a>
 
-  <div class="section-title">Weekly (Dad)</div>
+  <div class="section-title">For Dad</div>
 
   <a href="weekly_review.html" class="tile review">
     <div class="tile-label">Weekly Review</div>
-    <div class="tile-title">Bundle &amp; Send to Coach</div>
-    <div class="tile-desc">Sunday night: combines rounds, notes, and your observations into one message for Claude.</div>
-    <span class="tile-meta">Sundays</span>
-  </a>
-
-  <div class="section-title">Reference</div>
-
-  <a href="today_session.html" class="tile">
-    <div class="tile-label">Day 1 Baseline · Done</div>
-    <div class="tile-title">Baseline Assessment</div>
-    <div class="tile-desc">Original baseline session from May 25.</div>
-  </a>
-
-  <a href="strength_assessment.html" class="tile strength">
-    <div class="tile-label">Day 1 Strength · Done</div>
-    <div class="tile-title">Strength Assessment</div>
-    <div class="tile-desc">Movement screen results from May 25.</div>
+    <div class="tile-title">Sunday Bundle</div>
+    <div class="tile-desc">Sees accountability stats, rounds, notes — combines into one message for Claude to plan next week.</div>
+    <span class="tile-cta">Sundays</span>
   </a>
 
   <div class="footer-note">
-    <strong>How to use this site:</strong> Tap any tile to open. Progress saves automatically. To install as an app: Share → Add to Home Screen.
+    <strong>Save to home screen:</strong> In your browser, Share → Add to Home Screen.<br>
+    All data saves locally on this device.
   </div>
 
 </div>
 
 <script>
-  const tournamentDate = new Date('2026-06-02T07:00:00');
-  function updateCountdown() {
-    const now = new Date();
-    const diff = tournamentDate - now;
-    const el = document.getElementById('countdown');
-    if (!el) return;
-    if (diff <= 0) { el.innerHTML = '🏌️ Tournament is today!'; return; }
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    if (days > 0) el.innerHTML = '<strong>' + days + '</strong> day' + (days === 1 ? '' : 's') + ' until tournament';
-    else el.innerHTML = '<strong>' + hours + '</strong> hours until tournament';
+  function updateDate() {
+    const d = new Date();
+    const label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    document.getElementById('dateStrip').innerHTML = '<strong>' + label + '</strong>';
   }
-  updateCountdown();
-  setInterval(updateCountdown, 60000);
+  updateDate();
 </script>
 
 </body>

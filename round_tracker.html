@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Round Tracker</title>
 <style>
   :root {
@@ -15,9 +15,10 @@
     --accent: #2ea043;
     --accent-dim: #1f6f33;
     --info: #3b82f6;
+    --warn: #d29922;
     --header-grad: linear-gradient(135deg, #1e40af 0%, #0b1f4f 100%);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     background: var(--bg);
@@ -29,26 +30,63 @@
   .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
   header {
     background: var(--header-grad);
-    padding: 16px 16px 22px;
+    padding: 14px 16px 18px;
   }
   header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
-  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
-  header .sub { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 20px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 4px; display: flex; justify-content: space-between; align-items: center; }
   .save-indicator { font-size: 11px; color: rgba(255,255,255,0.7); opacity: 0; transition: opacity 0.3s; }
   .save-indicator.visible { opacity: 1; }
 
-  .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+  .container { padding: 14px; max-width: 600px; margin: 0 auto; }
 
+  /* Step indicator */
+  .steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .step {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .step.active { background: var(--accent); }
+  .step.done { background: var(--accent-dim); }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .panel h2 {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .panel p.help {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  /* Round selector */
   .round-selector {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 16px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 13px;
+    gap: 8px;
+    font-size: 12px;
   }
   .round-selector label { color: var(--text-dim); flex-shrink: 0; }
   .round-selector select {
@@ -58,7 +96,8 @@
     border-radius: 6px;
     padding: 6px 8px;
     color: var(--text);
-    font-size: 13px;
+    font-size: 12px;
+    min-width: 0;
   }
   .round-selector button {
     background: var(--info);
@@ -68,181 +107,297 @@
     padding: 6px 10px;
     font-size: 12px;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
-  .preset-bar {
-    background: rgba(46,160,67,0.06);
-    border: 1px dashed var(--accent-dim);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 16px;
-  }
-  .preset-bar h3 {
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .preset-buttons {
+  /* Course preset cards */
+  .preset-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    margin-top: 8px;
   }
-  .preset-buttons button {
+  .preset-btn {
     background: var(--bg);
-    border: 1px solid var(--accent-dim);
-    color: var(--accent);
-    padding: 8px 10px;
-    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 8px;
+    border-radius: 8px;
     font-size: 12px;
     cursor: pointer;
     font-family: inherit;
-    font-weight: 600;
+    text-align: left;
+    line-height: 1.3;
   }
-  .preset-buttons button:active { background: var(--card-hover); }
-  .preset-note { font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.4; }
+  .preset-btn:active { background: var(--card-hover); }
+  .preset-btn .name { font-weight: 600; display: block; }
+  .preset-btn .tee { color: var(--text-dim); font-size: 11px; display: block; margin-top: 2px; }
+  .preset-btn.selected { border-color: var(--accent); background: rgba(46,160,67,0.1); }
 
-  .info-toggle {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    border-radius: 6px;
-    padding: 5px 10px;
-    font-size: 12px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: inherit;
-  }
-  .info-toggle .chev { transition: transform 0.2s; display: inline-block; font-size: 9px; }
-  .info-toggle.open .chev { transform: rotate(180deg); }
-  .info-panel {
-    display: none;
-    background: rgba(46,160,67,0.05);
-    border-left: 2px solid var(--accent-dim);
-    border-radius: 0 6px 6px 0;
-    padding: 10px 12px;
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.6;
-    margin-bottom: 14px;
-  }
-  .info-panel.open { display: block; }
-  .info-panel strong { color: var(--text); }
-  .info-panel ul { padding-left: 18px; margin: 6px 0; }
-  .info-panel li { margin-bottom: 6px; }
-
-  .info-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 16px;
-  }
-  .info-card h2 { font-size: 12px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  /* Form fields */
   .field { margin-bottom: 10px; }
   .field:last-child { margin-bottom: 0; }
-  .field label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
   .field input, .field select, .field textarea {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 8px 10px;
+    padding: 10px 12px;
     color: var(--text);
-    font-size: 14px;
+    font-size: 15px;
     font-family: inherit;
   }
-  .field textarea { min-height: 60px; resize: vertical; }
+  .field textarea { min-height: 70px; resize: vertical; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-  table.hole-table {
-    width: 100%;
-    border-collapse: collapse;
+  /* Hole-by-hole entry — current hole focus */
+  .current-hole {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    overflow: hidden;
-    font-size: 13px;
+    padding: 14px;
+    margin-bottom: 12px;
   }
-  table.hole-table th {
-    background: rgba(46,160,67,0.1);
-    color: var(--accent);
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 8px 4px;
-    border-bottom: 1px solid var(--border);
-    font-weight: 600;
+  .hole-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
   }
-  table.hole-table td {
-    padding: 4px;
-    border-bottom: 1px solid rgba(48,54,61,0.5);
-    text-align: center;
-  }
-  table.hole-table td.hole-num {
-    background: rgba(46,160,67,0.05);
-    color: var(--text-dim);
-    font-weight: 600;
-    font-size: 12px;
-    width: 30px;
-  }
-  table.hole-table td.yds {
-    font-size: 10px;
-    color: var(--text-dim);
-    width: 38px;
-  }
-  table.hole-table input, table.hole-table select {
-    width: 100%;
+  .hole-nav-btn {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 4px 2px;
     color: var(--text);
-    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    font-family: inherit;
+    min-width: 50px;
+    font-weight: 700;
+  }
+  .hole-nav-btn:active { background: var(--card-hover); }
+  .hole-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .hole-title {
     text-align: center;
+    flex: 1;
+  }
+  .hole-title .num {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .hole-title .info {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .hole-title .info .par { color: var(--accent); font-weight: 600; }
+
+  /* Score quick buttons */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .score-btn {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 14px 0;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    position: relative;
+  }
+  .score-btn:active { transform: scale(0.95); }
+  .score-btn.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .score-btn .label {
+    display: block;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-dim);
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+  }
+  .score-btn.selected .label { color: rgba(255,255,255,0.85); }
+
+  .score-other {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  .score-other label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+  .score-other input {
+    width: 60px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    color: var(--text);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* Putts */
+  .putts-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .putts-btn {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
     font-family: inherit;
   }
-  table.hole-table input.par {
-    background: rgba(46,160,67,0.05);
-    border-color: rgba(46,160,67,0.2);
-    color: #a0d9b0;
+  .putts-btn:active { transform: scale(0.95); }
+  .putts-btn.selected {
+    background: var(--info);
+    border-color: var(--info);
+    color: white;
   }
 
-  .section-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--accent);
-    margin: 20px 0 10px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  /* Toggles for FIR/GIR/UD */
+  .toggle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
   }
+  .toggle-btn {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--text-dim);
+    padding: 10px 4px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+  }
+  .toggle-btn .lbl { font-size: 9px; letter-spacing: 0.5px; opacity: 0.7; display: block; margin-bottom: 2px; }
+  .toggle-btn:active { transform: scale(0.97); }
+  .toggle-btn.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .toggle-btn.off-na { opacity: 0.4; }
 
+  .toggle-row .pen-input {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+    text-align: center;
+  }
+  .toggle-row .pen-input label { font-size: 9px; color: var(--text-dim); letter-spacing: 0.5px; display: block; }
+  .toggle-row .pen-input input { width: 100%; background: transparent; border: none; color: var(--text); font-size: 16px; font-weight: 600; text-align: center; padding: 2px 0; }
+
+  /* Summary tables */
   .totals {
     background: linear-gradient(135deg, rgba(46,160,67,0.15) 0%, rgba(46,160,67,0.05) 100%);
     border: 1px solid var(--accent-dim);
     border-radius: 12px;
-    padding: 16px;
-    margin-top: 16px;
+    padding: 14px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 10px;
     text-align: center;
+    margin-bottom: 12px;
   }
-  .totals .stat .num { font-size: 24px; font-weight: 700; color: var(--accent); }
-  .totals .stat .lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .totals .stat .num { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .totals .stat .lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
+  /* All-holes view */
+  .all-holes-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+  }
+  .all-holes-toggle .chev { font-size: 9px; transition: transform 0.2s; }
+  .all-holes-toggle.open .chev { transform: rotate(180deg); }
+  .all-holes-table {
+    display: none;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .all-holes-table.visible { display: table; }
+  .all-holes-table th {
+    background: rgba(46,160,67,0.08);
+    color: var(--accent);
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 6px 2px;
+    font-weight: 600;
+  }
+  .all-holes-table td {
+    padding: 5px 2px;
+    text-align: center;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .all-holes-table tr.current td { background: rgba(46,160,67,0.08); }
+  .all-holes-table tr.has-data td { color: var(--text); }
+  .all-holes-table tr.no-data td { color: var(--text-dim); }
+  .all-holes-table td.score-bad { color: #ef4444; font-weight: 600; }
+  .all-holes-table td.score-bogey { color: #fb923c; font-weight: 600; }
+  .all-holes-table td.score-par { color: var(--text); }
+  .all-holes-table td.score-birdie { color: #60a5fa; font-weight: 600; }
+  .all-holes-table td.score-eagle { color: var(--accent); font-weight: 700; }
+
+  /* Footer */
   .footer-actions {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: var(--card);
     border-top: 1px solid var(--border);
-    padding: 12px 16px;
+    padding: 10px 14px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
   }
   .footer-actions button {
@@ -261,7 +416,7 @@
     background: var(--card-hover);
     color: var(--text);
     border: 1px solid var(--border);
-    max-width: 100px;
+    max-width: 90px;
     flex: 0 0 auto;
   }
 </style>
@@ -272,9 +427,9 @@
 
 <header>
   <div class="label">Round Tracker</div>
-  <h1>Post-Round Entry</h1>
+  <h1>Track Your Round</h1>
   <div class="sub">
-    <span>Fill out within 30 min of finishing</span>
+    <span>One hole at a time. Tap fast.</span>
     <span class="save-indicator" id="saveIndicator">✓ Saved</span>
   </div>
 </header>
@@ -287,86 +442,114 @@
     <button onclick="newRound()">+ New</button>
   </div>
 
-  <!-- HOME COURSE PRESETS -->
-  <div class="preset-bar">
-    <h3>Home course quick-fill</h3>
-    <div class="preset-buttons">
-      <button onclick="applyPreset('east_gold')">East · Gold (7,116y)</button>
-      <button onclick="applyPreset('east_blue')">East · Blue (6,439y)</button>
-      <button onclick="applyPreset('west_gold')">West · Gold (6,752y)</button>
-      <button onclick="applyPreset('west_blue')">West · Blue (6,234y)</button>
+  <!-- COURSE SETUP -->
+  <div class="panel" id="setupPanel">
+    <h2>1. Course &amp; Date</h2>
+    <p class="help">Tap a preset to auto-fill par + yardages, or fill in manually below.</p>
+
+    <div class="preset-grid" id="presetGrid">
+      <button class="preset-btn" onclick="applyPreset('oakeast_gold')">
+        <span class="name">Oak Tree East</span><span class="tee">Gold · 7,116 yds · Par 70</span>
+      </button>
+      <button class="preset-btn" onclick="applyPreset('oakeast_blue')">
+        <span class="name">Oak Tree East</span><span class="tee">Blue · 6,439 yds · Par 71</span>
+      </button>
+      <button class="preset-btn" onclick="applyPreset('oakwest_gold')">
+        <span class="name">Oak Tree West</span><span class="tee">Gold · 6,752 yds · Par 70</span>
+      </button>
+      <button class="preset-btn" onclick="applyPreset('oakwest_blue')">
+        <span class="name">Oak Tree West</span><span class="tee">Blue · 6,234 yds · Par 70</span>
+      </button>
+      <button class="preset-btn" onclick="applyPreset('kickingbird_blue')">
+        <span class="name">Kickingbird</span><span class="tee">Blue · 6,424 yds · Par 70</span>
+      </button>
+      <button class="preset-btn" onclick="applyPreset('kickingbird_black')">
+        <span class="name">Kickingbird</span><span class="tee">Black · 6,944 yds · Par 70</span>
+      </button>
     </div>
-    <div class="preset-note">Tap to fill par, yardage, and course info. You can still edit anything.</div>
-  </div>
 
-  <button class="info-toggle" data-toggle="howto">How to fill this out <span class="chev">▼</span></button>
-  <div class="info-panel" id="howto">
-    <strong>Quick legend:</strong>
-    <ul>
-      <li><strong>Par/Yds:</strong> Auto-filled from preset if you tap one. Otherwise enter manually.</li>
-      <li><strong>Score:</strong> Strokes taken on the hole.</li>
-      <li><strong>Putts:</strong> Number of strokes once on the green.</li>
-      <li><strong>F (Fairway):</strong> Tick if your tee shot landed in the fairway. Par 4s and par 5s only.</li>
-      <li><strong>GIR:</strong> Tick if you got on the green in regulation. Par 3 = 1 shot, par 4 = 2, par 5 = 3.</li>
-      <li><strong>UD (Up &amp; Down):</strong> Tick if you missed the green BUT got down in 2.</li>
-      <li><strong>Pen:</strong> Number of penalty strokes on the hole.</li>
-    </ul>
-    <strong>Best practice:</strong> Fill in after each hole or at the turn/end. Filling out hours later loses too much detail.
-  </div>
-
-  <div class="info-card">
-    <h2>Round Info</h2>
-    <div class="info-grid">
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="r_date">
+    <div style="margin-top: 12px;">
+      <div class="field-row">
+        <div class="field"><label>Date</label><input type="date" id="r_date"></div>
+        <div class="field"><label>Round Type</label>
+          <select id="r_type">
+            <option value="practice">Practice</option>
+            <option value="tournament">Tournament</option>
+            <option value="prep">Tournament Prep</option>
+            <option value="casual">Casual</option>
+          </select>
+        </div>
       </div>
-      <div class="field">
-        <label>Course</label>
-        <input type="text" id="r_course" placeholder="Course name">
-      </div>
-      <div class="field">
-        <label>Tees / Yardage</label>
-        <input type="text" id="r_tees" placeholder="Blue / 6,400">
-      </div>
-      <div class="field">
-        <label>Course Rating / Slope</label>
-        <input type="text" id="r_rating" placeholder="74.6 / 140">
-      </div>
-      <div class="field">
-        <label>Conditions</label>
-        <input type="text" id="r_conditions" placeholder="Sunny, 85°, wind 15mph">
-      </div>
-      <div class="field">
-        <label>Round Type</label>
-        <select id="r_type">
-          <option value="practice">Practice Round</option>
-          <option value="tournament">Tournament</option>
-          <option value="prep">Tournament Prep</option>
-          <option value="casual">Casual</option>
-        </select>
+      <div class="field"><label>Course</label><input type="text" id="r_course" placeholder="Course name"></div>
+      <div class="field-row">
+        <div class="field"><label>Tees / Yardage</label><input type="text" id="r_tees" placeholder="Gold / 7,116"></div>
+        <div class="field"><label>Conditions</label><input type="text" id="r_conditions" placeholder="Sunny, calm"></div>
       </div>
     </div>
   </div>
 
-  <div class="section-title">Hole-by-Hole</div>
-  <table class="hole-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Yds</th>
-        <th>Par</th>
-        <th>Score</th>
-        <th>Putts</th>
-        <th>F</th>
-        <th>G</th>
-        <th>UD</th>
-        <th>Pen</th>
-      </tr>
-    </thead>
-    <tbody id="holeTable"></tbody>
-  </table>
+  <!-- CURRENT HOLE -->
+  <div class="current-hole">
+    <div class="hole-nav">
+      <button class="hole-nav-btn" id="prevBtn" onclick="navigateHole(-1)">◀</button>
+      <div class="hole-title">
+        <div class="num" id="holeNum">1</div>
+        <div class="info">
+          <span class="par" id="holePar">Par —</span> · <span id="holeYds">— yds</span>
+        </div>
+      </div>
+      <button class="hole-nav-btn" id="nextBtn" onclick="navigateHole(1)">▶</button>
+    </div>
 
+    <p class="help" style="font-size: 11px; margin-bottom: 8px; text-align: center; color: var(--text-dim);">
+      Tap your score. Tap your putts. Tap fairway/green/up-down if it applies.
+    </p>
+
+    <!-- Score quick-tap (relative to par) -->
+    <div class="score-grid" id="scoreGrid">
+      <!-- generated by JS -->
+    </div>
+
+    <div class="score-other">
+      <label>Or enter:</label>
+      <input type="number" id="scoreOther" min="1" max="15" placeholder="e.g. 8" oninput="setScoreFromInput()">
+    </div>
+
+    <!-- Putts -->
+    <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Putts</div>
+    <div class="putts-grid">
+      <button class="putts-btn" onclick="setPutts(0)">0</button>
+      <button class="putts-btn" onclick="setPutts(1)">1</button>
+      <button class="putts-btn" onclick="setPutts(2)">2</button>
+      <button class="putts-btn" onclick="setPutts(3)">3</button>
+      <button class="putts-btn" onclick="setPutts(4)">4+</button>
+    </div>
+
+    <!-- FIR / GIR / UD / Penalty -->
+    <div class="toggle-row">
+      <button class="toggle-btn" id="firBtn" onclick="toggleStat('fir')">
+        <span class="lbl">Fairway</span>HIT
+      </button>
+      <button class="toggle-btn" id="girBtn" onclick="toggleStat('gir')">
+        <span class="lbl">Green in Reg</span>HIT
+      </button>
+      <div class="pen-input">
+        <label>Penalty</label>
+        <input type="number" id="penInput" min="0" max="3" value="0" oninput="setPen(this.value)">
+      </div>
+    </div>
+    <div class="toggle-row">
+      <button class="toggle-btn" id="udBtn" onclick="toggleStat('ud')" style="grid-column: 1 / -1;">
+        <span class="lbl">Up &amp; Down (if missed green)</span>SAVED
+      </button>
+    </div>
+
+    <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; text-align: center;">
+      Hit ▶ to move to next hole · Auto-saves
+    </div>
+  </div>
+
+  <!-- TOTALS -->
   <div class="totals">
     <div class="stat"><div class="num" id="t_score">—</div><div class="lbl">Score</div></div>
     <div class="stat"><div class="num" id="t_putts">—</div><div class="lbl">Putts</div></div>
@@ -374,56 +557,24 @@
     <div class="stat"><div class="num" id="t_gir">—</div><div class="lbl">GIR</div></div>
   </div>
 
-  <div class="section-title">What Cost You Strokes?</div>
-  <div class="info-card">
-    <div class="field">
-      <label>Driver — how many fairways hit?</label>
-      <input type="text" id="drv_summary" placeholder="e.g. 8 of 14, mostly left misses">
-    </div>
-    <div class="field">
-      <label>Approach shots — typical miss pattern</label>
-      <input type="text" id="app_summary" placeholder="e.g. short and right with mid-irons">
-    </div>
-    <div class="field">
-      <label>3-putts (how many, from where)</label>
-      <input type="text" id="three_putts" placeholder="e.g. 2 three-putts, both 40+ ft">
-    </div>
-    <div class="field">
-      <label>Penalty shots (OB / water / drops)</label>
-      <input type="text" id="penalties_detail" placeholder="e.g. 1 OB driver on #7">
-    </div>
-  </div>
+  <!-- ALL HOLES VIEW (collapsible) -->
+  <button class="all-holes-toggle" onclick="toggleAllHoles()">
+    <span>View all 18 holes</span><span class="chev">▼</span>
+  </button>
+  <table class="all-holes-table" id="allHolesTable">
+    <thead>
+      <tr><th>#</th><th>Par</th><th>Yds</th><th>Score</th><th>Putts</th><th>F</th><th>G</th><th>UD</th></tr>
+    </thead>
+    <tbody id="allHolesBody"></tbody>
+  </table>
 
-  <div class="section-title">Mental Game</div>
-  <div class="info-card">
-    <div class="field">
-      <label>Mental mistakes (wrong club, no commit, bad decision)</label>
-      <textarea id="mental_mistakes" placeholder="Be specific."></textarea>
-    </div>
-    <div class="field">
-      <label>Pre-shot routine — followed it consistently? (1-10)</label>
-      <input type="number" id="routine" min="1" max="10" placeholder="1-10">
-    </div>
-    <div class="field">
-      <label>Where did you lose focus? (front 9 / back 9 / specific hole)</label>
-      <input type="text" id="focus_loss" placeholder="e.g. back 9 after a double on 11">
-    </div>
-  </div>
-
-  <div class="section-title">Takeaways</div>
-  <div class="info-card">
-    <div class="field">
-      <label>One thing that worked</label>
-      <textarea id="worked" placeholder=""></textarea>
-    </div>
-    <div class="field">
-      <label>One thing to fix this week</label>
-      <textarea id="fix" placeholder=""></textarea>
-    </div>
-    <div class="field">
-      <label>Energy at end of round (1-10)</label>
-      <input type="number" id="end_energy" min="1" max="10">
-    </div>
+  <!-- POST-ROUND NOTES -->
+  <div class="panel" style="margin-top: 14px;">
+    <h2>Post-Round Notes (optional)</h2>
+    <div class="field"><label>What worked</label><textarea id="worked" placeholder=""></textarea></div>
+    <div class="field"><label>What didn't</label><textarea id="failed" placeholder=""></textarea></div>
+    <div class="field"><label>Mental mistakes / wrong clubs</label><textarea id="mental" placeholder=""></textarea></div>
+    <div class="field"><label>Energy at end (1-10)</label><input type="number" id="energy" min="1" max="10"></div>
   </div>
 
 </div>
@@ -434,113 +585,214 @@
 </div>
 
 <script>
-  // Home course preset data
+  // ===== COURSE PRESETS =====
+  // Oak Tree data from user-provided scorecards; Kickingbird from web search (best available).
   const PRESETS = {
-    east_gold: {
-      course: 'Home Course — East',
-      tees: 'Gold / 7,116',
-      rating: '76.3 / 137',
+    oakeast_gold: {
+      course: 'Oak Tree East', tees: 'Gold / 7,116', rating: '76.3 / 137',
       pars:  [4,4,4,5,4,3,4,3,4, 4,4,5,4,3,4,4,3,4],
-      yards: [411,458,442,560,437,194,433,178,467, 374,436,562,398,236,431,455,207,437],
-      hcps:  [5,1,15,7,9,13,11,17,3, 18,10,16,8,2,12,4,14,6]
+      yards: [411,458,442,560,437,194,433,178,467, 374,436,562,398,236,431,455,207,437]
     },
-    east_blue: {
-      course: 'Home Course — East',
-      tees: 'Blue / 6,439',
-      rating: '79.5 / 147',
+    oakeast_blue: {
+      course: 'Oak Tree East', tees: 'Blue / 6,439', rating: '79.5 / 147',
       pars:  [4,5,4,5,4,3,4,3,4, 4,4,5,4,3,4,4,3,4],
-      yards: [400,432,402,520,423,178,402,159,436, 319,399,512,336,186,389,393,162,391],
-      hcps:  [3,13,7,1,11,15,9,17,5, 14,12,2,6,16,10,4,18,8]
+      yards: [400,432,402,520,423,178,402,159,436, 319,399,512,336,186,389,393,162,391]
     },
-    west_gold: {
-      course: 'Home Course — West',
-      tees: 'Gold / 6,752',
-      rating: '74.6 / 140',
+    oakwest_gold: {
+      course: 'Oak Tree West', tees: 'Gold / 6,752', rating: '74.6 / 140',
       pars:  [4,3,4,4,4,3,5,4,4, 3,4,4,4,3,4,5,4,4],
-      yards: [380,204,470,333,432,150,576,462,393, 192,371,405,350,174,469,536,399,456],
-      hcps:  [11,3,1,17,9,13,7,5,15, 16,4,8,12,6,2,14,18,10]
+      yards: [380,204,470,333,432,150,576,462,393, 192,371,405,350,174,469,536,399,456]
     },
-    west_blue: {
-      course: 'Home Course — West',
-      tees: 'Blue / 6,234',
-      rating: '71.4 / 132',
+    oakwest_blue: {
+      course: 'Oak Tree West', tees: 'Blue / 6,234', rating: '71.4 / 132',
       pars:  [4,3,4,4,4,3,5,4,4, 3,4,4,4,3,4,5,4,4],
-      yards: [343,166,444,327,372,138,518,431,370, 155,367,380,337,170,433,520,374,389],
-      hcps:  [11,3,1,17,9,13,7,5,15, 16,4,8,12,6,2,14,18,10]
+      yards: [343,166,444,327,372,138,518,431,370, 155,367,380,337,170,433,520,374,389]
+    },
+    kickingbird_blue: {
+      course: 'Kickingbird', tees: 'Blue / 6,424', rating: '71.8 / 125',
+      pars:  [4,4,3,5,4,3,4,4,4, 4,4,4,3,5,4,3,5,3],
+      yards: [430,320,175,490,450,148,405,395,420, 380,390,415,178,500,420,150,490,170]  // Estimated — needs verification
+    },
+    kickingbird_black: {
+      course: 'Kickingbird', tees: 'Black / 6,944', rating: '74.8 / 133',
+      pars:  [4,4,3,5,4,3,4,4,4, 4,4,4,3,5,4,3,5,3],
+      yards: [464,345,189,525,485,160,436,426,450, 412,415,440,195,540,455,170,520,185]  // From partial scorecard
     }
   };
 
-  const STORAGE_KEY = 'training_rounds';
+  const STORAGE_KEY = 'training_rounds_v2';
+  const SCORE_DELTAS = [-2, -1, 0, 1, 2]; // Eagle, Birdie, Par, Bogey, Double
+
   let rounds = {};
   let currentRoundId = null;
+  let currentHole = 1;
   let saveTimer;
   const saveIndicator = document.getElementById('saveIndicator');
 
-  // Info toggle
-  document.querySelectorAll('.info-toggle').forEach(btn => {
-    const labelNode = btn.firstChild;
-    const originalLabel = labelNode.nodeValue;
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.toggle;
-      const panel = document.getElementById(id);
-      const isOpen = panel.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      labelNode.nodeValue = isOpen ? 'Hide ' : originalLabel;
-    });
-  });
+  function emptyRound() {
+    return {
+      meta: { date: '', course: '', tees: '', rating: '', conditions: '', type: 'practice', preset: '' },
+      pars: Array(18).fill(null),
+      yards: Array(18).fill(null),
+      holes: Array(18).fill(null).map((_, i) => ({
+        hole: i + 1, score: null, putts: null, fir: false, gir: false, ud: false, pen: 0
+      })),
+      notes: { worked: '', failed: '', mental: '', energy: '' }
+    };
+  }
 
-  // Generate hole rows
-  const tbody = document.getElementById('holeTable');
-  for (let i = 1; i <= 18; i++) {
-    const row = document.createElement('tr');
-    if (i === 10) row.style.borderTop = '2px solid #2ea043';
-    row.innerHTML = `
-      <td class="hole-num">${i}</td>
-      <td class="yds" data-yds="${i}">-</td>
-      <td><input type="number" min="3" max="5" class="par" data-hole="${i}" placeholder="-"></td>
-      <td><input type="number" min="1" max="12" class="score" data-hole="${i}" placeholder="-"></td>
-      <td><input type="number" min="0" max="6" class="putts" data-hole="${i}" placeholder="-"></td>
-      <td><input type="checkbox" class="fir" data-hole="${i}"></td>
-      <td><input type="checkbox" class="gir" data-hole="${i}"></td>
-      <td><input type="checkbox" class="ud" data-hole="${i}"></td>
-      <td><input type="number" min="0" max="3" class="pen" data-hole="${i}" placeholder="0"></td>
-    `;
-    tbody.appendChild(row);
+  function currentRound() {
+    return rounds[currentRoundId];
   }
 
   function applyPreset(key) {
     const p = PRESETS[key];
     if (!p) return;
+    const r = currentRound();
+    r.meta.course = p.course;
+    r.meta.tees = p.tees;
+    r.meta.rating = p.rating;
+    r.meta.preset = key;
+    r.pars = [...p.pars];
+    r.yards = [...p.yards];
+    // Update UI
     document.getElementById('r_course').value = p.course;
     document.getElementById('r_tees').value = p.tees;
-    document.getElementById('r_rating').value = p.rating;
-    p.pars.forEach((par, idx) => {
-      document.querySelector(`.par[data-hole="${idx+1}"]`).value = par;
-    });
-    p.yards.forEach((yds, idx) => {
-      document.querySelector(`[data-yds="${idx+1}"]`).textContent = yds;
-    });
-    updateTotals();
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
     saveAll();
+    renderCurrentHole();
+    renderAllHoles();
   }
   window.applyPreset = applyPreset;
 
-  function updateTotals() {
+  // ===== Score buttons =====
+  function renderScoreButtons() {
+    const r = currentRound();
+    const par = r.pars[currentHole - 1] || 4;
+    const grid = document.getElementById('scoreGrid');
+    grid.innerHTML = '';
+    const labels = ['Eagle', 'Birdie', 'Par', 'Bogey', 'Double'];
+    SCORE_DELTAS.forEach((delta, idx) => {
+      const score = par + delta;
+      if (score < 1) return;
+      const btn = document.createElement('button');
+      btn.className = 'score-btn';
+      const currentScore = r.holes[currentHole - 1].score;
+      if (currentScore !== null && parseInt(currentScore) === score) btn.classList.add('selected');
+      btn.innerHTML = `${score}<span class="label">${labels[idx]}</span>`;
+      btn.onclick = () => setScore(score);
+      grid.appendChild(btn);
+    });
+    // Show current value in 'or enter' input
+    document.getElementById('scoreOther').value = r.holes[currentHole - 1].score || '';
+  }
+
+  function setScore(score) {
+    const r = currentRound();
+    r.holes[currentHole - 1].score = score;
+    saveAll();
+    renderCurrentHole();
+    renderTotals();
+    renderAllHoles();
+  }
+
+  function setScoreFromInput() {
+    const val = document.getElementById('scoreOther').value;
+    const r = currentRound();
+    r.holes[currentHole - 1].score = val ? parseInt(val) : null;
+    saveAll();
+    renderCurrentHole();
+    renderTotals();
+    renderAllHoles();
+  }
+  window.setScoreFromInput = setScoreFromInput;
+
+  function setPutts(n) {
+    const r = currentRound();
+    r.holes[currentHole - 1].putts = n;
+    saveAll();
+    renderCurrentHole();
+    renderTotals();
+    renderAllHoles();
+  }
+  window.setPutts = setPutts;
+
+  function toggleStat(stat) {
+    const r = currentRound();
+    r.holes[currentHole - 1][stat] = !r.holes[currentHole - 1][stat];
+    saveAll();
+    renderCurrentHole();
+    renderTotals();
+    renderAllHoles();
+  }
+  window.toggleStat = toggleStat;
+
+  function setPen(val) {
+    const r = currentRound();
+    r.holes[currentHole - 1].pen = parseInt(val) || 0;
+    saveAll();
+  }
+  window.setPen = setPen;
+
+  function navigateHole(delta) {
+    const newHole = currentHole + delta;
+    if (newHole < 1 || newHole > 18) return;
+    currentHole = newHole;
+    renderCurrentHole();
+  }
+  window.navigateHole = navigateHole;
+
+  function renderCurrentHole() {
+    const r = currentRound();
+    const idx = currentHole - 1;
+    const par = r.pars[idx];
+    const yds = r.yards[idx];
+    const hole = r.holes[idx];
+
+    document.getElementById('holeNum').textContent = currentHole;
+    document.getElementById('holePar').textContent = par ? `Par ${par}` : 'Par —';
+    document.getElementById('holeYds').textContent = yds ? `${yds} yds` : '— yds';
+
+    document.getElementById('prevBtn').disabled = currentHole === 1;
+    document.getElementById('nextBtn').disabled = currentHole === 18;
+
+    renderScoreButtons();
+
+    // Putts
+    document.querySelectorAll('.putts-btn').forEach((btn, i) => {
+      btn.classList.toggle('selected', hole.putts !== null && hole.putts === i);
+    });
+
+    // Stats
+    const fir = document.getElementById('firBtn');
+    const gir = document.getElementById('girBtn');
+    const ud = document.getElementById('udBtn');
+
+    fir.classList.toggle('on', hole.fir);
+    gir.classList.toggle('on', hole.gir);
+    ud.classList.toggle('on', hole.ud);
+
+    // FIR not applicable on par 3
+    if (par === 3) {
+      fir.classList.add('off-na');
+      fir.title = 'N/A on par 3';
+    } else {
+      fir.classList.remove('off-na');
+    }
+
+    document.getElementById('penInput').value = hole.pen || 0;
+  }
+
+  function renderTotals() {
+    const r = currentRound();
     let score = 0, putts = 0, fir = 0, firTotal = 0, gir = 0;
-    document.querySelectorAll('.score').forEach(el => {
-      if (el.value) score += parseInt(el.value);
-    });
-    document.querySelectorAll('.putts').forEach(el => {
-      if (el.value) putts += parseInt(el.value);
-    });
-    document.querySelectorAll('.par').forEach(el => {
-      if (el.value && parseInt(el.value) >= 4) firTotal++;
-    });
-    document.querySelectorAll('.fir').forEach(el => {
-      if (el.checked) fir++;
-    });
-    document.querySelectorAll('.gir').forEach(el => {
-      if (el.checked) gir++;
+    r.holes.forEach((h, i) => {
+      if (h.score !== null) score += parseInt(h.score);
+      if (h.putts !== null) putts += parseInt(h.putts);
+      const par = r.pars[i];
+      if (par && par >= 4) { firTotal++; if (h.fir) fir++; }
+      if (h.gir) gir++;
     });
     document.getElementById('t_score').textContent = score || '—';
     document.getElementById('t_putts').textContent = putts || '—';
@@ -548,115 +800,63 @@
     document.getElementById('t_gir').textContent = `${gir}/18`;
   }
 
-  function collectYards() {
-    const yds = [];
-    for (let i = 1; i <= 18; i++) {
-      const cell = document.querySelector(`[data-yds="${i}"]`);
-      yds.push(cell ? cell.textContent : '-');
-    }
-    return yds;
-  }
-
-  function populateYards(yds) {
-    if (!yds) return;
-    yds.forEach((y, idx) => {
-      const cell = document.querySelector(`[data-yds="${idx+1}"]`);
-      if (cell) cell.textContent = y || '-';
-    });
-  }
-
-  function collectRoundData() {
-    const data = {
-      meta: {
-        date: document.getElementById('r_date').value,
-        course: document.getElementById('r_course').value,
-        tees: document.getElementById('r_tees').value,
-        rating: document.getElementById('r_rating').value,
-        conditions: document.getElementById('r_conditions').value,
-        type: document.getElementById('r_type').value
-      },
-      yards: collectYards(),
-      holes: [],
-      summary: {
-        driver: document.getElementById('drv_summary').value,
-        approach: document.getElementById('app_summary').value,
-        three_putts: document.getElementById('three_putts').value,
-        penalties: document.getElementById('penalties_detail').value
-      },
-      mental: {
-        mistakes: document.getElementById('mental_mistakes').value,
-        routine: document.getElementById('routine').value,
-        focus_loss: document.getElementById('focus_loss').value
-      },
-      takeaways: {
-        worked: document.getElementById('worked').value,
-        fix: document.getElementById('fix').value,
-        end_energy: document.getElementById('end_energy').value
+  function renderAllHoles() {
+    const r = currentRound();
+    const tbody = document.getElementById('allHolesBody');
+    tbody.innerHTML = '';
+    r.holes.forEach((h, i) => {
+      const par = r.pars[i];
+      const yds = r.yards[i];
+      const hasData = h.score !== null;
+      const tr = document.createElement('tr');
+      tr.className = hasData ? 'has-data' : 'no-data';
+      if (i + 1 === currentHole) tr.classList.add('current');
+      tr.onclick = () => { currentHole = i + 1; renderCurrentHole(); };
+      let scoreClass = '';
+      if (hasData && par) {
+        const delta = h.score - par;
+        if (delta >= 2) scoreClass = 'score-bad';
+        else if (delta === 1) scoreClass = 'score-bogey';
+        else if (delta === 0) scoreClass = 'score-par';
+        else if (delta === -1) scoreClass = 'score-birdie';
+        else scoreClass = 'score-eagle';
       }
-    };
-    for (let i = 1; i <= 18; i++) {
-      data.holes.push({
-        hole: i,
-        par: document.querySelector(`.par[data-hole="${i}"]`).value,
-        score: document.querySelector(`.score[data-hole="${i}"]`).value,
-        putts: document.querySelector(`.putts[data-hole="${i}"]`).value,
-        fir: document.querySelector(`.fir[data-hole="${i}"]`).checked,
-        gir: document.querySelector(`.gir[data-hole="${i}"]`).checked,
-        ud: document.querySelector(`.ud[data-hole="${i}"]`).checked,
-        pen: document.querySelector(`.pen[data-hole="${i}"]`).value || 0
-      });
-    }
-    return data;
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>${par || '-'}</td>
+        <td>${yds || '-'}</td>
+        <td class="${scoreClass}">${h.score || '-'}</td>
+        <td>${h.putts !== null ? h.putts : '-'}</td>
+        <td>${par >= 4 ? (h.fir?'✓':'-') : '·'}</td>
+        <td>${h.gir?'✓':'-'}</td>
+        <td>${h.ud?'✓':'-'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
 
-  function populateForm(data) {
-    document.getElementById('r_date').value = data.meta.date || '';
-    document.getElementById('r_course').value = data.meta.course || '';
-    document.getElementById('r_tees').value = data.meta.tees || '';
-    document.getElementById('r_rating').value = data.meta.rating || '';
-    document.getElementById('r_conditions').value = data.meta.conditions || '';
-    document.getElementById('r_type').value = data.meta.type || 'practice';
-    document.getElementById('drv_summary').value = data.summary.driver || '';
-    document.getElementById('app_summary').value = data.summary.approach || '';
-    document.getElementById('three_putts').value = data.summary.three_putts || '';
-    document.getElementById('penalties_detail').value = data.summary.penalties || '';
-    document.getElementById('mental_mistakes').value = data.mental.mistakes || '';
-    document.getElementById('routine').value = data.mental.routine || '';
-    document.getElementById('focus_loss').value = data.mental.focus_loss || '';
-    document.getElementById('worked').value = data.takeaways.worked || '';
-    document.getElementById('fix').value = data.takeaways.fix || '';
-    document.getElementById('end_energy').value = data.takeaways.end_energy || '';
-    populateYards(data.yards);
-    (data.holes || []).forEach(h => {
-      const i = h.hole;
-      document.querySelector(`.par[data-hole="${i}"]`).value = h.par || '';
-      document.querySelector(`.score[data-hole="${i}"]`).value = h.score || '';
-      document.querySelector(`.putts[data-hole="${i}"]`).value = h.putts || '';
-      document.querySelector(`.fir[data-hole="${i}"]`).checked = !!h.fir;
-      document.querySelector(`.gir[data-hole="${i}"]`).checked = !!h.gir;
-      document.querySelector(`.ud[data-hole="${i}"]`).checked = !!h.ud;
-      document.querySelector(`.pen[data-hole="${i}"]`).value = h.pen || '';
-    });
-    updateTotals();
+  function toggleAllHoles() {
+    const btn = document.querySelector('.all-holes-toggle');
+    const tbl = document.getElementById('allHolesTable');
+    btn.classList.toggle('open');
+    tbl.classList.toggle('visible');
   }
+  window.toggleAllHoles = toggleAllHoles;
 
-  function clearForm() {
-    document.querySelectorAll('input').forEach(i => {
-      if (i.type === 'checkbox') i.checked = false;
-      else i.value = '';
-    });
-    document.querySelectorAll('textarea, select').forEach(i => {
-      if (i.tagName === 'SELECT') i.selectedIndex = 0;
-      else i.value = '';
-    });
-    document.querySelectorAll('[data-yds]').forEach(c => c.textContent = '-');
-    document.getElementById('r_date').valueAsDate = new Date();
-    updateTotals();
-  }
-
+  // ===== Persistence =====
   function saveAll() {
     if (!currentRoundId) return;
-    rounds[currentRoundId] = collectRoundData();
+    // Pull meta from form fields
+    const r = currentRound();
+    r.meta.date = document.getElementById('r_date').value;
+    r.meta.course = document.getElementById('r_course').value;
+    r.meta.tees = document.getElementById('r_tees').value;
+    r.meta.conditions = document.getElementById('r_conditions').value;
+    r.meta.type = document.getElementById('r_type').value;
+    r.notes.worked = document.getElementById('worked').value;
+    r.notes.failed = document.getElementById('failed').value;
+    r.notes.mental = document.getElementById('mental').value;
+    r.notes.energy = document.getElementById('energy').value;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(rounds));
       saveIndicator.classList.add('visible');
@@ -672,12 +872,56 @@
       if (saved) rounds = JSON.parse(saved);
     } catch(e) { rounds = {}; }
     const ids = Object.keys(rounds).sort();
-    if (ids.length === 0) newRound();
-    else {
+    if (ids.length === 0) {
+      newRound();
+    } else {
       currentRoundId = ids[ids.length - 1];
-      populateForm(rounds[currentRoundId]);
-      refreshRoundSelector();
+      populateForm();
     }
+  }
+
+  function newRound() {
+    const id = 'round_' + Date.now();
+    currentRoundId = id;
+    rounds[id] = emptyRound();
+    rounds[id].meta.date = new Date().toISOString().split('T')[0];
+    currentHole = 1;
+    populateForm();
+    saveAll();
+  }
+  window.newRound = newRound;
+
+  function deleteCurrentRound() {
+    if (!currentRoundId) return;
+    if (!confirm('Delete this round?')) return;
+    delete rounds[currentRoundId];
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rounds)); } catch(e) {}
+    const ids = Object.keys(rounds).sort();
+    if (ids.length === 0) newRound();
+    else { currentRoundId = ids[ids.length - 1]; populateForm(); }
+  }
+  window.deleteCurrentRound = deleteCurrentRound;
+
+  function populateForm() {
+    const r = currentRound();
+    document.getElementById('r_date').value = r.meta.date || '';
+    document.getElementById('r_course').value = r.meta.course || '';
+    document.getElementById('r_tees').value = r.meta.tees || '';
+    document.getElementById('r_conditions').value = r.meta.conditions || '';
+    document.getElementById('r_type').value = r.meta.type || 'practice';
+    document.getElementById('worked').value = r.notes.worked || '';
+    document.getElementById('failed').value = r.notes.failed || '';
+    document.getElementById('mental').value = r.notes.mental || '';
+    document.getElementById('energy').value = r.notes.energy || '';
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+    if (r.meta.preset) {
+      const idx = ['oakeast_gold','oakeast_blue','oakwest_gold','oakwest_blue','kickingbird_blue','kickingbird_black'].indexOf(r.meta.preset);
+      if (idx >= 0) document.querySelectorAll('.preset-btn')[idx]?.classList.add('selected');
+    }
+    renderCurrentHole();
+    renderTotals();
+    renderAllHoles();
+    refreshRoundSelector();
   }
 
   function refreshRoundSelector() {
@@ -687,64 +931,51 @@
       const r = rounds[id];
       const opt = document.createElement('option');
       opt.value = id;
-      opt.textContent = (r.meta.date || 'no-date') + ' — ' + (r.meta.course || 'untitled');
+      const dateLabel = r.meta.date || 'new';
+      const courseLabel = r.meta.course || 'untitled';
+      let scoreSum = 0; let anyScore = false;
+      r.holes.forEach(h => { if (h.score !== null) { scoreSum += parseInt(h.score); anyScore = true; } });
+      opt.textContent = `${dateLabel} — ${courseLabel}${anyScore ? ' (' + scoreSum + ')' : ''}`;
       if (id === currentRoundId) opt.selected = true;
       sel.appendChild(opt);
     });
   }
 
-  function newRound() {
-    const id = 'round_' + Date.now();
-    currentRoundId = id;
-    rounds[id] = { meta: { type: 'practice' }, holes: [], summary: {}, mental: {}, takeaways: {} };
-    clearForm();
-    saveAll();
-  }
+  document.getElementById('roundSelect').addEventListener('change', (e) => {
+    currentRoundId = e.target.value;
+    currentHole = 1;
+    populateForm();
+  });
 
-  function deleteCurrentRound() {
-    if (!currentRoundId) return;
-    if (!confirm('Delete this round?')) return;
-    delete rounds[currentRoundId];
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rounds)); } catch(e) {}
-    const ids = Object.keys(rounds).sort();
-    if (ids.length === 0) newRound();
-    else {
-      currentRoundId = ids[ids.length - 1];
-      populateForm(rounds[currentRoundId]);
-      refreshRoundSelector();
-    }
-  }
+  // Wire up form auto-save
+  ['r_date','r_course','r_tees','r_conditions','r_type','worked','failed','mental','energy'].forEach(id => {
+    document.getElementById(id).addEventListener('input', saveAll);
+    document.getElementById(id).addEventListener('change', saveAll);
+  });
 
+  // ===== Share =====
   function buildSummary() {
-    const d = collectRoundData();
-    let s = `ROUND: ${d.meta.date || '-'} — ${d.meta.course || '-'}\n`;
-    s += `Tees: ${d.meta.tees || '-'} (Rating ${d.meta.rating || '-'})\n`;
-    s += `Conditions: ${d.meta.conditions || '-'}\n`;
-    s += `Type: ${d.meta.type}\n\n`;
+    const r = currentRound();
+    let s = `ROUND: ${r.meta.date || '-'} — ${r.meta.course || '-'}\n`;
+    s += `Tees: ${r.meta.tees || '-'} | Conditions: ${r.meta.conditions || '-'}\n`;
+    s += `Type: ${r.meta.type}\n\n`;
     s += `Hole|Yds |Par|Score|Putts|F|G|UD|Pen\n`;
     s += `----|----|---|-----|-----|-|-|--|----\n`;
-    d.holes.forEach((h, idx) => {
-      const yds = (d.yards && d.yards[idx]) || '-';
-      s += `  ${String(h.hole).padStart(2)}|${String(yds).padStart(4)}| ${h.par || '-'} |  ${h.score || '-'}  |  ${h.putts || '-'}  |${h.fir?'Y':'-'}|${h.gir?'Y':'-'}|${h.ud?'Y':'-'}| ${h.pen}\n`;
+    let score = 0, putts = 0, fir = 0, firTotal = 0, gir = 0;
+    r.holes.forEach((h, i) => {
+      const par = r.pars[i] || '-';
+      const yds = r.yards[i] || '-';
+      s += `  ${String(h.hole).padStart(2)}|${String(yds).padStart(4)}| ${par} |  ${h.score !== null ? h.score : '-'}  |  ${h.putts !== null ? h.putts : '-'}  |${h.fir?'Y':'-'}|${h.gir?'Y':'-'}|${h.ud?'Y':'-'}| ${h.pen || 0}\n`;
+      if (h.score !== null) score += parseInt(h.score);
+      if (h.putts !== null) putts += parseInt(h.putts);
+      if (par && par >= 4) { firTotal++; if (h.fir) fir++; }
+      if (h.gir) gir++;
     });
-    let totalScore = 0, totalPutts = 0, firTotal = 0, firHit = 0, girHit = 0;
-    d.holes.forEach(h => {
-      if (h.score) totalScore += parseInt(h.score);
-      if (h.putts) totalPutts += parseInt(h.putts);
-      if (h.par && parseInt(h.par) >= 4) { firTotal++; if (h.fir) firHit++; }
-      if (h.gir) girHit++;
-    });
-    s += `\nTOTALS: Score ${totalScore || '-'} | Putts ${totalPutts || '-'} | FIR ${firTotal ? firHit+'/'+firTotal : '-'} | GIR ${girHit}/18\n\n`;
-    s += `Driver: ${d.summary.driver || '-'}\n`;
-    s += `Approach: ${d.summary.approach || '-'}\n`;
-    s += `3-putts: ${d.summary.three_putts || '-'}\n`;
-    s += `Penalties: ${d.summary.penalties || '-'}\n\n`;
-    s += `Mental mistakes: ${d.mental.mistakes || '-'}\n`;
-    s += `Routine (1-10): ${d.mental.routine || '-'}\n`;
-    s += `Focus loss: ${d.mental.focus_loss || '-'}\n\n`;
-    s += `What worked: ${d.takeaways.worked || '-'}\n`;
-    s += `To fix: ${d.takeaways.fix || '-'}\n`;
-    s += `End energy: ${d.takeaways.end_energy || '-'}\n`;
+    s += `\nTOTALS: Score ${score} | Putts ${putts} | FIR ${firTotal ? fir+'/'+firTotal : '-'} | GIR ${gir}/18\n\n`;
+    s += `What worked: ${r.notes.worked || '-'}\n`;
+    s += `What didn't: ${r.notes.failed || '-'}\n`;
+    s += `Mental: ${r.notes.mental || '-'}\n`;
+    s += `End energy: ${r.notes.energy || '-'}\n`;
     return s;
   }
 
@@ -764,18 +995,7 @@
     const w = window.open('', '_blank');
     w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
   }
-
-  document.querySelectorAll('input, textarea, select').forEach(el => {
-    if (el.id === 'roundSelect') return;
-    const handler = () => { updateTotals(); saveAll(); };
-    el.addEventListener('input', handler);
-    el.addEventListener('change', handler);
-  });
-
-  document.getElementById('roundSelect').addEventListener('change', (e) => {
-    currentRoundId = e.target.value;
-    if (rounds[currentRoundId]) populateForm(rounds[currentRoundId]);
-  });
+  window.shareResults = shareResults;
 
   loadAll();
 </script>
