@@ -6,34 +6,18 @@
 <title>Today</title>
 <style>
   :root {
-    --bg: #0d1117;
-    --card: #161b22;
-    --card-hover: #1c2330;
-    --border: #30363d;
-    --text: #e6edf3;
-    --text-dim: #8b949e;
-    --accent: #2ea043;
-    --accent-dim: #1f6f33;
-    --info: #3b82f6;
-    --warn: #f97316;
-    --purple: #a855f7;
-    --teal: #14b8a6;
-    --red: #ef4444;
+    --bg: #0d1117; --card: #161b22; --card-hover: #1c2330; --border: #30363d;
+    --text: #e6edf3; --text-dim: #8b949e; --accent: #2ea043; --accent-dim: #1f6f33;
+    --info: #3b82f6; --warn: #f97316; --purple: #a855f7; --teal: #14b8a6; --red: #ef4444;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 0 0 80px 0;
-    font-size: 16px;
-    line-height: 1.5;
+    background: var(--bg); color: var(--text);
+    padding: 0 0 80px 0; font-size: 16px; line-height: 1.5;
   }
   .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
-  header {
-    background: linear-gradient(135deg, #1f6f33 0%, #0d3018 100%);
-    padding: 16px 20px 22px;
-  }
+  header { background: linear-gradient(135deg, #1f6f33 0%, #0d3018 100%); padding: 16px 20px 22px; }
   header .date-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
   header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
   header .sub { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px; }
@@ -47,8 +31,8 @@
   .container { padding: 14px; max-width: 600px; margin: 0 auto; }
 
   .day-selector {
-    display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding: 4px 0;
-    scrollbar-width: none;
+    display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto;
+    padding: 4px 0; scrollbar-width: none;
   }
   .day-selector::-webkit-scrollbar { display: none; }
   .day-pill {
@@ -56,16 +40,26 @@
     color: var(--text-dim); padding: 6px 12px; border-radius: 16px; font-size: 12px;
     font-family: inherit; cursor: pointer; white-space: nowrap;
   }
-  .day-pill.active {
-    background: var(--accent); border-color: var(--accent); color: white; font-weight: 600;
-  }
+  .day-pill.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
   .day-pill.has-progress { border-color: var(--accent-dim); }
+  .day-pill .badge { display: inline-block; margin-left: 4px; font-size: 10px; padding: 1px 4px; border-radius: 3px; background: rgba(239,68,68,0.2); color: var(--red); }
+  .day-pill.active .badge { background: rgba(255,255,255,0.25); color: white; }
 
-  .schedule-tag {
-    display: inline-block; background: rgba(239,68,68,0.15); color: var(--red);
-    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
-    margin-bottom: 12px;
+  .priorities-card {
+    background: rgba(46,160,67,0.06);
+    border: 1px solid var(--accent-dim);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 12px;
   }
+  .priorities-card .label {
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 6px;
+  }
+  .priorities-card ol { padding-left: 20px; color: var(--text-dim); line-height: 1.6; }
+  .priorities-card ol li { margin-bottom: 2px; }
+  .priorities-card strong { color: var(--text); }
 
   .section {
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -74,59 +68,57 @@
   .section.morning { border-left: 4px solid var(--warn); }
   .section.rooms { border-left: 4px solid var(--purple); }
   .section.workout { border-left: 4px solid var(--red); }
-  .section.golf { border-left: 4px solid var(--accent); }
-  .section.evening { border-left: 4px solid var(--info); }
+  .section.practice { border-left: 4px solid var(--accent); }
+  .section.golf { border-left: 4px solid var(--info); }
+  .section.evening { border-left: 4px solid var(--teal); }
 
   .section-header {
     padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;
     cursor: pointer; user-select: none;
   }
-  .section-header h2 {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-  }
+  .section-header h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
   .section.morning .section-header h2 { color: var(--warn); }
   .section.rooms .section-header h2 { color: var(--purple); }
   .section.workout .section-header h2 { color: var(--red); }
-  .section.golf .section-header h2 { color: var(--accent); }
-  .section.evening .section-header h2 { color: var(--info); }
-  .section-header .right {
-    display: flex; gap: 8px; align-items: center;
-  }
+  .section.practice .section-header h2 { color: var(--accent); }
+  .section.golf .section-header h2 { color: var(--info); }
+  .section.evening .section-header h2 { color: var(--teal); }
+  .section-header .right { display: flex; gap: 8px; align-items: center; }
   .section-progress {
     font-size: 11px; color: var(--text-dim); padding: 3px 8px; border-radius: 4px; background: var(--bg);
   }
   .section-progress.complete { background: rgba(46,160,67,0.15); color: var(--accent); font-weight: 600; }
   .section-chev { color: var(--text-dim); transition: transform 0.2s; font-size: 11px; }
   .section.collapsed .section-chev { transform: rotate(-90deg); }
-
   .section-body { padding: 0 14px 12px; }
   .section.collapsed .section-body { display: none; }
+
   .section-intro {
     font-size: 12px; color: var(--text-dim); margin-bottom: 10px; line-height: 1.5;
     background: rgba(255,255,255,0.02); padding: 8px 10px; border-radius: 6px;
   }
   .section-intro strong { color: var(--text); }
 
-  .subsection-title {
-    font-size: 11px; color: var(--text-dim); letter-spacing: 1.5px;
-    text-transform: uppercase; font-weight: 600;
-    margin: 12px 0 6px; padding-bottom: 4px;
-    border-bottom: 1px solid rgba(48,54,61,0.5);
+  .if-short {
+    background: rgba(210,153,34,0.08);
+    border-left: 3px solid var(--warn);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 10px;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #f0d27a;
+    line-height: 1.5;
   }
-  .subsection-title:first-child { margin-top: 0; }
+  .if-short strong { color: var(--warn); }
 
-  .task {
-    padding: 9px 0;
-    border-bottom: 1px solid rgba(48,54,61,0.4);
-  }
+  .task { padding: 9px 0; border-bottom: 1px solid rgba(48,54,61,0.4); }
   .task:last-child { border-bottom: none; }
   .task-row { display: flex; align-items: flex-start; gap: 12px; }
   .task-row input[type=checkbox] {
     appearance: none; -webkit-appearance: none;
     width: 24px; height: 24px;
-    border: 2px solid var(--border);
-    border-radius: 6px; margin-top: 0px;
-    cursor: pointer; flex-shrink: 0;
+    border: 2px solid var(--border); border-radius: 6px;
+    margin-top: 0px; cursor: pointer; flex-shrink: 0;
     position: relative; background: transparent;
   }
   .task-row input[type=checkbox]:checked {
@@ -142,11 +134,13 @@
     font-size: 12px; color: var(--text-dim);
     margin-left: 36px; margin-top: 2px; line-height: 1.5;
   }
-  .task-time {
+  .task-badge {
     display: inline-block; background: var(--bg); color: var(--text-dim);
     padding: 1px 6px; border-radius: 3px; font-size: 10px;
     margin-left: 6px; font-weight: 600;
   }
+  .task-badge.priority { background: rgba(239,68,68,0.15); color: var(--red); }
+  .task-badge.optional { background: rgba(139,148,158,0.15); color: var(--text-dim); }
 
   .info-toggle {
     background: transparent; border: 1px solid var(--border); color: var(--text-dim);
@@ -166,14 +160,12 @@
   .info-panel strong { color: var(--text); }
   .info-panel ol, .info-panel ul { padding-left: 16px; margin: 4px 0; }
   .info-panel li { margin-bottom: 4px; }
-  .info-panel .tip { color: #fcd34d; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); }
-  .info-panel table { width: 100%; margin: 6px 0; border-collapse: collapse; font-size: 11px; }
-  .info-panel th, .info-panel td { padding: 4px 6px; text-align: left; border-bottom: 1px solid rgba(48,54,61,0.5); }
-  .info-panel th { color: var(--text); }
-
-  .quick-actions {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
+  .info-panel .tip {
+    color: #fcd34d; margin-top: 8px; padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.1);
   }
+
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
   .quick-link {
     background: var(--bg); border: 1px solid var(--border); color: var(--text);
     padding: 10px; border-radius: 8px; text-decoration: none;
@@ -182,6 +174,19 @@
   .quick-link:active { background: var(--card-hover); }
   .quick-link .ico { font-size: 16px; display: block; margin-bottom: 2px; }
 
+  .workout-link {
+    display: block;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-bottom: 8px;
+  }
+  .workout-link .name { font-weight: 700; font-size: 14px; }
+  .workout-link .meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
   .field { margin-bottom: 10px; }
   .field label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
   .field input, .field textarea {
@@ -189,7 +194,6 @@
     border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 14px; font-family: inherit;
   }
   .field textarea { min-height: 60px; resize: vertical; }
-
   .rating-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .rating-group button {
     background: var(--bg); border: 1px solid var(--border); color: var(--text-dim);
@@ -216,7 +220,7 @@
 <header>
   <div class="date-label" id="dateLabel">—</div>
   <h1 id="dayTitle">Today's Plan</h1>
-  <div class="sub" id="daySub">Built for accountability</div>
+  <div class="sub" id="daySub"></div>
   <div class="score-strip">
     <span>Today's progress</span>
     <strong id="todayProgress">0 / 0</strong>
@@ -227,7 +231,15 @@
 
   <div class="day-selector" id="daySelector"></div>
 
-  <div id="scheduleTagContainer"></div>
+  <div class="priorities-card">
+    <div class="label">This Week's Priorities (from your data)</div>
+    <ol>
+      <li><strong>Tee game.</strong> 2/14 fairways Friday. Your 76 happened despite the driver. Goal: 50%+ fairways on tracked rounds.</li>
+      <li><strong>Mid-iron approaches.</strong> 9 GIR Friday was elite. Keep the new grip work going.</li>
+      <li><strong>Mental resilience.</strong> Saturday's "gave up" cost 7+ strokes. We're building a reset routine.</li>
+      <li><strong>Putting = maintenance.</strong> 29-31 putts/round. Locked in. Light touch only.</li>
+    </ol>
+  </div>
 
   <div id="sectionsContainer"></div>
 
@@ -241,26 +253,22 @@
   const STORAGE_KEY = 'training_daily_v1';
   let allData = {};
 
-  // ===== STANDARD ROUTINES =====
-  // Wake times vary by day. Bed by 11pm every night.
+  // ===== STANDARD ROUTINES (no fixed times) =====
 
-  function morningTasks(wakeTime) {
-    return [
-      { id: 'm_wake', label: `Wake up by ${wakeTime}`, time: wakeTime },
-      { id: 'm_bed', label: 'Make bed' },
-      { id: 'm_water', label: 'Drink 16 oz of water first thing' },
-      { id: 'm_breakfast', label: 'Real breakfast (protein + carbs)',
-        spec: 'Eggs, oatmeal, yogurt + fruit, toast with peanut butter, etc.' },
-      { id: 'm_mobility', label: '10 min mobility / stretching', info: 'mobility' },
-      { id: 'm_plan', label: 'Open this page, review today\'s plan',
-        spec: 'Know what you\'re doing before leaving the house' }
-    ];
-  }
+  const STANDARD_MORNING = [
+    { id: 'm_wake', label: 'Wake up + out of bed' },
+    { id: 'm_bed', label: 'Make bed' },
+    { id: 'm_water', label: 'Drink 16 oz of water first thing' },
+    { id: 'm_breakfast', label: 'Real breakfast (protein + carbs)',
+      spec: 'Eggs, oatmeal, yogurt + fruit, toast with peanut butter, etc.' },
+    { id: 'm_mobility', label: '10 min mobility / stretching', info: 'mobility' },
+    { id: 'm_plan', label: 'Open today\'s plan, know what you\'re doing' }
+  ];
 
   const STANDARD_ROOMS = [
     { id: 'r_bed', label: 'Bedroom: bed made, clothes off floor, surfaces clear' },
     { id: 'r_bath', label: 'Bathroom: counter wiped, towels hung, floor clear' },
-    { id: 'r_game', label: 'Game room: floor clear, controllers put away, trash out' }
+    { id: 'r_game', label: 'Game room: floor clear, controllers away, trash out' }
   ];
 
   function eveningTasks() {
@@ -272,189 +280,212 @@
     ];
   }
 
-  // ===== WEEK 1: June 8 → June 14 =====
+  // ===== WEEK 2 PLAN =====
+  // Monday: Kickingbird 4:30 (no practice that day)
+  // Tue-Sun: morning/early-afternoon practice + evening 18 at Oak Tree
+  // Workouts: recommend Tue (lower/core after light AM) + Fri (upper/core after light AM)
 
   const WEEK = {
-    '2026-06-08': {
-      title: 'Monday — Workout + Kickingbird',
-      sub: 'Oak Tree closed · Ortho 10:30 AM · Kickingbird 4:30 PM',
-      wakeTime: '8:30 AM',
-      scheduleTag: '⏰ Orthodontist appointment 10:30 AM',
-      includeWorkout: true,
-      workout: {
-        title: '💪 Workout — Mondays only',
-        intro: 'Oak Tree is closed Mondays. Use the time for cardio + strength. This is your hardest workout day of the week.',
-        tasks: [
-          { id: 'w_run', label: 'Neighborhood run — 20-25 minutes', time: 'AM',
-            info: 'monday_run',
-            spec: 'Easy pace. Not a sprint. Goal is heart and lungs, not a PR.' },
-          { id: 'w_strength', label: 'Full home strength session — 45 min', time: 'AM',
-            info: 'monday_strength',
-            spec: 'After the run. Hydrate first. Equipment: 15-lb DBs, med ball, body weight.' },
-          { id: 'w_cooldown', label: 'Cool-down stretching — 10 min',
-            spec: 'Hamstrings, hip flexors, pec stretches.' }
-        ]
-      },
+    '2026-06-15': {
+      title: 'Monday — Kickingbird Round',
+      sub: 'Oak Tree closed · Kickingbird 4:30 PM · No practice today',
       golf: {
-        intro: 'Tee time at 4:30 PM at Kickingbird. Use Round Tracker to log every hole — this is a tracked round and an important data point (HS tryouts venue). Plan: leave home by 3:30 PM to arrive 45 min early for warmup.',
+        intro: 'Just the round at Kickingbird today. Use the open morning/midday for rest, errands, and light prep. Body needs recovery from last week\'s rounds.',
         tasks: [
-          { id: 'g_drive', label: 'Leave for Kickingbird', time: '3:30 PM' },
-          { id: 'g_arrive', label: 'Arrive 3:45 PM — check in, settle' },
-          { id: 'g_warmup', label: 'Pre-round warmup (45 min)', time: '3:45 PM',
-            info: 'tournament_warmup' },
-          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE in Round Tracker', time: '4:30 PM' },
-          { id: 'g_focus', label: 'Round focus: course management',
-            info: 'mgmt_focus',
-            spec: 'Smart shot over hero shot. Driver only when fairway is realistic. Aim middle of greens.' },
+          { id: 'g_warmup', label: 'Pre-round warmup at Kickingbird (45 min)', info: 'tournament_warmup' },
+          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE in Round Tracker' },
+          { id: 'g_focus', label: 'Round focus: TEE BALLS', info: 'mgmt_focus',
+            spec: 'On every par 4/5 tee: pick the club that gets you in the fairway, not the longest. 50%+ fairways.' },
           { id: 'g_share', label: 'Share round within 30 min of finishing' },
-          { id: 'g_note', label: 'Session Note: how the new course felt' }
-        ]
+          { id: 'g_note', label: 'Session Note: what happened on bad tee shots' }
+        ],
+        ifShort: 'Skip the 45-min warmup if late — minimum 15 min (putting + 10 range balls).'
       }
     },
 
-    '2026-06-09': {
-      title: 'Tuesday — Big Practice Day',
-      sub: 'Oak Tree · ~3.5 hours of structured practice',
-      wakeTime: '8:00 AM',
+    '2026-06-16': {
+      title: 'Tuesday — Practice + 18',
+      sub: 'AM short game block · Evening 18 at Oak Tree',
+      workout: 'lower_core',
       golf: {
-        intro: 'No playing today. Today is the most important practice day of the week — structured, intentional reps. The leak from Saturday was par 3 / long iron play. We work that.',
+        intro: 'Practice in the morning/early afternoon, play 18 in the evening. Today\'s practice focuses on the scoring zone since putting and short game saved the 76 Friday.',
         tasks: [
-          { id: 'g_arrive', label: 'At Oak Tree by 10:00 AM', time: '10:00 AM' },
-          { id: 'g_warmup', label: 'Putting green warmup (15 min)', time: '10:00',
-            info: 'putt_warmup',
-            spec: '20 short putts (3-6 ft) + 10 lag putts (30+ ft) to feel the speed.' },
+          { id: 'p_warmup', label: 'Putting green warmup (10 min)', info: 'putt_warmup' },
 
-          { id: 'g_putt_block', label: 'BLOCK 1: Putting station work (45 min)', time: '10:15',
-            info: 'putt_block_detailed',
-            spec: '3-ft clock face → 6-ft clock face → 10-ft makes → lag ladder. Count makes at each station.' },
+          { id: 'p_putt', label: 'Putting maintenance — 20 min', info: 'putt_maintenance',
+            spec: 'Light. Putting is your strength now. Don\'t overpractice it.' },
 
-          { id: 'g_short_block', label: 'BLOCK 2: Short game station work (60 min)', time: '11:00',
-            info: 'short_block_detailed',
-            spec: 'Chip ladder + pitch ladder + bunker. Specific scoring criteria.' },
+          { id: 'p_short', label: 'Short game block — 45 min', info: 'short_block',
+            spec: 'Chips + 30/40-yd wedges. Track scores.' },
 
-          { id: 'g_lunch', label: 'Lunch + 30 min rest', time: '12:00' },
+          { id: 'p_wedge', label: '40-yd wedge ladder — 20 min', info: 'wedge_ladder',
+            spec: 'Was 0/10 at baseline. We rebuild this every week.' },
 
-          { id: 'g_range_block', label: 'BLOCK 3: Range — full bag (75 min)', time: '12:30',
-            info: 'range_block_detailed',
-            spec: '15 min wedges → 25 min mid-irons (the leak) → 15 min long irons/hybrid → 20 min tee clubs. Quality over quantity.' },
+          { id: 'p_done', label: 'Practice complete (~95 min total). Hydrate, eat, rest.' },
 
-          { id: 'g_short_close', label: 'BLOCK 4: Short game closer (30 min)', time: '1:45',
-            info: 'short_close',
-            spec: '10 chips + 10 putts to end on success.' },
+          { id: 'g_warmup', label: 'Pre-round warmup at Oak Tree (30 min)', info: 'evening_warmup',
+            spec: 'Lighter warmup since you practiced this morning.' },
 
-          { id: 'g_done', label: 'Done by 2:15 PM. Hydrate, eat, rest the rest of the day.' },
-          { id: 'g_log', label: 'Open Session Notes, log how blocks went' }
-        ]
+          { id: 'g_round', label: 'Play 18 at Oak Tree — TRACK EVERY HOLE' },
+
+          { id: 'g_share', label: 'Share round + Session Note within 30 min' }
+        ],
+        ifShort: 'Cut wedge ladder if pressed. Keep short game block — it\'s the priority.'
       }
     },
 
-    '2026-06-10': {
-      title: 'Wednesday — Tracked Round (East)',
-      sub: 'Oak Tree East · Tracked 18 · 1:00 PM tee time',
-      wakeTime: '8:00 AM',
+    '2026-06-17': {
+      title: 'Wednesday — Practice + 18',
+      sub: 'AM range block (TEE GAME focus) · Evening 18',
       golf: {
-        intro: 'Play 18 holes at Oak Tree East (Gold tees). This is a TRACKED round — fill in Round Tracker hole by hole, real time, every hole. Last time you played East, you shot 85 with the new grip. Goal today: under 80.',
+        intro: 'TEE GAME day. 2/14 fairways isn\'t sustainable. We\'re working driver and 3-wood with intent today. Plus full bag work.',
         tasks: [
-          { id: 'g_arrive', label: 'At Oak Tree by 12:00 PM', time: '12:00 PM' },
-          { id: 'g_warmup', label: 'Full pre-round warmup (45 min)', time: '12:00',
-            info: 'tournament_warmup' },
-          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE', time: '1:00 PM',
-            info: 'tracking_emphasis',
-            spec: 'No exceptions. Score, putts, FIR, GIR, UD, penalty — every hole.' },
-          { id: 'g_share', label: 'Share round within 30 min of finishing' },
-          { id: 'g_post', label: 'After round: 30 min short game (work on whatever broke)' },
-          { id: 'g_note', label: 'Add a Session Note about the round' }
-        ]
+          { id: 'p_warmup', label: 'Putting/chipping warmup (15 min)' },
+
+          { id: 'p_tee', label: 'Tee club shootout — 30 min', info: 'tee_shootout',
+            spec: 'Driver vs. 3-wood vs. hybrid. Find your "fairway-finder."' },
+
+          { id: 'p_range', label: 'Full bag range block — 45 min', info: 'range_block',
+            spec: 'Mid-irons + long irons. Pre-shot routine every ball.' },
+
+          { id: 'p_short', label: 'Short game closer — 20 min', info: 'short_closer',
+            spec: 'End on success. 10 chips + 10 putts to wrap.' },
+
+          { id: 'p_done', label: 'Practice complete (~110 min). Hydrate, eat, rest.' },
+
+          { id: 'g_warmup', label: 'Pre-round warmup (30 min)' },
+
+          { id: 'g_round', label: 'Play 18 at Oak Tree — TRACK EVERY HOLE' },
+
+          { id: 'g_share', label: 'Share round + Session Note' }
+        ],
+        ifShort: 'Cut the full-bag range block. Tee club shootout is the must-do today.'
       }
     },
 
-    '2026-06-11': {
-      title: 'Thursday — Strength + Practice',
-      sub: 'AM strength · PM short game / range',
-      wakeTime: '8:00 AM',
-      includeWorkout: true,
-      workout: {
-        title: '💪 Strength Session',
-        intro: 'Full home strength. Med ball, dumbbells. After the morning routine.',
-        tasks: [
-          { id: 'w_warmup', label: 'Movement warmup (5 min)' },
-          { id: 'w_strength', label: 'Full strength circuit', info: 'thu_strength_detailed',
-            spec: 'Goblet squat 4×10, med ball rot 4×8/side, DB row 4×10/side, plank 3×60.' },
-          { id: 'w_cooldown', label: 'Cool-down stretching (5 min)' }
-        ]
-      },
+    '2026-06-18': {
+      title: 'Thursday — Practice + 18',
+      sub: 'AM mental & precision · Evening 18',
       golf: {
-        intro: 'Afternoon at Oak Tree. Three structured blocks. About 3 hours.',
+        intro: 'Mental resilience day plus iron precision. Saturday\'s "gave up" cost real strokes. We\'re building a structured response to bad holes.',
         tasks: [
-          { id: 'g_arrive', label: 'At Oak Tree by 1:30 PM', time: '1:30 PM' },
-          { id: 'g_warmup', label: 'Putting green warmup (15 min)' },
-          { id: 'g_chip', label: 'BLOCK 1: Chipping (45 min)', info: 'chip_block_detailed',
-            spec: '30 chips from varied lies. Score yourself.' },
-          { id: 'g_bunker', label: 'BLOCK 2: Bunker work (30 min)', info: 'bunker_detailed',
-            spec: '15 greenside shots. Different lies.' },
-          { id: 'g_putt', label: 'BLOCK 3: Putting (45 min)', info: 'putt_block_detailed' },
-          { id: 'g_range', label: 'BLOCK 4: Range (45 min) — wedges + 7i focus',
-            info: 'range_focus_wedges' },
-          { id: 'g_done', label: 'Done by 5:00 PM.' },
-          { id: 'g_log', label: 'Session Notes if anything stood out' }
-        ]
+          { id: 'p_warmup', label: 'Mobility + putting warmup (15 min)' },
+
+          { id: 'p_routine', label: 'Pre-shot routine reps — 20 min', info: 'preshot_routine',
+            spec: 'Build a repeatable routine. 20 reps at home before going to course.' },
+
+          { id: 'p_recovery', label: 'Recovery shot practice — 30 min', info: 'recovery_drill',
+            spec: 'Drop a ball in trouble spots. Practice the punch-out, the pitch-out, the smart play.' },
+
+          { id: 'p_irons', label: 'Iron precision block — 45 min', info: 'iron_block',
+            spec: '7-iron and 5-iron/hybrid. The clubs you hit into long par 3s.' },
+
+          { id: 'p_short', label: 'Short game (20 min)', info: 'short_quick',
+            spec: 'Light maintenance. Don\'t grind.' },
+
+          { id: 'p_done', label: 'Practice complete (~130 min). Hydrate, eat, rest.' },
+
+          { id: 'g_warmup', label: 'Pre-round warmup (30 min)' },
+
+          { id: 'g_round', label: 'Play 18 at Oak Tree — TRACK EVERY HOLE' },
+
+          { id: 'g_round_mental', label: 'IN-ROUND: After any bogey+, run the reset routine',
+            info: 'reset_routine' },
+
+          { id: 'g_share', label: 'Share round + Session Note' }
+        ],
+        ifShort: 'Cut iron block. Mental work + recovery shots are the must-dos.'
       }
     },
 
-    '2026-06-12': {
-      title: 'Friday — Tracked Round (West)',
-      sub: 'Oak Tree West · Tracked 18 · 1:00 PM tee time',
-      wakeTime: '8:00 AM',
+    '2026-06-19': {
+      title: 'Friday — Practice + 18',
+      sub: 'AM range block · Evening 18',
+      workout: 'upper_core',
       golf: {
-        intro: 'Second tracked round of the week. Oak Tree West this time (Gold tees) for variety. Goal: keep the new grip consistent across two different courses. Focus on the 40-yard wedge — it was a baseline weakness.',
+        intro: 'Mid-iron focus day. Friday last week was 9 GIR — that\'s the level we want to lock in.',
         tasks: [
-          { id: 'g_arrive', label: 'At Oak Tree by 12:00 PM', time: '12:00 PM' },
-          { id: 'g_warmup', label: 'Full pre-round warmup (45 min)', info: 'tournament_warmup' },
-          { id: 'g_round', label: 'Play 18 — TRACK EVERY HOLE', time: '1:00 PM' },
-          { id: 'g_share', label: 'Share round within 30 min' },
-          { id: 'g_post', label: 'After round: 20 min lag putting (no full swing)' },
-          { id: 'g_note', label: 'Session Note about the round' }
-        ]
+          { id: 'p_warmup', label: 'Putting green warmup (10 min)' },
+
+          { id: 'p_short_warmup', label: 'Short game warmup — 15 min', info: 'short_quick' },
+
+          { id: 'p_range', label: 'Full bag range block — 50 min', info: 'range_block',
+            spec: 'Wedges → 9i → 7i → 5i/hybrid → driver. Block practice, full routine each ball.' },
+
+          { id: 'p_tee', label: 'Tee clubs (15 min)', info: 'tee_shootout',
+            spec: 'Whichever club won this week\'s fairway test — 15 balls.' },
+
+          { id: 'p_putt', label: 'Putting (15 min) — short putts only', info: 'putt_maintenance' },
+
+          { id: 'p_done', label: 'Practice complete (~110 min). Hydrate, eat, rest.' },
+
+          { id: 'g_warmup', label: 'Pre-round warmup (30 min)' },
+
+          { id: 'g_round', label: 'Play 18 at Oak Tree — TRACK EVERY HOLE' },
+
+          { id: 'g_share', label: 'Share round + Session Note' }
+        ],
+        ifShort: 'Range block is the must-do. Skip the tee clubs add-on if needed.'
       }
     },
 
-    '2026-06-13': {
-      title: 'Saturday — Lighter Day',
-      sub: 'Sleep in OK · Range focus + optional 9',
-      wakeTime: '9:30 AM',
+    '2026-06-20': {
+      title: 'Saturday — Practice + 18',
+      sub: 'Lighter practice · Evening 18',
       golf: {
-        intro: 'Lighter load today. Focus block + optional 9. About 2-3 hours total.',
+        intro: 'Lighter practice day before Sunday. You\'ve played a lot of golf this week — quality over quantity.',
         tasks: [
-          { id: 'g_arrive', label: 'At Oak Tree by 11:30 AM', time: '11:30 AM' },
-          { id: 'g_warmup', label: 'Putting/chip warmup (15 min)' },
-          { id: 'g_range', label: 'Range focus session — 60 min', info: 'sat_range_focus',
-            spec: 'Pick the BIGGEST leak from this week\'s rounds. Just work that.' },
-          { id: 'g_short', label: 'Short game (30 min) — chips + wedges' },
-          { id: 'g_optional', label: 'Optional: play 9 holes (track if you do)' },
-          { id: 'g_done', label: 'Off the course by 3:30 PM' }
-        ]
+          { id: 'p_warmup', label: 'Putting + chipping warmup (15 min)' },
+
+          { id: 'p_focus', label: 'Focus block — 45 min', info: 'sat_focus',
+            spec: 'Pick ONE leak from this week\'s rounds. Work it. Just that.' },
+
+          { id: 'p_short', label: 'Short game variety (30 min)', info: 'short_variety',
+            spec: 'Different lies, different clubs. Creative shots.' },
+
+          { id: 'p_done', label: 'Practice complete (~90 min). Hydrate, eat, rest.' },
+
+          { id: 'g_warmup', label: 'Pre-round warmup (30 min)' },
+
+          { id: 'g_round', label: 'Play 18 at Oak Tree — TRACK EVERY HOLE' },
+
+          { id: 'g_share', label: 'Share round + Session Note' }
+        ],
+        ifShort: 'Just the focus block + 18. Skip the variety add-on.'
       }
     },
 
-    '2026-06-14': {
-      title: 'Sunday — Rest + Review',
-      sub: 'Sleep in · Light mobility · Dad runs Weekly Review tonight',
-      wakeTime: '9:30 AM',
+    '2026-06-21': {
+      title: 'Sunday — Practice + 18 + Review',
+      sub: 'AM short practice · Evening 18 · Dad runs Weekly Review tonight',
       golf: {
-        intro: 'Recovery day. Light putting/mobility only. No range, no 18 holes. Sleep is when skills consolidate.',
+        intro: 'Last day of the cycle. Lighter practice. Play 18. Dad runs the Weekly Review tonight to plan next week.',
         tasks: [
-          { id: 'g_mobility', label: '15 min full mobility / stretching' },
-          { id: 'g_putt', label: 'Optional: 20 min carpet putting (only if you feel like it)' },
-          { id: 'g_rest', label: 'REST. No range. No 18 holes. Day off the course.' },
-          { id: 'g_reflect', label: 'Reflect on the week — what got better, what didn\'t' },
-          { id: 'g_dad_review', label: 'Dad runs Weekly Review tonight' }
-        ]
+          { id: 'p_warmup', label: 'Mobility + putting warmup (15 min)' },
+
+          { id: 'p_putt', label: 'Putting (15 min)', info: 'putt_maintenance' },
+
+          { id: 'p_short', label: 'Short game (30 min)', info: 'short_quick' },
+
+          { id: 'p_swing', label: 'Range — feel only, 20 balls (15 min)',
+            spec: 'No grinding. Just loose, easy reps to keep the feel.' },
+
+          { id: 'p_done', label: 'Practice complete (~75 min). Hydrate, eat, rest.' },
+
+          { id: 'g_warmup', label: 'Pre-round warmup (30 min)' },
+
+          { id: 'g_round', label: 'Play 18 at Oak Tree — TRACK EVERY HOLE' },
+
+          { id: 'g_share', label: 'Share round + Session Note' },
+
+          { id: 'g_dad', label: 'Dad runs Weekly Review tonight' }
+        ],
+        ifShort: 'Just the round if pressed for time. This is the lightest practice day of the week.'
       }
     }
   };
 
-  // ===== INFO PANELS — Detailed practice instructions =====
-
+  // ===== INFO PANELS =====
   const INFO_PANELS = {
     mobility: `<strong>10-min mobility routine:</strong>
       <ol>
@@ -467,192 +498,177 @@
         <li>Cat/cow — 8 reps</li>
       </ol>`,
 
-    monday_run: `<strong>Neighborhood run:</strong>
+    putt_warmup: `<strong>Quick putting warmup (10 min):</strong>
       <ol>
-        <li>5 min walk warmup</li>
-        <li>20 min easy-pace run — conversational pace, you should be able to talk in short sentences</li>
-        <li>5 min walk cool-down</li>
-      </ol>
-      <strong>Goal:</strong> Aerobic base. NOT a sprint workout. Your heart rate should feel sustainable.
-      <div class="tip"><strong>Why:</strong> Cardiovascular endurance helps you walk 18 holes without losing focus on the back nine. Tournament golf rewards stamina.</div>`,
-
-    monday_strength: `<strong>Monday strength circuit (45 min):</strong>
-      <p><strong>Warmup (5 min):</strong> Dynamic stretches.</p>
-      <strong>Main circuit — 4 rounds of:</strong>
-      <ol>
-        <li><strong>Goblet squat</strong> — 10 reps. Both 15-lb DBs at chest, full depth, drive through heels.</li>
-        <li><strong>Med ball rotational throws</strong> — 8 reps each side. Side-on to wall, 6-lb ball, hip-led rotation.</li>
-        <li><strong>DB row</strong> — 10 reps each side. 15-lb DB, hand on chair for support.</li>
-        <li><strong>Pushups</strong> — max reps (stop at 15 if it's easy).</li>
-        <li><strong>Plank</strong> — 60 sec hold.</li>
-        <li><strong>Rest 90 sec</strong> between rounds.</li>
-      </ol>
-      <strong>Finisher (5 min):</strong> Ab wheel rollouts — 3 sets of 6-8 reps.
-      <div class="tip">Total: ~35 min main work, 10 min stretching. Build progressively over the summer.</div>`,
-
-    putt_warmup: `<strong>Putting warmup (15 min):</strong>
-      <ol>
-        <li>10 min: 20 short putts (3-6 ft) — feel the roll, no scoring</li>
-        <li>5 min: 10 lag putts from 30+ ft — feel only</li>
+        <li>15 short putts (3-5 ft) — feel the roll</li>
+        <li>10 lag putts (30+ ft) — feel the distance</li>
       </ol>`,
 
-    putt_block_detailed: `<strong>Putting station block (45 min):</strong>
-      <p><strong>Station 1 — 3-foot clock face (10 min)</strong></p>
+    putt_maintenance: `<strong>Putting maintenance (20 min):</strong>
+      <p>Putting is locked in (29-31 putts/round). Maintenance only.</p>
       <ul>
-        <li>Place 4 balls around hole at 12, 3, 6, 9 o'clock positions, all 3 ft away.</li>
-        <li>Hit 10 putts total, going around the clock 2.5 times.</li>
-        <li>Goal: 9 or 10 makes. <strong>Record your score.</strong></li>
-        <li>If under 9, repeat with focus on a clean strike.</li>
+        <li><strong>10 min:</strong> 20 putts from 5 feet (clock face). Goal: 14+/20.</li>
+        <li><strong>10 min:</strong> 5 lag putts each from 25, 35, 45 ft. Goal: 8+/15 inside 3 ft past hole.</li>
       </ul>
-      <p><strong>Station 2 — 6-foot clock face (10 min)</strong></p>
-      <ul>
-        <li>Same setup at 6 ft. 10 putts.</li>
-        <li>Goal: 6 or 7 makes. Record.</li>
-      </ul>
-      <p><strong>Station 3 — 10-foot makes (10 min)</strong></p>
-      <ul>
-        <li>10 putts from 10 ft to a single hole.</li>
-        <li>Goal: 4-5 makes. Record.</li>
-      </ul>
-      <p><strong>Station 4 — Lag ladder (15 min)</strong></p>
-      <ul>
-        <li>5 putts each from 20, 30, 40 feet.</li>
-        <li>Place a putter 3 ft past the hole as "danger zone."</li>
-        <li>Goal: stop ball BETWEEN hole and putter (within 3 ft past).</li>
-        <li>Count: of 15 putts, how many landed in that 3-ft zone past the hole?</li>
-        <li>Short is worse than long.</li>
-      </ul>
-      <div class="tip">Write your station scores in Session Notes after the block. We track these week to week.</div>`,
+      <div class="tip">Don't overpractice putting this week. Your stroke is good.</div>`,
 
-    short_block_detailed: `<strong>Short game block (60 min):</strong>
-      <p><strong>Station 1 — Standard chips, easy lie (15 min)</strong></p>
+    short_block: `<strong>Short game block (45 min):</strong>
+      <p><strong>Chips from clean lie (15 min):</strong></p>
       <ul>
-        <li>10 chips from clean fairway lie, 10-15 ft off green.</li>
-        <li>Use 52° or 56° — whichever you trust.</li>
-        <li>Goal: 6+ within 3 ft of hole. <strong>Record.</strong></li>
+        <li>15 chips, one club (56°)</li>
+        <li>Score: how many inside 3 ft? Goal: 8+/15</li>
       </ul>
-      <p><strong>Station 2 — Chip from rough (15 min)</strong></p>
+      <p><strong>Chips from rough (15 min):</strong></p>
       <ul>
-        <li>10 chips from rough/longer grass.</li>
-        <li>Adjust technique — open face, slightly steeper angle of attack.</li>
-        <li>Goal: 4+ within 6 ft. Record.</li>
+        <li>15 chips, slightly steeper attack angle</li>
+        <li>Goal: 6+/15 inside 6 ft</li>
       </ul>
-      <p><strong>Station 3 — 40-yard wedge ladder (20 min)</strong></p>
+      <p><strong>Bunker shots (15 min):</strong></p>
       <ul>
-        <li>10 balls at 30 yards. Land within 6 ft.</li>
-        <li>10 balls at 40 yards. Land within 10 ft.</li>
-        <li>Record both scores.</li>
-        <li>The 40-yd wedge was 0/10 at baseline. We're rebuilding this.</li>
-      </ul>
-      <p><strong>Station 4 — Bunker (10 min)</strong></p>
-      <ul>
-        <li>10 greenside bunker shots from flat lies.</li>
-        <li>Goal: 6+ on the green, 3+ inside 10 ft.</li>
+        <li>10 splash shots from flat lies</li>
+        <li>Goal: 8+ on green, 4+ inside 10 ft</li>
       </ul>`,
 
-    range_block_detailed: `<strong>Range block (75 min) — block practice, not rake-and-rip:</strong>
-      <p><strong>Wedges (15 min) — warmup + control</strong></p>
+    wedge_ladder: `<strong>40-yd wedge ladder (20 min):</strong>
       <ul>
-        <li>15 balls with PW. Pick a target. Full pre-shot routine on every ball.</li>
-        <li>Note: are misses going left or right? Short or long?</li>
+        <li>10 balls at 30 yards — land within 6 ft</li>
+        <li>10 balls at 40 yards — land within 10 ft</li>
       </ul>
-      <p><strong>Mid-irons (25 min) — THE LEAK</strong></p>
-      <ul>
-        <li>10 balls with 9-iron.</li>
-        <li>20 balls with 7-iron. This is the bellwether club.</li>
-        <li>Track misses meticulously. If 8 of 20 missed left, write it down.</li>
-        <li>Try: stronger grip (more knuckles visible) on a few to see if face squares up.</li>
-      </ul>
-      <p><strong>Long irons / hybrid (15 min)</strong></p>
-      <ul>
-        <li>15 balls with 5-iron or hybrid (whatever you carry).</li>
-        <li>This is the club you hit into long par 3s. Tournament priority.</li>
-      </ul>
-      <p><strong>Tee clubs (20 min) — FAIRWAY FINDER TEST</strong></p>
-      <ul>
-        <li>Hit 10 drivers, 10 three-woods at the same fairway target.</li>
-        <li>Count: out of 10 with each, how many landed in fairway width?</li>
-        <li>Whichever club gets you a higher % is your tournament tee club.</li>
-      </ul>
-      <div class="tip">After block: record stats in Session Notes. Miss patterns, percentage in fairway, etc.</div>`,
+      <strong>Score yourself.</strong> Was 0/10 at baseline. Goal this week: 3+/20.
+      <div class="tip">This is "in-between" distance. Most amateurs leak strokes here. We've been rebuilding it.</div>`,
 
-    short_close: `<strong>End on success (30 min):</strong>
+    tee_shootout: `<strong>Tee club shootout (30 min):</strong>
+      <p>The driver hit 2 of 14 fairways Friday. Time to find your tournament tee club.</p>
       <ol>
-        <li>10 chips to a hole 25 ft away. End when you put 5 within 3 ft in a row.</li>
-        <li>10 putts from 6 ft. End when you make 5 in a row.</li>
+        <li>Pick a fairway-width target on the range (about 30 yards wide at your carry distance).</li>
+        <li>Hit <strong>10 drivers</strong> at it. Count: how many landed in target zone?</li>
+        <li>Hit <strong>10 three-woods</strong> at the same target. Count fairways.</li>
+        <li>Hit <strong>10 with whatever hybrid/longer iron you trust off a tee.</strong> Count fairways.</li>
       </ol>
-      <div class="tip">Always end practice on a made putt. Tour pros do this — last image of the day matters.</div>`,
+      <strong>Take the winner.</strong> The club with the highest fairway % is your tournament tee club until further notice.
+      <div class="tip">A 3-wood in the fairway beats a driver in the woods. Every. Single. Time.</div>`,
 
-    thu_strength_detailed: `<strong>Strength circuit (35 min main work):</strong>
-      <p>4 rounds of:</p>
+    range_block: `<strong>Full bag range block (45-50 min):</strong>
+      <p><strong>Wedges (10 min):</strong></p>
+      <ul><li>10-12 PW balls. Pick a target. Full routine.</li></ul>
+      <p><strong>Mid-irons (20 min) — the bellwether:</strong></p>
+      <ul>
+        <li>10 with 9-iron</li>
+        <li>15 with 7-iron — note miss pattern carefully</li>
+      </ul>
+      <p><strong>Long irons / hybrid (15 min):</strong></p>
+      <ul><li>15 balls. This is your long par 3 club. Tournament priority.</li></ul>
+      <div class="tip">After block: write down miss patterns in Session Notes.</div>`,
+
+    short_closer: `<strong>End-on-success closer (20 min):</strong>
       <ol>
-        <li>Goblet squat — 10 reps (both 15-lb DBs)</li>
-        <li>Med ball rotational throws — 8/side, 6-lb ball</li>
-        <li>DB row — 10/side, 15-lb</li>
-        <li>Plank — 60 sec</li>
-        <li>Rest 90 sec between rounds</li>
+        <li>10 chips to a hole 25 ft away. Don\'t stop until you put 5 within 3 ft in a row.</li>
+        <li>10 putts from 6 ft. Don\'t stop until you make 5 in a row.</li>
       </ol>
-      <p><strong>Finisher:</strong> Ab wheel 3×6-8 reps + side plank 2×30 sec each side.</p>`,
+      <div class="tip">Last image of practice matters. Always end on a make.</div>`,
 
-    chip_block_detailed: `<strong>Chipping block (45 min):</strong>
+    short_quick: `<strong>Quick short game (15-30 min):</strong>
       <ul>
-        <li>10 chips from clean lie — 1 club (56°)</li>
-        <li>10 chips from clean lie — 1 club (PW)</li>
-        <li>10 chips from rough — 56°</li>
-        <li>Score yourself out of 30: how many within 3 ft? Within 6 ft?</li>
-      </ul>
-      <div class="tip">Two clubs same lie shows you which is more reliable for you.</div>`,
-
-    bunker_detailed: `<strong>Bunker block (30 min):</strong>
-      <ul>
-        <li>5 splash shots — flat lie</li>
-        <li>5 splash shots — slightly downhill</li>
-        <li>5 splash shots — uphill</li>
-        <li>Goal: all 15 on the green. 5+ within 10 ft.</li>
-      </ul>
-      <strong>Technique reminder:</strong> Open face, ball forward in stance, hit 2 inches behind the ball, accelerate through the sand.`,
-
-    range_focus_wedges: `<strong>Range — wedges + 7i (45 min):</strong>
-      <ul>
-        <li>15 balls PW at a target — track miss pattern</li>
-        <li>15 balls 56° at a closer target</li>
-        <li>20 balls 7-iron — full pre-shot routine on EVERY ball</li>
+        <li>15 chips from clean lie — count makes inside 3 ft</li>
+        <li>10 wedges from 30-40 yards — count inside 10 ft</li>
+        <li>10 short putts (5 ft) — count makes</li>
       </ul>`,
 
-    sat_range_focus: `<strong>Saturday range focus block:</strong>
-      <p>Look at this week's tracked rounds. Where did you lose the most strokes?</p>
+    short_variety: `<strong>Short game variety (30 min):</strong>
+      <p>Different lies, different clubs. Build creativity.</p>
       <ul>
-        <li>Tee shots not in fairway → 30 balls driver + 3-wood, alternating, target line</li>
-        <li>Approaches too left/right → mid-iron block, 30 balls, full routine</li>
-        <li>Wedges (60-100 yd) → ladder drill, 30 balls</li>
-        <li>Putting → carpet at home is fine, or putting green here</li>
-      </ul>
-      <strong>Don't try to fix everything in one session.</strong> Pick ONE leak. 60 minutes on it.`,
+        <li>5 high lob shots over a bunker (60°)</li>
+        <li>5 low-running bump-and-runs (8-iron or PW)</li>
+        <li>5 chips from downhill lie</li>
+        <li>5 chips from uphill lie</li>
+        <li>5 chips from sidehill lie (ball below feet)</li>
+        <li>5 chips from sidehill lie (ball above feet)</li>
+      </ul>`,
 
-    tournament_warmup: `<strong>Pre-round warmup template (45 min):</strong>
+    preshot_routine: `<strong>Pre-shot routine reps (20 min):</strong>
+      <p>Before going to the course. In your living room or backyard with any club.</p>
+      <strong>The routine — 5-7 steps, repeatable:</strong>
+      <ol>
+        <li>Stand behind ball, pick exact target</li>
+        <li>Visualize the shot shape (draw, fade, straight, high, low)</li>
+        <li>1-2 practice swings, feeling the shot</li>
+        <li>Walk into the ball — clubface to target FIRST</li>
+        <li>Set your feet</li>
+        <li>One look at target, one look at ball</li>
+        <li>Trigger word ("smooth," "go," whatever) → swing</li>
+      </ol>
+      <strong>Do 20 full reps of this with any club.</strong> Same routine, every time.
+      <div class="tip">Once it\'s automatic, use it on EVERY shot in tonight\'s round. Including 3-foot putts.</div>`,
+
+    recovery_drill: `<strong>Recovery shot practice (30 min):</strong>
+      <p>The 83 had 3 penalty strokes. The 76 had 1. Recovery decisions are scoring.</p>
+      <p><strong>Set up these scenarios at the practice area:</strong></p>
+      <ul>
+        <li><strong>Punch-out:</strong> 10 balls, hit a low 6-iron under "trees" (imaginary). Goal: 100+ yds, low, straight.</li>
+        <li><strong>Pitch-out sideways:</strong> 10 balls, simulate being in rough next to OB. Don\'t go for hero shot — pitch sideways to fairway.</li>
+        <li><strong>Layup wedge:</strong> 10 balls from rough, 150 yds out. Take a 9-iron, lay up to 50 yds instead of forcing a 7-iron to the green.</li>
+      </ul>
+      <div class="tip"><strong>The rule:</strong> When you\'re in trouble, the worst score on the hole is a triple. The smart play turns a triple into a bogey. Every. Time.</div>`,
+
+    iron_block: `<strong>Iron precision block (45 min):</strong>
+      <p>7-iron and 5-iron/hybrid. The clubs that hit greens (or don\'t).</p>
+      <p><strong>7-iron station (25 min):</strong></p>
+      <ul>
+        <li>20 balls, full routine each one</li>
+        <li>Pick a flag or target. Track: how many landed within "green-width" of target?</li>
+        <li>Note miss direction every shot</li>
+      </ul>
+      <p><strong>5-iron / hybrid station (20 min):</strong></p>
+      <ul>
+        <li>15 balls, same drill</li>
+        <li>This is your long par-3 club. Tournament priority.</li>
+      </ul>`,
+
+    reset_routine: `<strong>The Bad-Hole Reset Routine:</strong>
+      <p>When you make a bogey+ (especially double or worse), you have until the next tee box to reset. Here\'s the routine:</p>
+      <ol>
+        <li><strong>Walk slowly to the next tee.</strong> Don\'t rush. Don\'t replay the bad shot.</li>
+        <li><strong>One deep breath.</strong> Long exhale.</li>
+        <li><strong>Trigger phrase:</strong> "Next shot is the only shot." Say it in your head.</li>
+        <li><strong>On the tee:</strong> Take your normal pre-shot routine. Don\'t change anything because you\'re mad.</li>
+        <li><strong>If you can\'t reset by the next tee:</strong> Pick a "reset line" — the next sprinkler head, the next yardage marker, whatever. By the time you cross it, you\'re a new player.</li>
+      </ol>
+      <strong>Saturday\'s 83:</strong> You wrote "gave up" mentally. Bad holes happen. Tournament golfers feel the same frustration — they just don\'t let it bleed into the next 4 holes.
+      <div class="tip">This is a skill, not a personality trait. It\'s practiced.</div>`,
+
+    evening_warmup: `<strong>Evening warmup (30 min):</strong>
+      <p>Lighter than morning warmup since you already practiced today.</p>
+      <ol>
+        <li>5 min putting — short putts + 5 lag putts</li>
+        <li>5 min chipping — 5 chips</li>
+        <li>20 min range — short irons, mid-irons, then driver/3-wood. ~25 balls total.</li>
+      </ol>`,
+
+    tournament_warmup: `<strong>Full pre-round warmup (45 min):</strong>
       <ol>
         <li><strong>10 min putting:</strong> 20 short putts (3-6 ft), then 10 lag putts (30+ ft)</li>
         <li><strong>10 min chipping:</strong> 15 chips from varied lies, focus on landing spot</li>
-        <li><strong>25 min range:</strong> PW → 9i → 7i → 5i/hybrid → driver/3-wood. 5-8 balls each. Full pre-shot routine on every ball.</li>
+        <li><strong>25 min range:</strong> PW → 9i → 7i → 5i/hybrid → driver/3-wood. 5-8 balls each. Full routine.</li>
       </ol>
-      <strong>Finish</strong> with the club you'll hit off #1.`,
+      <strong>Finish</strong> with the club you\'ll hit off #1.`,
 
     mgmt_focus: `<strong>Course management focus:</strong>
       <ul>
-        <li>Every par 4/5 tee: ask "driver or 3-wood?" — whatever gives more fairways</li>
+        <li>Every par 4/5 tee: ask "driver or 3-wood/hybrid?" — pick whichever puts you in fairway more often</li>
         <li>Approaches: aim middle of green, not the pin</li>
         <li>Par 3s with trouble: club up, swing easier</li>
         <li>In trouble: pitch out sideways, not the hero shot</li>
       </ul>`,
 
-    tracking_emphasis: `<strong>This is non-negotiable:</strong>
+    sat_focus: `<strong>Saturday focus block (45 min):</strong>
+      <p>Look at Tue/Wed/Thu/Fri rounds. Where did you lose the most strokes?</p>
       <ul>
-        <li>Open Round Tracker before the round starts</li>
-        <li>Tap a course preset</li>
-        <li>After every hole, before walking to next tee, log: score, putts, FIR (if par 4+), GIR, UD (if missed GIR), penalty</li>
-        <li>If you don't track it, the round doesn't help you improve</li>
+        <li><strong>Tee shots</strong> → driver + 3-wood, 30 balls, target line</li>
+        <li><strong>Approaches</strong> → 7i / 5i block, 30 balls, full routine</li>
+        <li><strong>Wedges (30-60 yd)</strong> → ladder drill, 30 balls</li>
+        <li><strong>Short game</strong> → chips + lag putts</li>
       </ul>
-      <strong>Dad sees the data either way</strong> — better to be honest than to skip it.`
+      <strong>Pick ONE.</strong> 45 minutes on it. Quality over variety today.`
   };
 
   // ===== Date helpers =====
@@ -666,33 +682,24 @@
     return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
   }
 
-  function getWeekDates() {
-    return Object.keys(WEEK).sort();
-  }
+  function getWeekDates() { return Object.keys(WEEK).sort(); }
 
   let viewDate = todayStr();
   if (!WEEK[viewDate]) {
-    const weekDates = getWeekDates();
-    viewDate = weekDates[0];
+    const dates = getWeekDates();
+    viewDate = dates[0];
   }
 
-  function getDayData(date) {
-    if (!allData[date]) allData[date] = {};
-    return allData[date];
-  }
+  function getDayData(date) { if (!allData[date]) allData[date] = {}; return allData[date]; }
 
   function load() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) allData = JSON.parse(saved);
-    } catch(e) { allData = {}; }
+    try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) allData = JSON.parse(saved); }
+    catch(e) { allData = {}; }
   }
-
   function save() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(allData)); } catch(e) {}
   }
 
-  // ===== Render =====
   function renderDaySelector() {
     const sel = document.getElementById('daySelector');
     sel.innerHTML = '';
@@ -702,16 +709,18 @@
       const dayNum = d.getDate();
       const pill = document.createElement('button');
       pill.className = 'day-pill' + (date === viewDate ? ' active' : '');
-      pill.textContent = `${day} ${dayNum}`;
+      const plan = WEEK[date];
+      const workout = plan && plan.workout;
+      pill.innerHTML = `${day} ${dayNum}${workout ? ' <span class="badge">💪</span>' : ''}`;
       const dayData = allData[date] || {};
       const hasProgress = Object.entries(dayData).some(([k,v]) => v === true && !k.startsWith('_'));
       if (hasProgress && date !== viewDate) pill.classList.add('has-progress');
-      pill.onclick = () => { viewDate = date; render(); };
+      pill.onclick = () => { viewDate = date; render(); window.scrollTo({top:0,behavior:'smooth'}); };
       sel.appendChild(pill);
     });
   }
 
-  function renderSection(sectionClass, title, intro, tasks, dayData, defaultOpen = true) {
+  function renderSection(sectionClass, title, intro, tasks, dayData, defaultOpen = true, ifShort = null) {
     let html = `<div class="section ${sectionClass}${defaultOpen ? '' : ' collapsed'}" data-section="${sectionClass}">`;
     const completed = tasks.filter(t => dayData[t.id]).length;
     const total = tasks.length;
@@ -719,18 +728,19 @@
     html += `<div class="section-header" onclick="toggleSection('${sectionClass}')">
       <h2>${title}</h2>
       <div class="right">
-        <span class="section-progress ${isComplete ? 'complete' : ''}">${isComplete ? '✓ Done' : completed + '/' + total}</span>
+        <span class="section-progress ${isComplete ? 'complete' : ''}">${isComplete ? '✓' : completed + '/' + total}</span>
         <span class="section-chev">▼</span>
       </div>
     </div>`;
     html += `<div class="section-body">`;
     if (intro) html += `<div class="section-intro">${intro}</div>`;
+    if (ifShort) html += `<div class="if-short"><strong>⏱ If short on time:</strong> ${ifShort}</div>`;
     tasks.forEach(t => {
       const checked = !!dayData[t.id];
       html += `<div class="task">
         <div class="task-row ${checked ? 'done' : ''}">
           <input type="checkbox" id="${t.id}" ${checked ? 'checked' : ''} onchange="toggleTask('${t.id}', this.checked)">
-          <label class="task-label" for="${t.id}">${t.label}${t.time ? ' <span class="task-time">' + t.time + '</span>' : ''}</label>
+          <label class="task-label" for="${t.id}">${t.label}</label>
         </div>`;
       if (t.spec) html += `<div class="task-spec">${t.spec}</div>`;
       if (t.info) {
@@ -757,37 +767,49 @@
     }
 
     renderDaySelector();
-
-    // Schedule tag (orthodontist, etc.)
-    const tagContainer = document.getElementById('scheduleTagContainer');
-    if (dayPlan && dayPlan.scheduleTag) {
-      tagContainer.innerHTML = `<div class="schedule-tag">${dayPlan.scheduleTag}</div>`;
-    } else {
-      tagContainer.innerHTML = '';
-    }
-
     const container = document.getElementById('sectionsContainer');
+
     if (!dayPlan) {
-      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim);">No plan scheduled for this date.</div>';
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim);">No plan for this date.</div>';
       updateTodayProgress();
       return;
     }
 
     let html = '';
+    html += renderSection('morning', '🌅 Morning Routine', '', STANDARD_MORNING, dayData);
+    html += renderSection('rooms', '🏠 Rooms Check', '', STANDARD_ROOMS, dayData);
 
-    // Morning routine with day-specific wake time
-    html += renderSection('morning', `🌅 Morning Routine — Wake ${dayPlan.wakeTime}`, '', morningTasks(dayPlan.wakeTime), dayData);
-
-    // Rooms
-    html += renderSection('rooms', '🏠 Rooms Check', 'Bedroom, bathroom, game room. Discipline transfers.', STANDARD_ROOMS, dayData);
-
-    // Workout (Monday + Thursday)
-    if (dayPlan.includeWorkout && dayPlan.workout) {
-      html += renderSection('workout', dayPlan.workout.title, dayPlan.workout.intro, dayPlan.workout.tasks, dayData);
+    // Workout recommendation (separate page, just link)
+    if (dayPlan.workout) {
+      const name = dayPlan.workout === 'lower_core' ? 'Lower Body + Core (60 min)' : 'Upper Body + Core (60 min)';
+      const note = dayPlan.workout === 'lower_core' ? 'Recommended workout day' : 'Recommended workout day';
+      html += `<div class="section workout">
+        <div class="section-header" style="cursor: default;">
+          <h2>💪 Workout — Recommended Today</h2>
+        </div>
+        <div class="section-body">
+          <div class="section-intro">${note}. Do this in the AM, after the morning routine, before practice. Or skip if your body is fatigued — listen to it.</div>
+          <a href="workouts.html?w=${dayPlan.workout}" class="workout-link">
+            <div class="name">${name}</div>
+            <div class="meta">Tap to open full workout · 60 min · Track sets/reps</div>
+          </a>
+        </div>
+      </div>`;
     }
 
-    // Golf
-    html += renderSection('golf', '⛳ Golf Plan', dayPlan.golf.intro, dayPlan.golf.tasks, dayData);
+    // Practice (most days) and Golf
+    const tasks = dayPlan.golf.tasks;
+    const practiceTasks = tasks.filter(t => t.id.startsWith('p_'));
+    const golfTasks = tasks.filter(t => !t.id.startsWith('p_'));
+
+    if (practiceTasks.length > 0) {
+      html += renderSection('practice', '⛳ Morning Practice', dayPlan.golf.intro, practiceTasks, dayData, true, dayPlan.golf.ifShort);
+      if (golfTasks.length > 0) {
+        html += renderSection('golf', '🏌️ Evening Round (18)', 'Play 18 at Oak Tree. Track every hole. Apply the morning\'s work.', golfTasks, dayData);
+      }
+    } else {
+      html += renderSection('golf', '⛳ Today\'s Round', dayPlan.golf.intro, tasks, dayData, true, dayPlan.golf.ifShort);
+    }
 
     // Quick links
     html += `<div class="section">
@@ -796,12 +818,13 @@
         <div class="quick-actions">
           <a href="round_tracker.html" class="quick-link"><span class="ico">📋</span>Round Tracker</a>
           <a href="session_notes.html" class="quick-link"><span class="ico">📝</span>Session Notes</a>
+          <a href="workouts.html" class="quick-link"><span class="ico">💪</span>Workouts</a>
+          <a href="index.html" class="quick-link"><span class="ico">🏠</span>Hub</a>
         </div>
       </div>
     </div>`;
 
-    // Evening
-    html += renderSection('evening', '🌙 Evening', 'Wind down. Tomorrow starts when you go to bed tonight.', eveningTasks(), dayData);
+    html += renderSection('evening', '🌙 Evening Wind-Down', '', eveningTasks(), dayData);
 
     // Notes
     html += `<div class="section">
@@ -809,7 +832,7 @@
       <div class="section-body">
         <div class="field">
           <label>Anything worth flagging? (optional)</label>
-          <textarea id="dailyNote" oninput="saveDailyNote(this.value)" placeholder="">${dayData._note || ''}</textarea>
+          <textarea id="dailyNote" oninput="saveDailyNote(this.value)">${dayData._note || ''}</textarea>
         </div>
         <div class="field">
           <label>How was today overall? (1-5)</label>
@@ -848,70 +871,48 @@
   }
   window.toggleInfo = toggleInfo;
 
-  function saveDailyNote(val) {
-    const dayData = getDayData(viewDate);
-    dayData._note = val;
-    save();
-  }
+  function saveDailyNote(val) { const dd = getDayData(viewDate); dd._note = val; save(); }
   window.saveDailyNote = saveDailyNote;
 
   function setDayRating(n) {
-    const dayData = getDayData(viewDate);
-    dayData._rating = n;
+    const dd = getDayData(viewDate);
+    dd._rating = n;
     save();
-    [1,2,3,4,5].forEach(i => {
-      document.getElementById('rating_' + i)?.classList.toggle('selected', i === n);
-    });
+    [1,2,3,4,5].forEach(i => document.getElementById('rating_' + i)?.classList.toggle('selected', i === n));
   }
   window.setDayRating = setDayRating;
 
   function getAllTaskIds(dayPlan) {
-    let ids = [...morningTasks(dayPlan.wakeTime).map(t => t.id),
-               ...STANDARD_ROOMS.map(t => t.id),
-               ...dayPlan.golf.tasks.map(t => t.id),
-               ...eveningTasks().map(t => t.id)];
-    if (dayPlan.includeWorkout && dayPlan.workout) {
-      ids = [...ids, ...dayPlan.workout.tasks.map(t => t.id)];
-    }
-    return ids;
+    return [...STANDARD_MORNING.map(t => t.id),
+            ...STANDARD_ROOMS.map(t => t.id),
+            ...dayPlan.golf.tasks.map(t => t.id),
+            ...eveningTasks().map(t => t.id)];
   }
 
   function updateTodayProgress() {
     const dayPlan = WEEK[viewDate];
-    if (!dayPlan) {
-      document.getElementById('todayProgress').textContent = '—';
-      return;
-    }
+    if (!dayPlan) { document.getElementById('todayProgress').textContent = '—'; return; }
     const dayData = getDayData(viewDate);
     const ids = getAllTaskIds(dayPlan);
-    const total = ids.length;
     const done = ids.filter(id => dayData[id]).length;
-    document.getElementById('todayProgress').textContent = `${done} / ${total}`;
+    document.getElementById('todayProgress').textContent = `${done} / ${ids.length}`;
   }
 
   async function shareToday() {
     const dayPlan = WEEK[viewDate];
     if (!dayPlan) { alert('No plan for this date'); return; }
     const dayData = getDayData(viewDate);
-    let text = `DAILY PROGRESS — ${formatDateLabel(viewDate)}\n`;
-    text += `${dayPlan.title}\n`;
-    text += `========================================\n\n`;
-
+    let text = `DAILY PROGRESS — ${formatDateLabel(viewDate)}\n${dayPlan.title}\n========================================\n\n`;
     function block(title, tasks) {
       let s = `${title}\n`;
-      tasks.forEach(t => {
-        const checked = dayData[t.id] ? '✓' : '✗';
-        s += `  ${checked} ${t.label}\n`;
-      });
+      tasks.forEach(t => { s += `  ${dayData[t.id] ? '✓' : '✗'} ${t.label}\n`; });
       return s + '\n';
     }
-
-    text += block(`🌅 MORNING (wake ${dayPlan.wakeTime})`, morningTasks(dayPlan.wakeTime));
+    text += block('🌅 MORNING', STANDARD_MORNING);
     text += block('🏠 ROOMS', STANDARD_ROOMS);
-    if (dayPlan.includeWorkout) text += block('💪 WORKOUT', dayPlan.workout.tasks);
+    if (dayPlan.workout) text += `💪 WORKOUT: ${dayPlan.workout === 'lower_core' ? 'Lower + Core' : 'Upper + Core'} recommended\n\n`;
     text += block('⛳ GOLF', dayPlan.golf.tasks);
     text += block('🌙 EVENING', eveningTasks());
-
     if (dayData._rating) text += `Day rating: ${dayData._rating} / 5\n`;
     if (dayData._note) text += `Note: ${dayData._note}\n`;
 
@@ -920,7 +921,7 @@
       catch (err) { if (err.name === 'AbortError') return; }
     }
     if (navigator.clipboard) {
-      try { await navigator.clipboard.writeText(text); alert('✓ Copied. Paste into Messages.'); return; } catch(e) {}
+      try { await navigator.clipboard.writeText(text); alert('✓ Copied.'); return; } catch(e) {}
     }
     const w = window.open('', '_blank');
     w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');

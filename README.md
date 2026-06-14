@@ -1,31 +1,47 @@
-# Training Hub
+# Summer Training Site
 
-Personal training site — daily plans, round tracker, strength assessments.
-
-## Hosting
-
-This site is built as a static HTML site for GitHub Pages.
-
-1. Create a new repository on GitHub
-2. Upload these files to the repository root
-3. Go to **Settings → Pages**
-4. Under "Source", select **Deploy from a branch**
-5. Choose `main` branch, `/ (root)` folder, click Save
-6. Wait ~1 minute, then visit `https://<username>.github.io/<repo-name>/`
+Mobile-first personal training site. All data saves locally to the device.
 
 ## File structure
 
-- `index.html` — landing page / hub
-- `today_session.html` — Day 1 baseline assessment (golf)
-- `strength_assessment.html` — Day 1 evening strength session
-- `round_tracker.html` — universal post-round entry form
+- `index.html` — Hub page with tiles for every section
+- `daily.html` — Today's plan (morning routine, practice, evening 18, wind-down)
+- `round_tracker.html` — Hole-by-hole round tracking with Oak Tree and Kickingbird presets
+- `session_notes.html` — Quick post-session reflection (rating + 4 prompts)
+- `workouts.html` — Two 60-min workouts: Lower+Core and Upper+Core
+- `weekly_review.html` — Dad's Sunday bundler (rounds + notes + accountability)
 
-## How data is stored
+## GitHub Pages setup
 
-All entered data is saved to the browser's `localStorage` on the device. Nothing is sent anywhere — data lives only on the phone or browser where it was entered. Auto-save runs on every change.
+1. Push files to a GitHub repo
+2. Settings → Pages → Source = main branch / root
+3. Site lives at `https://<username>.github.io/<repo>/`
+4. On phone: open the site → Share → Add to Home Screen
 
-To install as an app on iOS: open the URL in Safari → Share → Add to Home Screen.
+## Storage keys
 
-## Privacy
+All data lives in `localStorage` on the device. Keys:
 
-No personal names or identifying information are stored in this repo. Only generic training content.
+- `training_daily_v1` — daily checkboxes, notes, ratings
+- `training_rounds_v2` — round tracker data
+- `training_session_notes` — session notes
+- `training_workouts` — workout sessions (keyed by date + workout type)
+
+## Course presets in Round Tracker
+
+- Oak Tree East — Gold (7,116 yds / Par 70) and Blue (6,439 yds / Par 71)
+- Oak Tree West — Gold (6,752 yds / Par 70) and Blue (6,234 yds / Par 70)
+- Kickingbird — Blue (6,424 yds / Par 70) and Black (6,944 yds / Par 70)
+
+Kickingbird yardages are estimates from publicly available scorecard data. Verify and adjust as needed.
+
+## Weekly rhythm
+
+- **Mon:** Kickingbird only (no practice)
+- **Tue-Sun:** AM/early-PM practice + evening 18 at Oak Tree
+- **Workouts:** Tue (Lower+Core) and Fri (Upper+Core) recommended
+- **Sun night:** Dad runs Weekly Review
+
+## Equipment note
+
+When new clubs arrive (Titleist T100 irons + GT3 driver/woods/hybrids in stiff shafts), request a new plan. The first week with new clubs should be a dedicated "fitting-in week" — adjust stock yardages, dial in trajectories, no swing-change grinding.

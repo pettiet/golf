@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workouts</title>
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --card-hover: #1c2330; --border: #30363d;
+    --text: #e6edf3; --text-dim: #8b949e; --accent: #2ea043; --info: #3b82f6;
+    --warn: #f97316; --red: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding: 0 0 80px 0; font-size: 16px; line-height: 1.5;
+  }
+  .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  header { background: linear-gradient(135deg, #c2410c 0%, #4a1505 100%); padding: 16px 16px 22px; }
+  header .label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.75); }
+  header h1 { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  header .sub { font-size: 13px; color: rgba(255,255,255,0.9); margin-top: 4px; }
+
+  .container { padding: 14px; max-width: 600px; margin: 0 auto; }
+
+  .workout-tabs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;
+  }
+  .workout-tab {
+    background: var(--card); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; text-align: center;
+  }
+  .workout-tab.active {
+    background: var(--warn); border-color: var(--warn); color: white;
+  }
+  .workout-tab .meta { display: block; font-size: 10px; opacity: 0.7; margin-top: 2px; font-weight: 500; }
+
+  .when-card {
+    background: rgba(249,115,22,0.06);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 10px; padding: 12px; margin-bottom: 14px;
+    font-size: 12px; color: var(--text-dim); line-height: 1.5;
+  }
+  .when-card strong { color: var(--text); }
+
+  .equipment-row {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;
+    font-size: 12px; color: var(--text-dim);
+  }
+  .equipment-row strong { color: var(--text); }
+
+  .block {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 12px; overflow: hidden;
+  }
+  .block-header {
+    padding: 12px 14px;
+    background: linear-gradient(180deg, rgba(249,115,22,0.08) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .block-num { font-size: 11px; color: var(--warn); letter-spacing: 1.5px; text-transform: uppercase; }
+  .block-title { font-size: 16px; font-weight: 700; margin-top: 2px; }
+  .block-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .block-body { padding: 8px 14px 12px; }
+
+  .exercise {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .exercise:last-child { border-bottom: none; }
+
+  .ex-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+  .ex-check {
+    appearance: none; -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border: 2px solid var(--border); border-radius: 6px;
+    margin-top: 2px; cursor: pointer; flex-shrink: 0;
+    position: relative; background: transparent;
+  }
+  .ex-check:checked { background: var(--warn); border-color: var(--warn); }
+  .ex-check:checked::after {
+    content: '✓'; position: absolute; top: -2px; left: 3px;
+    color: white; font-weight: bold; font-size: 16px;
+  }
+  .ex-info { flex: 1; }
+  .ex-name { font-size: 15px; font-weight: 600; }
+  .ex-spec { font-size: 12px; color: var(--warn); margin-top: 2px; }
+
+  .info-toggle {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    border-radius: 5px; padding: 3px 8px; font-size: 11px; cursor: pointer;
+    margin-left: 32px; margin-top: 6px;
+    display: inline-flex; align-items: center; gap: 5px; font-family: inherit;
+  }
+  .info-toggle .chev { transition: transform 0.2s; font-size: 8px; }
+  .info-toggle.open .chev { transform: rotate(180deg); }
+  .info-panel {
+    display: none; margin-left: 32px; margin-top: 6px;
+    background: rgba(249,115,22,0.06); border-left: 2px solid rgba(249,115,22,0.4);
+    border-radius: 0 4px 4px 0; padding: 8px 10px;
+    font-size: 12px; color: var(--text-dim); line-height: 1.6;
+  }
+  .info-panel.open { display: block; }
+  .info-panel strong { color: var(--text); }
+  .info-panel ol, .info-panel ul { padding-left: 16px; margin: 4px 0; }
+  .info-panel li { margin-bottom: 3px; }
+  .info-panel .tip { color: #fcd34d; margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1); }
+
+  .ex-log {
+    margin-left: 32px; margin-top: 8px;
+  }
+  .ex-log label {
+    font-size: 10px; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 1px; display: block; margin-bottom: 3px;
+  }
+  .ex-log input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 6px 8px; color: var(--text); font-size: 13px;
+    font-family: inherit;
+  }
+
+  .footer-actions {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--card); border-top: 1px solid var(--border);
+    padding: 10px 14px; display: flex; gap: 8px; justify-content: center;
+  }
+  .footer-actions button {
+    flex: 1; max-width: 240px; background: var(--warn); color: white;
+    border: none; border-radius: 8px; padding: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .footer-actions button.secondary {
+    background: var(--card-hover); color: var(--text);
+    border: 1px solid var(--border); max-width: 100px; flex: 0 0 auto;
+  }
+
+  .if-short {
+    background: rgba(210,153,34,0.08);
+    border-left: 3px solid var(--warn);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 10px; margin: 10px 0;
+    font-size: 12px; color: #f0d27a; line-height: 1.5;
+  }
+  .if-short strong { color: var(--warn); }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Hub</a>
+
+<header>
+  <div class="label">Workouts</div>
+  <h1>Strength &amp; Conditioning</h1>
+  <div class="sub">Two 60-min workouts · Pick the day, do the work</div>
+</header>
+
+<div class="container">
+
+  <div class="when-card">
+    <strong>When to do these:</strong> 2x per week, with at least one rest day between them. Recommended: <strong>Tuesday (Lower+Core)</strong> and <strong>Friday (Upper+Core)</strong>. Done in the morning before practice, or on lighter practice days. Skip if your body is genuinely fatigued — golf reps come first.
+  </div>
+
+  <div class="workout-tabs">
+    <button class="workout-tab" id="tab_lower" onclick="showWorkout('lower_core')">
+      Lower + Core
+      <span class="meta">60 min · Recommended Tue</span>
+    </button>
+    <button class="workout-tab" id="tab_upper" onclick="showWorkout('upper_core')">
+      Upper + Core
+      <span class="meta">60 min · Recommended Fri</span>
+    </button>
+  </div>
+
+  <div class="equipment-row">
+    <strong>Equipment:</strong> 2× 15-lb DBs · 2× 5-lb DBs · 2× 3-lb DBs · band gym (platform + bar) · ab wheel · 6-lb medicine ball
+  </div>
+
+  <div id="workoutContainer"></div>
+
+</div>
+
+<div class="footer-actions">
+  <button class="secondary" onclick="resetWorkout()">Reset</button>
+  <button onclick="shareWorkout()">📤 Share Workout</button>
+</div>
+
+<script>
+  // ===== WORKOUTS =====
+  const WORKOUTS = {
+    lower_core: {
+      name: 'Lower Body + Core',
+      duration: '60 min',
+      ifShort: 'In 30 min? Do Block 1 (warmup) + Block 2 (squats only) + Block 4 (planks + ab wheel). Skip Block 3.',
+      blocks: [
+        {
+          title: 'Block 1 · Warmup',
+          meta: '8 min · Dynamic',
+          exercises: [
+            { id: 'lw_arm', name: 'Arm circles + shoulder rolls', spec: '10 fwd, 10 back, each direction' },
+            { id: 'lw_leg', name: 'Leg swings', spec: '10 each leg, each direction (fwd-back, then side-to-side)' },
+            { id: 'lw_squat', name: 'Bodyweight squats', spec: '15 reps, controlled' },
+            { id: 'lw_lunge', name: 'Walking lunges', spec: '10 total (5 each leg)' },
+            { id: 'lw_hip', name: 'Hip openers (90/90)', spec: '5 each side' },
+            { id: 'lw_gws', name: "World's greatest stretch", spec: '3 each side', info: 'gws' }
+          ]
+        },
+        {
+          title: 'Block 2 · Strength — Lower Body',
+          meta: '25 min · Main work',
+          exercises: [
+            { id: 'lm_goblet', name: 'Goblet squat', spec: '4 sets × 10 reps · Both 15-lb DBs at chest · 90 sec rest', info: 'goblet', log: true, logFields: ['Weight used', 'How it felt'] },
+            { id: 'lm_split', name: 'Reverse lunges', spec: '4 sets × 8 reps each leg · 15-lb DBs at sides · 60 sec rest', info: 'reverse_lunge', log: true, logFields: ['Weight', 'Felt'] },
+            { id: 'lm_rdl', name: 'Single-leg Romanian deadlift', spec: '3 sets × 8 reps each leg · 1× 15-lb DB · 60 sec rest', info: 'sldl', log: true, logFields: ['Felt'] },
+            { id: 'lm_calf', name: 'Calf raises', spec: '3 sets × 15 reps · Both 15-lb DBs at sides · 45 sec rest', info: 'calf' }
+          ]
+        },
+        {
+          title: 'Block 3 · Power — Rotational',
+          meta: '12 min · Golf-specific',
+          exercises: [
+            { id: 'lp_throw', name: 'Med ball rotational throws', spec: '3 sets × 8 reps each side · 85% effort · 60 sec rest', info: 'rot_throw' },
+            { id: 'lp_slam', name: 'Med ball slams', spec: '3 sets × 10 reps · Full body extension · 60 sec rest', info: 'slam' }
+          ]
+        },
+        {
+          title: 'Block 4 · Core Finisher',
+          meta: '12 min · No rest',
+          exercises: [
+            { id: 'lc_plank', name: 'Plank hold', spec: '3 sets × 60 sec · 30 sec rest', log: true, logFields: ['Time held'] },
+            { id: 'lc_side', name: 'Side plank', spec: '3 sets × 30 sec each side · 15 sec rest' },
+            { id: 'lc_dead', name: 'Dead bugs', spec: '3 sets × 10 reps (5 each side) · 30 sec rest', info: 'deadbug' },
+            { id: 'lc_wheel', name: 'Ab wheel rollouts', spec: '3 sets × 8 reps · 60 sec rest · stop before failure', info: 'ab_wheel' }
+          ]
+        },
+        {
+          title: 'Block 5 · Cool-down',
+          meta: '3 min',
+          exercises: [
+            { id: 'lcd_ham', name: 'Standing hamstring stretch', spec: '30 sec each leg' },
+            { id: 'lcd_quad', name: 'Standing quad stretch', spec: '30 sec each leg' },
+            { id: 'lcd_hip', name: 'Hip flexor stretch (kneeling)', spec: '30 sec each side' },
+            { id: 'lcd_pigeon', name: 'Pigeon pose (or seated figure 4)', spec: '45 sec each side' }
+          ]
+        }
+      ]
+    },
+
+    upper_core: {
+      name: 'Upper Body + Core',
+      duration: '60 min',
+      ifShort: 'In 30 min? Do Block 1 (warmup) + Block 2 (push-ups + rows) + Block 4 (planks + ab wheel). Skip Block 3.',
+      blocks: [
+        {
+          title: 'Block 1 · Warmup',
+          meta: '8 min · Dynamic',
+          exercises: [
+            { id: 'uw_arm', name: 'Arm circles', spec: '15 fwd, 15 back' },
+            { id: 'uw_shoulder', name: 'Shoulder dislocates (broomstick or club)', spec: '15 reps', info: 'dislocates' },
+            { id: 'uw_trunk', name: 'Trunk rotations (standing)', spec: '15 each side' },
+            { id: 'uw_band', name: 'Band pull-aparts', spec: '20 reps', info: 'band_pull' },
+            { id: 'uw_thoracic', name: 'Thoracic rotations (quadruped)', spec: '8 each side', info: 'thoracic' }
+          ]
+        },
+        {
+          title: 'Block 2 · Strength — Push / Pull',
+          meta: '25 min · Main work',
+          exercises: [
+            { id: 'um_pushup', name: 'Push-ups', spec: '4 sets × max reps (cap 20) · 60 sec rest', info: 'pushup', log: true, logFields: ['Set 1', 'Set 2', 'Set 3', 'Set 4'] },
+            { id: 'um_row', name: 'Single-arm DB row', spec: '4 sets × 10 reps each side · 15-lb DB · 60 sec rest', info: 'db_row', log: true, logFields: ['Weight', 'Felt'] },
+            { id: 'um_press', name: 'Standing DB shoulder press', spec: '3 sets × 8 reps · Both 15-lb DBs · 90 sec rest', info: 'press', log: true, logFields: ['Weight', 'Felt'] },
+            { id: 'um_curl', name: 'Bicep curls', spec: '3 sets × 10 reps · Both 15-lb DBs · 45 sec rest' }
+          ]
+        },
+        {
+          title: 'Block 3 · Power — Rotational + Anti-Rotation',
+          meta: '12 min · Golf-specific',
+          exercises: [
+            { id: 'up_throw', name: 'Med ball rotational throws (overhead)', spec: '3 sets × 8 each side · 60 sec rest', info: 'rot_throw_oh' },
+            { id: 'up_chest', name: 'Med ball chest pass', spec: '3 sets × 12 reps · 60 sec rest', info: 'chest_pass' },
+            { id: 'up_pallof', name: 'Pallof press (using bands or DB)', spec: '3 sets × 10 reps each side · 60 sec rest', info: 'pallof' }
+          ]
+        },
+        {
+          title: 'Block 4 · Core Finisher',
+          meta: '12 min · No rest',
+          exercises: [
+            { id: 'uc_plank', name: 'Plank hold with shoulder taps', spec: '3 sets × 20 taps (10 each side) · 30 sec rest', info: 'shoulder_taps' },
+            { id: 'uc_side', name: 'Side plank with reach-under', spec: '3 sets × 8 each side · 30 sec rest', info: 'side_reach' },
+            { id: 'uc_bird', name: 'Bird dogs', spec: '3 sets × 10 reps (5 each side) · 30 sec rest', info: 'bird_dog' },
+            { id: 'uc_wheel', name: 'Ab wheel rollouts', spec: '3 sets × 8 reps · 60 sec rest' }
+          ]
+        },
+        {
+          title: 'Block 5 · Cool-down',
+          meta: '3 min',
+          exercises: [
+            { id: 'ucd_pec', name: 'Doorway pec stretch', spec: '30 sec each side' },
+            { id: 'ucd_tri', name: 'Overhead tricep stretch', spec: '30 sec each side' },
+            { id: 'ucd_cat', name: 'Cat-cow', spec: '10 reps' },
+            { id: 'ucd_child', name: "Child's pose", spec: '60 sec' }
+          ]
+        }
+      ]
+    }
+  };
+
+  // ===== INFO PANELS =====
+  const INFO = {
+    gws: `<strong>World's greatest stretch:</strong>
+      <ol>
+        <li>Start in high plank.</li>
+        <li>Step right foot OUTSIDE right hand into deep lunge.</li>
+        <li>Right hand on ground, reach LEFT hand to ceiling, opening chest.</li>
+        <li>Return hand, step back to plank. Switch sides.</li>
+      </ol>
+      <div class="tip">Opens hips, t-spine, hamstrings, shoulders — everything golf needs.</div>`,
+
+    goblet: `<strong>Goblet squat:</strong>
+      <ol>
+        <li>Hold both 15-lb DBs vertically against chest, side by side.</li>
+        <li>Elbows down, DBs tight to chest.</li>
+        <li>Feet shoulder-width, toes slightly out.</li>
+        <li>Sit back into hips, knees track over toes, chest up.</li>
+        <li>Go to thighs parallel or below.</li>
+        <li>Drive through heels to stand. Squeeze glutes at top.</li>
+      </ol>
+      <div class="tip">If 30 lb feels light, hold one DB pressed overhead for extra challenge. Or progress to a backpack with books.</div>`,
+
+    reverse_lunge: `<strong>Reverse lunges:</strong>
+      <ol>
+        <li>Stand tall, 15-lb DB in each hand at sides.</li>
+        <li>Step BACK with right leg into a lunge — front knee at 90°, back knee just above floor.</li>
+        <li>Drive through FRONT heel to return to standing.</li>
+        <li>Alternate legs. 8 each side = 16 total.</li>
+      </ol>
+      <div class="tip">Reverse lunges are knee-friendlier than forward lunges. Same strength benefit.</div>`,
+
+    sldl: `<strong>Single-leg Romanian deadlift:</strong>
+      <ol>
+        <li>Stand on right leg, 1× 15-lb DB in LEFT hand (opposite side).</li>
+        <li>Hinge at hip, lift left leg straight back behind you.</li>
+        <li>Lower DB toward floor as your back leg goes up — body forms a "T."</li>
+        <li>Keep right knee slightly bent. Squeeze right glute to return to standing.</li>
+        <li>8 reps each side.</li>
+      </ol>
+      <div class="tip">Big balance challenge. Use a wall for support if needed first few times.</div>`,
+
+    calf: `<strong>Calf raises:</strong>
+      <ol>
+        <li>Stand with both 15-lb DBs at sides.</li>
+        <li>Push up onto balls of feet. Hold 1 sec at top.</li>
+        <li>Slow lower. 15 reps.</li>
+      </ol>
+      <div class="tip">Stand on edge of step for more range of motion.</div>`,
+
+    rot_throw: `<strong>Med ball rotational throws:</strong>
+      <ol>
+        <li>Stand sideways to a wall, 3-4 ft away.</li>
+        <li>Hold 6-lb med ball at hip closest to wall.</li>
+        <li>Drive with hips first, then rotate torso, then throw ball HARD into wall.</li>
+        <li>Catch on rebound. Reset. 8 reps each side.</li>
+      </ol>
+      <div class="tip">Most golf-specific exercise we have. Hip-led rotation = same sequence as the swing.</div>`,
+
+    slam: `<strong>Med ball slams:</strong>
+      <ol>
+        <li>Stand tall, feet shoulder-width.</li>
+        <li>Hold 6-lb med ball overhead with both hands.</li>
+        <li>SLAM ball into floor in front of you with full body extension.</li>
+        <li>Pick up, reset, repeat. 10 reps.</li>
+      </ol>
+      <div class="tip">If using a regular med ball (non-slam), do this on grass or pad. Don't use a hardwood floor.</div>`,
+
+    deadbug: `<strong>Dead bug:</strong>
+      <ol>
+        <li>Lie on back, arms straight up, knees bent at 90°.</li>
+        <li>Lower RIGHT arm overhead AND LEFT leg straight (opposite sides).</li>
+        <li>Slow. Keep lower back flat to floor — that's the point.</li>
+        <li>Return. Switch sides. 10 reps total (5 each side).</li>
+      </ol>`,
+
+    ab_wheel: `<strong>Ab wheel rollout:</strong>
+      <ol>
+        <li>Kneel on floor (pad under knees), ab wheel in front of you.</li>
+        <li>Hands on handles. Slowly roll wheel out away from you.</li>
+        <li>Go as far as you can WITHOUT lower back sagging.</li>
+        <li>Pull back to start using your core.</li>
+      </ol>
+      <div class="tip"><strong>Stop short of failure</strong> — sagging into lower back can hurt you. Build range gradually.</div>`,
+
+    dislocates: `<strong>Shoulder dislocates:</strong>
+      <ol>
+        <li>Hold a broomstick (or golf club) with VERY wide grip.</li>
+        <li>Start with stick in front of body, arms straight.</li>
+        <li>Slowly bring stick over head and behind back, arms stay straight.</li>
+        <li>Return same path. 15 reps.</li>
+      </ol>
+      <div class="tip">If too tight to go behind back, widen grip more. Don't force it.</div>`,
+
+    band_pull: `<strong>Band pull-aparts:</strong>
+      <ol>
+        <li>Use the LalaHigh band, or any resistance band.</li>
+        <li>Hold band at shoulder height, arms straight out front.</li>
+        <li>Pull band apart by squeezing shoulder blades together.</li>
+        <li>Slow return. 20 reps.</li>
+      </ol>
+      <div class="tip">Builds rear-shoulder/upper-back strength. Counters the rounded-shoulder posture from too much sitting/phone time.</div>`,
+
+    thoracic: `<strong>Thoracic rotations:</strong>
+      <ol>
+        <li>On hands and knees (quadruped).</li>
+        <li>Put right hand behind head, elbow out.</li>
+        <li>Rotate right elbow DOWN toward left wrist, then UP toward ceiling.</li>
+        <li>8 reps each side.</li>
+      </ol>
+      <div class="tip">Opens up the mid-back rotation. Essential for golf — most amateurs are stiff here.</div>`,
+
+    pushup: `<strong>Push-ups:</strong>
+      <ol>
+        <li>Plank position, hands directly under shoulders.</li>
+        <li>Body in straight line from head to heels.</li>
+        <li>Lower chest to fist-distance from floor. Elbows ~45° from body.</li>
+        <li>Press back up.</li>
+      </ol>
+      <div class="tip">If 4 sets of full push-ups is too much, do knee push-ups on later sets. Track which type per set.</div>`,
+
+    db_row: `<strong>Single-arm DB row:</strong>
+      <ol>
+        <li>Right knee and right hand on a sturdy chair or low bench.</li>
+        <li>Left foot on floor, 15-lb DB in left hand.</li>
+        <li>Pull DB up to hip, elbow tight to body.</li>
+        <li>Slow lower. 10 reps. Switch sides.</li>
+      </ol>
+      <div class="tip">Squeeze back muscle hard at the top. Important for golf swing stability.</div>`,
+
+    press: `<strong>Standing DB shoulder press:</strong>
+      <ol>
+        <li>Stand tall, 15-lb DBs at shoulder height, palms facing forward.</li>
+        <li>Brace core, press both DBs straight overhead.</li>
+        <li>Lock out at top. Slow lower to shoulders.</li>
+        <li>8 reps.</li>
+      </ol>
+      <div class="tip">Don't arch lower back — keep glutes squeezed. If form breaks, drop to 5-lb DBs.</div>`,
+
+    rot_throw_oh: `<strong>Med ball overhead rotational throw:</strong>
+      <ol>
+        <li>Stand sideways to wall.</li>
+        <li>Hold ball overhead with both hands.</li>
+        <li>Throw ball into wall using a diagonal "chopping" motion across body.</li>
+        <li>Catch, reset. 8 each side.</li>
+      </ol>`,
+
+    chest_pass: `<strong>Med ball chest pass:</strong>
+      <ol>
+        <li>Stand 3-4 ft from wall, both hands on ball at chest.</li>
+        <li>Throw ball HARD into wall (basketball-style chest pass).</li>
+        <li>Catch on rebound. 12 reps.</li>
+      </ol>`,
+
+    pallof: `<strong>Pallof press (anti-rotation):</strong>
+      <ol>
+        <li>Attach band at chest height (door anchor or band gym).</li>
+        <li>Stand sideways to anchor, both hands on band at chest.</li>
+        <li>Press hands straight out in front of you. RESIST the band pulling you toward the anchor.</li>
+        <li>Hold 2 sec, return. 10 reps. Switch sides.</li>
+      </ol>
+      <div class="tip">Huge for golf. The core's job in the swing is anti-rotation — preventing the spine from twisting under load.</div>`,
+
+    shoulder_taps: `<strong>Plank with shoulder taps:</strong>
+      <ol>
+        <li>High plank position (top of push-up).</li>
+        <li>Without rocking hips, tap left hand to right shoulder.</li>
+        <li>Return. Tap right hand to left shoulder.</li>
+        <li>20 total (10 each side).</li>
+      </ol>
+      <div class="tip">Hips should barely move. The point is anti-rotation under fatigue.</div>`,
+
+    side_reach: `<strong>Side plank with reach-under:</strong>
+      <ol>
+        <li>Side plank on right elbow, hips lifted.</li>
+        <li>Reach LEFT hand under your body, then up toward ceiling — rotating torso.</li>
+        <li>8 reps each side.</li>
+      </ol>`,
+
+    bird_dog: `<strong>Bird dog:</strong>
+      <ol>
+        <li>Hands and knees, neutral spine.</li>
+        <li>Extend RIGHT arm forward AND LEFT leg back.</li>
+        <li>Hold 2 sec, slow return.</li>
+        <li>Alternate. 10 reps total.</li>
+      </ol>`
+  };
+
+  // ===== State =====
+  let currentWorkout = 'lower_core';
+  const STORAGE_KEY = 'training_workouts';
+  let workoutData = {};
+
+  // Read from URL param if present
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('w') === 'upper_core' || params.get('w') === 'lower_core') {
+    currentWorkout = params.get('w');
+  }
+
+  function load() {
+    try { const saved = localStorage.getItem(STORAGE_KEY); if (saved) workoutData = JSON.parse(saved); }
+    catch(e) { workoutData = {}; }
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(workoutData)); } catch(e) {}
+  }
+
+  function getSessionData() {
+    // Use today's date + workout name as key
+    const today = new Date().toISOString().split('T')[0];
+    const key = `${today}_${currentWorkout}`;
+    if (!workoutData[key]) workoutData[key] = {};
+    return workoutData[key];
+  }
+
+  function showWorkout(name) {
+    currentWorkout = name;
+    render();
+  }
+  window.showWorkout = showWorkout;
+
+  function render() {
+    document.getElementById('tab_lower').classList.toggle('active', currentWorkout === 'lower_core');
+    document.getElementById('tab_upper').classList.toggle('active', currentWorkout === 'upper_core');
+
+    const wk = WORKOUTS[currentWorkout];
+    const data = getSessionData();
+    let html = '';
+
+    if (wk.ifShort) {
+      html += `<div class="if-short"><strong>⏱ If short on time:</strong> ${wk.ifShort}</div>`;
+    }
+
+    wk.blocks.forEach(block => {
+      html += `<div class="block">
+        <div class="block-header">
+          <div class="block-num">${block.title.split('·')[0]}</div>
+          <div class="block-title">${block.title.split('·')[1] || block.title}</div>
+          <div class="block-meta">${block.meta}</div>
+        </div>
+        <div class="block-body">`;
+      block.exercises.forEach(ex => {
+        const checked = !!data[ex.id];
+        html += `<div class="exercise">
+          <div class="ex-header">
+            <input type="checkbox" class="ex-check" id="${ex.id}" ${checked ? 'checked' : ''} onchange="toggleExercise('${ex.id}', this.checked)">
+            <div class="ex-info">
+              <div class="ex-name">${ex.name}</div>
+              <div class="ex-spec">${ex.spec}</div>
+            </div>
+          </div>`;
+        if (ex.info) {
+          html += `<button class="info-toggle" onclick="toggleInfo('info_${ex.id}', this)">How to <span class="chev">▼</span></button>
+                   <div class="info-panel" id="info_${ex.id}">${INFO[ex.info] || ''}</div>`;
+        }
+        if (ex.log && ex.logFields) {
+          html += `<div class="ex-log">`;
+          ex.logFields.forEach((field, idx) => {
+            const fieldId = `${ex.id}_log${idx}`;
+            const val = data[fieldId] || '';
+            html += `<div style="margin-bottom: 6px;"><label>${field}</label>
+              <input type="text" id="${fieldId}" value="${val.replace(/"/g, '&quot;')}" oninput="logField('${fieldId}', this.value)"></div>`;
+          });
+          html += `</div>`;
+        }
+        html += `</div>`;
+      });
+      html += `</div></div>`;
+    });
+
+    document.getElementById('workoutContainer').innerHTML = html;
+  }
+
+  function toggleExercise(id, checked) {
+    const data = getSessionData();
+    data[id] = checked;
+    save();
+    render();
+  }
+  window.toggleExercise = toggleExercise;
+
+  function toggleInfo(id, btn) {
+    const panel = document.getElementById(id);
+    const labelNode = btn.firstChild;
+    const isOpen = panel.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    labelNode.nodeValue = isOpen ? 'Hide ' : 'How to ';
+  }
+  window.toggleInfo = toggleInfo;
+
+  function logField(id, val) {
+    const data = getSessionData();
+    data[id] = val;
+    save();
+  }
+  window.logField = logField;
+
+  function resetWorkout() {
+    if (!confirm('Reset today\'s ' + WORKOUTS[currentWorkout].name + ' workout?')) return;
+    const today = new Date().toISOString().split('T')[0];
+    const key = `${today}_${currentWorkout}`;
+    delete workoutData[key];
+    save();
+    render();
+  }
+  window.resetWorkout = resetWorkout;
+
+  async function shareWorkout() {
+    const wk = WORKOUTS[currentWorkout];
+    const data = getSessionData();
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    let s = `WORKOUT — ${today}\n${wk.name} (${wk.duration})\n=================================\n\n`;
+    wk.blocks.forEach(block => {
+      s += `${block.title}\n`;
+      block.exercises.forEach(ex => {
+        const check = data[ex.id] ? '✓' : '✗';
+        s += `  ${check} ${ex.name}\n`;
+        if (ex.log && ex.logFields) {
+          ex.logFields.forEach((field, idx) => {
+            const val = data[`${ex.id}_log${idx}`];
+            if (val) s += `      ${field}: ${val}\n`;
+          });
+        }
+      });
+      s += '\n';
+    });
+
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Workout', text: s }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
+    }
+    if (navigator.clipboard) {
+      try { await navigator.clipboard.writeText(s); alert('✓ Copied.'); return; } catch(e) {}
+    }
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + s.replace(/</g,'&lt;') + '</pre>');
+  }
+  window.shareWorkout = shareWorkout;
+
+  load();
+  render();
+</script>
+
+</body>
+</html>

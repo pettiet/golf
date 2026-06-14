@@ -5,17 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weekly Review</title>
 <style>
-  :root {
-    --bg: #0d1117;
-    --card: #161b22;
-    --card-hover: #1c2330;
-    --border: #30363d;
-    --text: #e6edf3;
-    --text-dim: #8b949e;
-    --accent: #2ea043;
-    --info: #3b82f6;
-    --header-grad: linear-gradient(135deg, #0369a1 0%, #082f49 100%);
-  }
+  :root { --bg: #0d1117; --card: #161b22; --card-hover: #1c2330; --border: #30363d; --text: #e6edf3; --text-dim: #8b949e; --accent: #2ea043; --info: #3b82f6; --header-grad: linear-gradient(135deg, #0369a1 0%, #082f49 100%); }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 0 0 90px 0; font-size: 16px; line-height: 1.5; }
   .back-link { display: inline-block; padding: 12px 16px; color: var(--text-dim); text-decoration: none; font-size: 14px; }
@@ -33,13 +23,9 @@
   .data-card .count { font-size: 22px; font-weight: 700; color: var(--text); }
   .data-card .count.empty { color: var(--text-dim); }
   .data-card .lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
-  .accountability-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;
-  }
+  .accountability-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
   .accountability-card h2 { font-size: 12px; color: #7dd3fc; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
-  .accountability-row {
-    display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 14px;
-  }
+  .accountability-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 14px; }
   .accountability-row:last-child { border-bottom: none; }
   .accountability-row .num { font-weight: 700; }
   .accountability-row .num.good { color: var(--accent); }
@@ -49,14 +35,8 @@
   .field label { display: block; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
   .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; color: var(--text); font-size: 14px; font-family: inherit; min-height: 80px; resize: vertical; }
   .preview { background: #050810; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: 'SF Mono', Menlo, monospace; font-size: 11px; color: var(--text-dim); max-height: 320px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
-  .footer-actions {
-    position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border);
-    padding: 12px 16px; display: flex; gap: 10px; justify-content: center;
-  }
-  .footer-actions button {
-    flex: 1; max-width: 280px; background: var(--info); color: white; border: none;
-    border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer;
-  }
+  .footer-actions { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); padding: 12px 16px; display: flex; gap: 10px; justify-content: center; }
+  .footer-actions button { flex: 1; max-width: 280px; background: var(--info); color: white; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -73,8 +53,8 @@
 
   <div class="when-card">
     <h2>How to use this</h2>
-    <p><strong>Sunday night, once per week.</strong> This bundles everything from the week: rounds, session notes, daily checkbox completion, and your observations.</p>
-    <p>Paste the output into Claude, we plan next week.</p>
+    <p><strong>Sunday night, once per week.</strong> Bundles everything: rounds, session notes, daily checkbox completion, accountability stats, your observations.</p>
+    <p>Paste the output into Claude. We plan next week.</p>
   </div>
 
   <h2 style="font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px;">This week's data</h2>
@@ -93,18 +73,9 @@
   <h2 style="font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px;">Dad's add-ons</h2>
 
   <div class="accountability-card">
-    <div class="field">
-      <label>Anything Dad observed (not in the data)</label>
-      <textarea id="dad_observed" placeholder="e.g. He's sleeping in better. Struggled mid-week with the new grip. Wrist felt sore Friday."></textarea>
-    </div>
-    <div class="field">
-      <label>Questions for coach</label>
-      <textarea id="dad_questions" placeholder="e.g. Should we worry about the wrist soreness? Is the lefty miss getting better?"></textarea>
-    </div>
-    <div class="field">
-      <label>Logistics / schedule changes next week</label>
-      <textarea id="dad_logistics" placeholder="e.g. Tournament on Wed at X course. Out of town Thursday."></textarea>
-    </div>
+    <div class="field"><label>Anything Dad observed (not in the data)</label><textarea id="dad_observed"></textarea></div>
+    <div class="field"><label>Questions for coach</label><textarea id="dad_questions"></textarea></div>
+    <div class="field"><label>Logistics / schedule changes next week</label><textarea id="dad_logistics"></textarea></div>
   </div>
 
   <h2 style="font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin: 20px 0 10px;">Preview</h2>
@@ -117,34 +88,21 @@
 </div>
 
 <script>
-  function loadJSON(key) {
-    try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { return {}; }
-  }
-
+  function loadJSON(key) { try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { return {}; } }
   function getWeekDates() {
-    // Last 7 days including today
-    const dates = [];
-    const today = new Date();
+    const dates = []; const today = new Date();
     for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      dates.push(`${y}-${m}-${day}`);
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
     }
     return dates;
   }
-
   function formatRound(r) {
-    let s = `\n--- ROUND: ${r.meta.date || '-'} — ${r.meta.course || '-'} ---\n`;
-    s += `Tees: ${r.meta.tees || '-'} | Conditions: ${r.meta.conditions || '-'}\n`;
-    s += `Type: ${r.meta.type || '-'}\n\n`;
+    let s = `\n--- ROUND: ${r.meta.date || '-'} — ${r.meta.course || '-'} ---\nTees: ${r.meta.tees || '-'} | Conditions: ${r.meta.conditions || '-'}\nType: ${r.meta.type || '-'}\n\n`;
     let score = 0, putts = 0, fir = 0, firTotal = 0, gir = 0;
     s += `Hole|Yds |Par|Score|Putts|F|G|UD|Pen\n`;
     (r.holes || []).forEach((h, i) => {
-      const par = r.pars[i];
-      const yds = r.yards[i];
+      const par = r.pars[i], yds = r.yards[i];
       s += `  ${String(h.hole).padStart(2)}|${String(yds || '-').padStart(4)}| ${par || '-'} |  ${h.score !== null ? h.score : '-'}  |  ${h.putts !== null ? h.putts : '-'}  |${h.fir?'Y':'-'}|${h.gir?'Y':'-'}|${h.ud?'Y':'-'}| ${h.pen || 0}\n`;
       if (h.score !== null) score += parseInt(h.score);
       if (h.putts !== null) putts += parseInt(h.putts);
@@ -153,172 +111,127 @@
     });
     s += `\nTOTALS: Score ${score} | Putts ${putts} | FIR ${firTotal ? fir+'/'+firTotal : '-'} | GIR ${gir}/18\n`;
     if (r.notes) {
-      s += `Worked: ${r.notes.worked || '-'}\n`;
-      s += `Didn't: ${r.notes.failed || '-'}\n`;
-      s += `Mental: ${r.notes.mental || '-'}\n`;
-      s += `End energy: ${r.notes.energy || '-'}\n`;
+      s += `Worked: ${r.notes.worked || '-'}\nDidn't: ${r.notes.failed || '-'}\nMental: ${r.notes.mental || '-'}\nEnd energy: ${r.notes.energy || '-'}\n`;
     }
     return s;
   }
-
   function formatNote(n) {
-    let s = `\n--- NOTE: ${n.date || '-'} (${n.type || '-'}${n.desc ? ' · ' + n.desc : ''}) ---\n`;
-    s += `Rating: ${n.rating || '-'} / 5\n`;
-    s += `Worked: ${n.worked || '-'}\n`;
-    s += `Didn't: ${n.failed || '-'}\n`;
-    s += `Flag: ${n.flag || '-'}\n`;
-    s += `Next: ${n.next || '-'}\n`;
-    return s;
+    return `\n--- NOTE: ${n.date || '-'} (${n.type || '-'}${n.desc ? ' · ' + n.desc : ''}) ---\nRating: ${n.rating || '-'} / 5\nWorked: ${n.worked || '-'}\nDidn't: ${n.failed || '-'}\nFlag: ${n.flag || '-'}\nNext: ${n.next || '-'}\n`;
   }
-
   function computeAccountability() {
     const daily = loadJSON('training_daily_v1');
     const dates = getWeekDates();
-    const stats = {
-      mornings_on_time: 0,
-      bed_made: 0,
-      breakfast: 0,
-      mobility: 0,
-      rooms_full: 0,
-      golf_done: 0,
-      evening_in_bed: 0,
-      days_logged: 0,
-      total_days: dates.length
-    };
+    const stats = { wake: 0, bed: 0, breakfast: 0, mobility: 0, rooms: 0, evening: 0, logged: 0, total: dates.length };
     dates.forEach(date => {
-      const d = daily[date];
-      if (!d) return;
-      if (Object.values(d).some(v => v === true)) stats.days_logged++;
-      if (d.m_wake) stats.mornings_on_time++;
-      if (d.m_bed) stats.bed_made++;
+      const d = daily[date]; if (!d) return;
+      if (Object.values(d).some(v => v === true)) stats.logged++;
+      if (d.m_wake) stats.wake++;
+      if (d.m_bed) stats.bed++;
       if (d.m_breakfast) stats.breakfast++;
       if (d.m_mobility) stats.mobility++;
-      if (d.r_bed && d.r_bath && d.r_game) stats.rooms_full++;
-      if (d.e_bed) stats.evening_in_bed++;
+      if (d.r_bed && d.r_bath && d.r_game) stats.rooms++;
+      if (d.e_bed) stats.evening++;
     });
     return stats;
   }
-
   function renderAccountability() {
-    const stats = computeAccountability();
-    const total = stats.total_days;
+    const s = computeAccountability();
     function row(label, num, total) {
       const ratio = num / total;
       let cls = 'bad';
-      if (ratio >= 0.8) cls = 'good';
-      else if (ratio >= 0.5) cls = 'warn';
+      if (ratio >= 0.8) cls = 'good'; else if (ratio >= 0.5) cls = 'warn';
       return `<div class="accountability-row"><span>${label}</span><span class="num ${cls}">${num}/${total}</span></div>`;
     }
-    const html = [
-      row('Mornings on time (7:30 wake)', stats.mornings_on_time, total),
-      row('Bed made', stats.bed_made, total),
-      row('Breakfast eaten', stats.breakfast, total),
-      row('Morning mobility done', stats.mobility, total),
-      row('All 3 rooms tidy', stats.rooms_full, total),
-      row('In bed by 10:30', stats.evening_in_bed, total)
+    document.getElementById('accountabilityList').innerHTML = [
+      row('Woke up + got out of bed', s.wake, s.total),
+      row('Bed made', s.bed, s.total),
+      row('Breakfast eaten', s.breakfast, s.total),
+      row('Morning mobility done', s.mobility, s.total),
+      row('All 3 rooms tidy', s.rooms, s.total),
+      row('In bed by 11:00', s.evening, s.total)
     ].join('');
-    document.getElementById('accountabilityList').innerHTML = html;
   }
-
   function buildBundle() {
     const rounds = loadJSON('training_rounds_v2');
     const notes = loadJSON('training_session_notes');
     const daily = loadJSON('training_daily_v1');
-    const stats = computeAccountability();
-    const dadObserved = document.getElementById('dad_observed').value;
-    const dadQuestions = document.getElementById('dad_questions').value;
-    const dadLogistics = document.getElementById('dad_logistics').value;
+    const workouts = loadJSON('training_workouts');
+    const s = computeAccountability();
+    const obs = document.getElementById('dad_observed').value;
+    const qs = document.getElementById('dad_questions').value;
+    const log = document.getElementById('dad_logistics').value;
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-    const weekDates = getWeekDates();
-    const dateRange = weekDates[0] + ' to ' + weekDates[weekDates.length - 1];
-
-    let s = `WEEKLY REVIEW — ${today}\n`;
-    s += `Week of ${dateRange}\n`;
-    s += `==================================\n\n`;
-
-    if (dadObserved || dadQuestions || dadLogistics) {
-      s += `>>> FROM DAD <<<\n\n`;
-      if (dadObserved) s += `Observations:\n${dadObserved}\n\n`;
-      if (dadQuestions) s += `Questions for coach:\n${dadQuestions}\n\n`;
-      if (dadLogistics) s += `Schedule / logistics next week:\n${dadLogistics}\n\n`;
+    const dates = getWeekDates();
+    let out = `WEEKLY REVIEW — ${today}\nWeek of ${dates[0]} to ${dates[dates.length - 1]}\n==================================\n\n`;
+    if (obs || qs || log) {
+      out += `>>> FROM DAD <<<\n\n`;
+      if (obs) out += `Observations:\n${obs}\n\n`;
+      if (qs) out += `Questions for coach:\n${qs}\n\n`;
+      if (log) out += `Logistics next week:\n${log}\n\n`;
     }
-
-    s += `>>> ACCOUNTABILITY (out of ${stats.total_days} days) <<<\n`;
-    s += `Mornings on time:    ${stats.mornings_on_time} / ${stats.total_days}\n`;
-    s += `Bed made:            ${stats.bed_made} / ${stats.total_days}\n`;
-    s += `Breakfast eaten:     ${stats.breakfast} / ${stats.total_days}\n`;
-    s += `Morning mobility:    ${stats.mobility} / ${stats.total_days}\n`;
-    s += `All 3 rooms tidy:    ${stats.rooms_full} / ${stats.total_days}\n`;
-    s += `In bed by 10:30:     ${stats.evening_in_bed} / ${stats.total_days}\n`;
-    s += `Days logged:         ${stats.days_logged} / ${stats.total_days}\n\n`;
-
-    // Filter rounds to this week
-    const weekRounds = Object.values(rounds).filter(r => r.meta.date && weekDates.includes(r.meta.date));
-    s += `>>> ROUNDS THIS WEEK (${weekRounds.length}) <<<\n`;
-    if (weekRounds.length === 0) s += `(no rounds tracked this week)\n`;
-    else weekRounds.forEach(r => { s += formatRound(r); });
-    s += `\n`;
-
-    const weekNotes = Object.values(notes).filter(n => n.date && weekDates.includes(n.date));
-    s += `>>> SESSION NOTES (${weekNotes.length}) <<<\n`;
-    if (weekNotes.length === 0) s += `(no session notes this week)\n`;
-    else weekNotes.forEach(n => { s += formatNote(n); });
-    s += `\n`;
-
-    // Daily notes/ratings
-    s += `>>> DAILY NOTES <<<\n`;
-    weekDates.forEach(date => {
+    out += `>>> ACCOUNTABILITY (out of ${s.total} days) <<<\n`;
+    out += `Woke up:       ${s.wake} / ${s.total}\n`;
+    out += `Bed made:      ${s.bed} / ${s.total}\n`;
+    out += `Breakfast:     ${s.breakfast} / ${s.total}\n`;
+    out += `Mobility:      ${s.mobility} / ${s.total}\n`;
+    out += `Rooms tidy:    ${s.rooms} / ${s.total}\n`;
+    out += `In bed by 11:  ${s.evening} / ${s.total}\n`;
+    out += `Days logged:   ${s.logged} / ${s.total}\n\n`;
+    const wkRounds = Object.values(rounds).filter(r => r.meta.date && dates.includes(r.meta.date));
+    out += `>>> ROUNDS THIS WEEK (${wkRounds.length}) <<<\n`;
+    if (wkRounds.length === 0) out += `(no rounds tracked this week)\n`;
+    else wkRounds.forEach(r => { out += formatRound(r); });
+    out += `\n`;
+    const wkNotes = Object.values(notes).filter(n => n.date && dates.includes(n.date));
+    out += `>>> SESSION NOTES (${wkNotes.length}) <<<\n`;
+    if (wkNotes.length === 0) out += `(no session notes this week)\n`;
+    else wkNotes.forEach(n => { out += formatNote(n); });
+    out += `\n`;
+    // Workouts done
+    const wkWorkouts = Object.keys(workouts).filter(k => dates.some(d => k.startsWith(d)));
+    out += `>>> WORKOUTS THIS WEEK (${wkWorkouts.length}) <<<\n`;
+    wkWorkouts.forEach(k => {
+      const date = k.split('_')[0];
+      const type = k.includes('lower_core') ? 'Lower+Core' : 'Upper+Core';
+      const data = workouts[k];
+      const done = Object.values(data).filter(v => v === true).length;
+      out += `${date}: ${type} — ${done} exercises checked\n`;
+    });
+    out += `\n>>> DAILY NOTES <<<\n`;
+    dates.forEach(date => {
       const d = daily[date] || {};
       if (d._rating || d._note) {
-        s += `${date}: rating ${d._rating || '-'}/5`;
-        if (d._note) s += `, note: "${d._note}"`;
-        s += `\n`;
+        out += `${date}: rating ${d._rating || '-'}/5`;
+        if (d._note) out += `, note: "${d._note}"`;
+        out += `\n`;
       }
     });
-
-    return s;
+    return out;
   }
-
   function updateStats() {
-    const rounds = loadJSON('training_rounds_v2');
-    const notes = loadJSON('training_session_notes');
-    const daily = loadJSON('training_daily_v1');
-    const weekDates = getWeekDates();
-    const roundCount = Object.values(rounds).filter(r => r.meta.date && weekDates.includes(r.meta.date)).length;
-    const noteCount = Object.values(notes).filter(n => n.date && weekDates.includes(n.date)).length;
-    const dayCount = weekDates.filter(d => daily[d] && Object.values(daily[d]).some(v => v === true)).length;
-
-    document.getElementById('roundCount').textContent = roundCount;
-    document.getElementById('roundCount').className = 'count' + (roundCount === 0 ? ' empty' : '');
-    document.getElementById('noteCount').textContent = noteCount;
-    document.getElementById('noteCount').className = 'count' + (noteCount === 0 ? ' empty' : '');
-    document.getElementById('dayCount').textContent = dayCount;
-    document.getElementById('dayCount').className = 'count' + (dayCount === 0 ? ' empty' : '');
+    const r = loadJSON('training_rounds_v2'), n = loadJSON('training_session_notes'), d = loadJSON('training_daily_v1');
+    const dates = getWeekDates();
+    const rc = Object.values(r).filter(x => x.meta.date && dates.includes(x.meta.date)).length;
+    const nc = Object.values(n).filter(x => x.date && dates.includes(x.date)).length;
+    const dc = dates.filter(x => d[x] && Object.values(d[x]).some(v => v === true)).length;
+    document.getElementById('roundCount').textContent = rc;
+    document.getElementById('roundCount').className = 'count' + (rc === 0 ? ' empty' : '');
+    document.getElementById('noteCount').textContent = nc;
+    document.getElementById('noteCount').className = 'count' + (nc === 0 ? ' empty' : '');
+    document.getElementById('dayCount').textContent = dc;
+    document.getElementById('dayCount').className = 'count' + (dc === 0 ? ' empty' : '');
   }
-
-  function updatePreview() {
-    document.getElementById('preview').textContent = buildBundle();
-  }
-
+  function updatePreview() { document.getElementById('preview').textContent = buildBundle(); }
   async function shareBundle() {
     const text = buildBundle();
-    if (navigator.share) {
-      try { await navigator.share({ title: 'Weekly Review', text: text }); return; }
-      catch (err) { if (err.name === 'AbortError') return; }
-    }
-    if (navigator.clipboard) {
-      try { await navigator.clipboard.writeText(text); alert('✓ Bundle copied. Paste into Claude.'); return; } catch(e) {}
-    }
+    if (navigator.share) { try { await navigator.share({ title: 'Weekly Review', text: text }); return; } catch (err) { if (err.name === 'AbortError') return; } }
+    if (navigator.clipboard) { try { await navigator.clipboard.writeText(text); alert('✓ Bundle copied.'); return; } catch(e) {} }
     const w = window.open('', '_blank');
     w.document.write('<pre style="white-space:pre-wrap;font-family:monospace;padding:20px;background:#0d1117;color:#e6edf3;min-height:100vh;margin:0;">' + text.replace(/</g,'&lt;') + '</pre>');
   }
   window.shareBundle = shareBundle;
-
   document.querySelectorAll('textarea').forEach(t => t.addEventListener('input', updatePreview));
-  updateStats();
-  renderAccountability();
-  updatePreview();
+  updateStats(); renderAccountability(); updatePreview();
 </script>
-
 </body>
 </html>

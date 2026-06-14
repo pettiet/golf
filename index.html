@@ -7,8 +7,8 @@
 <style>
   :root {
     --bg: #0d1117; --card: #161b22; --card-hover: #1c2330; --border: #30363d;
-    --text: #e6edf3; --text-dim: #8b949e; --accent: #2ea043; --info: #3b82f6;
-    --warn: #f97316; --purple: #a855f7; --teal: #14b8a6;
+    --text: #e6edf3; --text-dim: #8b949e; --accent: #2ea043; --accent-dim: #1f6f33;
+    --info: #3b82f6; --warn: #f97316; --purple: #a855f7; --teal: #14b8a6; --red: #ef4444;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
@@ -41,7 +41,7 @@
   .section-title:first-of-type { margin-top: 4px; }
 
   .rhythm-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 18px; overflow: hidden; }
-  .rhythm-header { padding: 12px 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .rhythm-header { padding: 12px 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; }
   .rhythm-header strong { font-size: 13px; }
   .rhythm-header .chev { color: var(--text-dim); transition: transform 0.2s; font-size: 12px; }
   .rhythm-card.open .rhythm-header .chev { transform: rotate(180deg); }
@@ -66,21 +66,18 @@
     background: linear-gradient(135deg, rgba(46,160,67,0.18) 0%, rgba(46,160,67,0.04) 100%);
     border-color: var(--accent-dim);
   }
-  .tile::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-  }
+  .tile::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
   .tile.primary::before { background: var(--accent); }
   .tile.tracker::before { background: var(--info); }
   .tile.notes::before { background: var(--purple); }
   .tile.review::before { background: var(--teal); }
-  .tile .tile-label {
-    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
-    margin-bottom: 4px; font-weight: 700;
-  }
+  .tile.workouts::before { background: var(--red); }
+  .tile .tile-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
   .tile.primary .tile-label { color: var(--accent); }
   .tile.tracker .tile-label { color: var(--info); }
   .tile.notes .tile-label { color: var(--purple); }
   .tile.review .tile-label { color: var(--teal); }
+  .tile.workouts .tile-label { color: var(--red); }
   .tile .tile-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
   .tile .tile-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
   .tile .tile-cta {
@@ -91,6 +88,7 @@
   .tile.tracker .tile-cta { background: rgba(59,130,246,0.15); color: var(--info); }
   .tile.notes .tile-cta { background: rgba(168,85,247,0.15); color: var(--purple); }
   .tile.review .tile-cta { background: rgba(20,184,166,0.15); color: var(--teal); }
+  .tile.workouts .tile-cta { background: rgba(239,68,68,0.15); color: var(--red); }
 
   .footer-note {
     margin-top: 20px; padding: 12px; background: var(--card); border: 1px solid var(--border);
@@ -120,7 +118,7 @@
         <span class="rhythm-who kid">KID</span>
         <div class="rhythm-content">
           <strong>Daily — open "Today" every morning.</strong>
-          <div class="when">Morning routine, rooms, golf plan, evening. Check things off as you go.</div>
+          <div class="when">Morning routine, rooms, practice plan, evening 18, evening wind-down. Check things off as you go.</div>
         </div>
       </div>
       <div class="rhythm-row">
@@ -138,6 +136,13 @@
         </div>
       </div>
       <div class="rhythm-row">
+        <span class="rhythm-who kid">KID</span>
+        <div class="rhythm-content">
+          <strong>Workouts — recommended Tue (Lower+Core) and Fri (Upper+Core).</strong>
+          <div class="when">2x per week, with at least one rest day between. Skip if body is fatigued.</div>
+        </div>
+      </div>
+      <div class="rhythm-row">
         <span class="rhythm-who dad">DAD</span>
         <div class="rhythm-content">
           <strong>Weekly Review — Sunday night.</strong>
@@ -152,7 +157,7 @@
   <a href="daily.html" class="tile primary">
     <div class="tile-label">Daily Plan</div>
     <div class="tile-title">Today's Plan</div>
-    <div class="tile-desc">Morning routine, rooms check, golf plan for today, evening wind-down. Start here every day.</div>
+    <div class="tile-desc">Morning routine, rooms check, practice plan, evening 18 holes, wind-down. Start here every day.</div>
     <span class="tile-cta">Open Today</span>
   </a>
 
@@ -163,6 +168,13 @@
     <div class="tile-title">Track a Round</div>
     <div class="tile-desc">Course presets for Oak Tree East/West and Kickingbird. Tap your score, hole by hole.</div>
     <span class="tile-cta">After Every Round</span>
+  </a>
+
+  <a href="workouts.html" class="tile workouts">
+    <div class="tile-label">Workouts</div>
+    <div class="tile-title">Strength &amp; Conditioning</div>
+    <div class="tile-desc">Two 60-min workouts: Lower+Core and Upper+Core. Recommended Tue and Fri.</div>
+    <span class="tile-cta">2x per week</span>
   </a>
 
   <a href="session_notes.html" class="tile notes">
@@ -177,7 +189,7 @@
   <a href="weekly_review.html" class="tile review">
     <div class="tile-label">Weekly Review</div>
     <div class="tile-title">Sunday Bundle</div>
-    <div class="tile-desc">Sees accountability stats, rounds, notes — combines into one message for Claude to plan next week.</div>
+    <div class="tile-desc">Accountability stats, rounds, notes — combines into one message for Claude to plan next week.</div>
     <span class="tile-cta">Sundays</span>
   </a>
 
