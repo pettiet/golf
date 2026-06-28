@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Your New Irons & Bag, Explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:light only;
+    --paper:#F4F6F3; --card:#FFFFFF; --ink:#16201A; --body:#2A332E;
+    --slate:#67736C; --fairway:#1C5A37; --fairway-deep:#123F26;
+    --glight:#E8F1EA; --gold:#8A5E0E; --hair:#E0E5E0; --steel:#8B978E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;background:var(--paper);}
+  body{background:var(--paper);color:var(--body);font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;font-size:17px;padding:0 20px 70px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;font-size:.74rem;color:var(--fairway);}
+  .label{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;font-size:.72rem;color:var(--slate);}
+  .hero{padding:58px 0 28px;border-bottom:3px solid var(--ink);}
+  .hero h1{font-family:'Oswald',sans-serif;font-weight:600;line-height:1.03;
+    letter-spacing:-.01em;font-size:2.7rem;color:var(--ink);margin:14px 0 16px;}
+  .hero h1 .accent{color:var(--fairway);}
+  .hero p{font-size:1.12rem;color:var(--body);max-width:50ch;}
+  section{padding:40px 0;border-bottom:1px solid var(--hair);}
+  h2{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.62rem;line-height:1.1;
+    color:var(--ink);margin:10px 0 14px;}
+  p.body{margin-bottom:14px;} p.body:last-child{margin-bottom:0;}
+  strong{font-weight:700;color:var(--ink);} em{font-style:italic;}
+  .analogy{background:var(--card);border:1px solid var(--hair);border-left:4px solid var(--gold);
+    padding:18px 20px;border-radius:4px;margin-top:8px;}
+  .analogy .label{display:block;margin-bottom:8px;color:var(--gold);}
+
+  /* loft ladder table */
+  table.ladder{width:100%;border-collapse:collapse;margin-top:6px;background:var(--card);
+    border:1px solid var(--hair);border-radius:8px;overflow:hidden;}
+  table.ladder th,table.ladder td{padding:11px 10px;text-align:center;border-bottom:1px solid var(--hair);}
+  table.ladder thead th{font-family:'Oswald',sans-serif;font-weight:600;font-size:.72rem;
+    letter-spacing:.05em;text-transform:uppercase;color:var(--slate);background:#FAFBFA;}
+  table.ladder thead th.new{color:var(--fairway);}
+  table.ladder td.club{font-family:'Oswald',sans-serif;font-weight:600;color:var(--ink);
+    text-align:left;padding-left:16px;font-size:1.02rem;}
+  table.ladder td.deg{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.35rem;}
+  table.ladder td.new{color:var(--fairway-deep);}
+  table.ladder td.old{color:var(--slate);}
+  table.ladder tr.hl td{background:var(--glight);}
+  table.ladder tr.hl td.club{color:var(--fairway);}
+  table.ladder tr:last-child td{border-bottom:none;}
+  .footnote{font-size:.85rem;color:var(--slate);margin-top:13px;line-height:1.45;}
+
+  .takeaway{background:var(--card);border:1px solid var(--hair);border-left:5px solid var(--fairway);
+    border-radius:5px;padding:18px 20px;margin-top:20px;}
+  .takeaway .label{display:block;color:var(--fairway);margin-bottom:6px;}
+  .takeaway p{font-size:1.06rem;color:var(--body);}
+
+  /* shaft strip */
+  .strip{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+  .chip{background:var(--card);border:1px solid var(--hair);border-radius:7px;padding:14px 15px;}
+  .chip .tag{font-family:'Oswald',sans-serif;font-size:.68rem;letter-spacing:.08em;
+    text-transform:uppercase;font-weight:600;margin-bottom:4px;}
+  .chip.old .tag{color:var(--slate);} .chip.new .tag{color:var(--fairway);}
+  .chip .name{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.05rem;color:var(--ink);margin-bottom:5px;}
+  .chip .d{font-size:.9rem;color:var(--body);line-height:1.4;}
+
+  /* bag */
+  .bag{border:1px solid var(--hair);border-radius:8px;overflow:hidden;background:var(--card);margin-top:6px;}
+  .bagrow{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+    border-top:1px solid var(--hair);}
+  .bagrow:first-child{border-top:none;}
+  .bagrow .name{font-family:'Oswald',sans-serif;font-weight:500;font-size:1.03rem;color:var(--ink);}
+  .bagrow .name small{display:block;font-family:'Inter',sans-serif;font-weight:400;font-size:.74rem;
+    color:var(--slate);text-transform:none;letter-spacing:0;margin-top:1px;}
+  .bagrow .lo{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.15rem;color:var(--body);}
+  .bagrow.zone{background:var(--glight);}
+  .bagrow.zone .name{color:var(--fairway-deep);font-weight:600;}
+  .bagrow.zone .lo{color:var(--fairway);}
+  .bagrow.irons-start{border-top:2px solid var(--ink);}
+
+  .opts{display:grid;gap:14px;margin-top:18px;}
+  .opt{border:1px solid var(--hair);border-radius:8px;padding:16px;background:var(--card);}
+  .opt h3{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.05rem;color:var(--ink);}
+  .opt .sub{font-size:.85rem;color:var(--slate);margin-bottom:12px;}
+  .step{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
+  .step .s-name{font-family:'Oswald',sans-serif;font-weight:500;font-size:.96rem;color:var(--ink);}
+  .step .s-lo{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.04rem;color:var(--body);}
+  .gap{font-size:.74rem;color:var(--slate);padding-left:2px;}
+  .gap b{color:var(--fairway);font-weight:700;}
+  .opt .verdict{margin-top:10px;padding-top:10px;border-top:1px dashed var(--hair);font-size:.92rem;color:var(--body);}
+  .opt .verdict b{color:var(--fairway);}
+
+  /* wedge compare */
+  .wedge{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+  .wcard{border:1px solid var(--hair);border-radius:8px;padding:15px;background:var(--card);}
+  .wcard h4{font-family:'Oswald',sans-serif;font-weight:600;font-size:.92rem;margin-bottom:3px;}
+  .wcard.old h4{color:var(--slate);} .wcard.new h4{color:var(--fairway);}
+  .wcard .wsub{font-size:.8rem;color:var(--slate);margin-bottom:10px;}
+  .wstep{display:flex;justify-content:space-between;padding:3px 0;font-family:'Oswald',sans-serif;
+    font-weight:500;font-size:.96rem;color:var(--ink);}
+  .wstep span:last-child{color:var(--slate);font-weight:400;font-family:'Inter',sans-serif;font-size:.8rem;}
+  .wbad{color:#9A3412;font-weight:700;}
+  .wcard .wnote{margin-top:9px;padding-top:9px;border-top:1px dashed var(--hair);font-size:.86rem;color:var(--body);}
+
+  ol.ranked{list-style:none;counter-reset:r;margin-top:6px;}
+  ol.ranked li{counter-increment:r;display:grid;grid-template-columns:34px 1fr;gap:14px;
+    padding:14px 0;border-top:1px solid var(--hair);align-items:start;}
+  ol.ranked li:first-child{border-top:none;}
+  ol.ranked li::before{content:counter(r);font-family:'Oswald',sans-serif;font-weight:600;
+    font-size:1.5rem;color:var(--fairway);line-height:1;}
+  ol.ranked .t{font-weight:700;color:var(--ink);}
+  ol.ranked .d{color:var(--body);font-size:.98rem;}
+  .weak-note{margin-top:16px;font-size:.98rem;color:var(--body);background:var(--card);
+    border:1px solid var(--hair);border-left:4px solid var(--gold);padding:14px 16px;border-radius:4px;}
+
+  .drills{margin-top:6px;}
+  .drill{padding:14px 0;border-top:1px solid var(--hair);}
+  .drill:first-child{border-top:none;}
+  .drill .dname{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.04rem;color:var(--ink);margin-bottom:3px;}
+  .drill .dname::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--fairway);margin-right:10px;vertical-align:middle;}
+  .drill .ddesc{font-size:.97rem;color:var(--body);line-height:1.5;padding-left:18px;}
+
+  .closing{padding:44px 0 8px;border-bottom:none;}
+  .closing h2{font-size:1.7rem;}
+  .closing .punch{font-family:'Oswald',sans-serif;font-weight:500;font-size:1.18rem;
+    color:var(--fairway);margin-top:18px;line-height:1.3;}
+
+  @media (max-width:440px){
+    .hero h1{font-size:2.2rem;}
+    .strip,.wedge{grid-template-columns:1fr;}
+    table.ladder td.deg{font-size:1.2rem;}
+  }
+  @media (min-width:560px){ .opts{grid-template-columns:1fr 1fr;} }
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(10px);animation:rise .6s ease forwards;}
+    .hero .reveal:nth-child(1){animation-delay:.04s;}
+    .hero .reveal:nth-child(2){animation-delay:.12s;}
+    .hero .reveal:nth-child(3){animation-delay:.2s;}
+    @keyframes rise{to{opacity:1;transform:none;}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow reveal">Your new setup &middot; what's really going on</div>
+    <h1 class="reveal">You didn't lose distance. <span class="accent">And you didn't lose a club.</span></h1>
+    <p class="reveal">Two things feel off about the new T100s: they seem shorter, and it looks like the bottom of the bag is missing a club. Neither is actually true. Here's the real story &mdash; with the numbers.</p>
+  </header>
+
+  <section>
+    <div class="label">Worry #1 &middot; "My irons got shorter"</div>
+    <h2>The number is a sticker. Loft is the club.</h2>
+    <p class="body">Loft is the angle on the face &mdash; the biggest thing the <em>club</em> controls for how far and high the ball goes, way more than the number stamped on the bottom. Two irons can both say "7" and have different lofts, so they fly different distances from the same swing.</p>
+    <div class="analogy">
+      <span class="label">Think of it like</span>
+      <p>Clothing sizes. A "Medium" tee isn't an exact measurement &mdash; one brand's Medium fits like another's Large. Iron numbers are the same. The "7" on a distance iron has way less loft than the "7" on a tour iron like the T100. <strong>Same name, different club.</strong></p>
+    </div>
+
+    <p class="body" style="margin-top:24px;">Here's the new irons next to the old ones &mdash; same club number, side by side, with the real lofts:</p>
+
+    <table class="ladder">
+      <thead><tr><th style="text-align:left;padding-left:16px;">Club</th><th class="new">New &middot; T100</th><th>Old &middot; Takomo 101</th></tr></thead>
+      <tbody>
+        <tr><td class="club">5-iron</td><td class="deg new">26&deg;</td><td class="deg old">23&deg;</td></tr>
+        <tr><td class="club">6-iron</td><td class="deg new">29&deg;</td><td class="deg old">26&deg;</td></tr>
+        <tr class="hl"><td class="club">7-iron</td><td class="deg new">33&deg;</td><td class="deg old">30&deg;</td></tr>
+        <tr><td class="club">8-iron</td><td class="deg new">37&deg;</td><td class="deg old">34&deg;</td></tr>
+        <tr><td class="club">9-iron</td><td class="deg new">41&deg;</td><td class="deg old">39&deg;</td></tr>
+        <tr><td class="club">PW</td><td class="deg new">45&deg;</td><td class="deg old">44&deg;</td></tr>
+      </tbody>
+    </table>
+    <p class="footnote">Both charts are exact published specs. Notice the new irons are about 3&deg; weaker through the scoring irons &mdash; but nearly identical at the PW. The change is all in the mid-irons, which is exactly where "it feels shorter" shows up.</p>
+
+    <div class="takeaway">
+      <span class="label">The one number to remember</span>
+      <p>Your new <strong>7-iron is 33&deg;</strong>. Your old <strong>8-iron was 34&deg;</strong>. Same loft. So your new 7 flies like your old 8 &mdash; that 3&deg; <em>is</em> the whole "it got shorter" feeling. Drop down one club for the same shot and it disappears.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Also part of the story</div>
+    <h2>The shafts changed too &mdash; toward control.</h2>
+    <p class="body">It's not only loft. The old irons had a lighter, easy-launch shaft; the new ones have a tour-weight shaft that rewards rhythm over muscle.</p>
+    <div class="strip">
+      <div class="chip old">
+        <div class="tag">Old irons</div>
+        <div class="name">KBS Tour Lite</div>
+        <div class="d">Lighter steel, higher launch, easy distance &mdash; built for a smooth, moderate tempo.</div>
+      </div>
+      <div class="chip new">
+        <div class="tag">New irons</div>
+        <div class="name">AMT Tour White &middot; Stiff</div>
+        <div class="d">Titleist's stock tour shaft. "Ascending mass": <em>lighter</em> in the long irons (helps launch the 5-iron) and <em>heavier</em> in the scoring irons (more control).</div>
+      </div>
+    </div>
+    <p class="body" style="margin-top:16px;">A tour-weight, stiffer shaft is more stable and repeatable &mdash; but it asks for good tempo. Swing it smooth and it flies on a rope. Try to muscle it and you'll lose both contact and distance. So if the mid-irons feel a touch shorter at first, that's the heavier shaft plus the weaker loft, both pointing the same direction: <strong>trading easy distance for tour-level control.</strong></p>
+  </section>
+
+  <section>
+    <div class="label">Worry #2 &middot; "I lost my 4-iron"</div>
+    <h2>You didn't lose a club. You upgraded one.</h2>
+    <p class="body">Your longest iron is now the 5-iron. The old long irons didn't leave a hole &mdash; they got replaced by two <strong>GT3 hybrids</strong>, which are easier to hit and launch higher than any long iron. At the top of the bag, especially at your swing speed, that's an upgrade.</p>
+
+    <div class="bag">
+      <div class="bagrow"><span class="name">Driver <small>GT3</small></span><span class="lo">~9&deg;</span></div>
+      <div class="bagrow"><span class="name">3-wood <small>GT3</small></span><span class="lo">~15&deg;</span></div>
+      <div class="bagrow zone"><span class="name">Hybrid <small>GT3 &mdash; see below</small></span><span class="lo">19&ndash;24&deg;</span></div>
+      <div class="bagrow zone"><span class="name">Hybrid <small>GT3 &mdash; see below</small></span><span class="lo">19&ndash;24&deg;</span></div>
+      <div class="bagrow irons-start"><span class="name">5-iron <small>T100</small></span><span class="lo">26&deg;</span></div>
+      <div class="bagrow"><span class="name">6-iron <small>T100</small></span><span class="lo">29&deg;</span></div>
+      <div class="bagrow"><span class="name">7-iron <small>T100</small></span><span class="lo">33&deg;</span></div>
+      <div class="bagrow"><span class="name">8-iron <small>T100</small></span><span class="lo">37&deg;</span></div>
+      <div class="bagrow"><span class="name">9-iron <small>T100</small></span><span class="lo">41&deg;</span></div>
+      <div class="bagrow"><span class="name">PW <small>T100</small></span><span class="lo">45&deg;</span></div>
+      <div class="bagrow"><span class="name">Wedges <small>Vokey</small></span><span class="lo">50 / 56 / 60&deg;</span></div>
+    </div>
+
+    <p class="body" style="margin-top:22px;">Two <strong>GT3 hybrids</strong> fill the space between the 3-wood and the 5-iron. Whichever two were ordered, <strong>both options fill it with even steps and no big gap.</strong> GT3 hybrids come in 19&deg; (3H), 21&deg; (4H), and 24&deg; (5H), and the hosel is adjustable.</p>
+
+    <div class="opts">
+      <div class="opt">
+        <h3>If it's the 3 &amp; 4 hybrids</h3>
+        <div class="sub">19&deg; + 21&deg;</div>
+        <div class="step"><span class="s-name">3-wood</span><span class="s-lo">15&deg;</span></div>
+        <div class="gap">&darr; <b>4&deg;</b></div>
+        <div class="step"><span class="s-name">3-hybrid</span><span class="s-lo">19&deg;</span></div>
+        <div class="gap">&darr; <b>2&deg;</b></div>
+        <div class="step"><span class="s-name">4-hybrid</span><span class="s-lo">21&deg;</span></div>
+        <div class="gap">&darr; <b>5&deg;</b></div>
+        <div class="step"><span class="s-name">5-iron</span><span class="s-lo">26&deg;</span></div>
+        <div class="verdict"><b>Clean.</b> And it avoids carrying both a "5 hybrid" and a "5 iron."</div>
+      </div>
+      <div class="opt">
+        <h3>If it's the 4 &amp; 5 hybrids</h3>
+        <div class="sub">21&deg; + 24&deg;</div>
+        <div class="step"><span class="s-name">3-wood</span><span class="s-lo">15&deg;</span></div>
+        <div class="gap">&darr; <b>6&deg;</b></div>
+        <div class="step"><span class="s-name">4-hybrid</span><span class="s-lo">21&deg;</span></div>
+        <div class="gap">&darr; <b>3&deg;</b></div>
+        <div class="step"><span class="s-name">5-hybrid</span><span class="s-lo">24&deg;</span></div>
+        <div class="gap">&darr; <b>2&deg;</b></div>
+        <div class="step"><span class="s-name">5-iron</span><span class="s-lo">26&deg;</span></div>
+        <div class="verdict"><b>Also clean.</b> The 5-hybrid tucks right up against the 5-iron.</div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="label">Bottom line</span>
+      <p>Either way, there's <strong>no hole in your bag.</strong> The biggest step is 5&ndash;6&deg; at the very top, which is normal up there. The whole top of the bag was gapped on purpose. The exact hybrid pair is stamped on the hosel sleeve (and usually the headcover) if you want to be sure.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The bottom of the bag got better too</div>
+    <h2>The wedges were re-gapped to match.</h2>
+    <p class="body">When the PW loft changed, the wedges were rebuilt to flow off it. The old setup actually had an 8&deg; hole below the pitching wedge &mdash; the new one closes it.</p>
+    <div class="wedge">
+      <div class="wcard old">
+        <h4>Old &middot; Jaws</h4>
+        <div class="wsub">52 / 56 / 60 &middot; regular shaft, stock grips</div>
+        <div class="wstep"><span>PW</span><span>44&deg;</span></div>
+        <div class="wstep"><span class="wbad">&darr; 8&deg; gap</span><span></span></div>
+        <div class="wstep"><span>GW</span><span>52&deg;</span></div>
+        <div class="wstep"><span>SW</span><span>56&deg;</span></div>
+        <div class="wstep"><span>LW</span><span>60&deg;</span></div>
+        <div class="wnote">A big jump from the strong PW into the 52&deg;.</div>
+      </div>
+      <div class="wcard new">
+        <h4>New &middot; Vokey</h4>
+        <div class="wsub">50 / 56 / 60 &middot; wedge-flex shafts, matched grips</div>
+        <div class="wstep"><span>PW</span><span>45&deg;</span></div>
+        <div class="wstep"><span style="color:var(--fairway);">&darr; 5&deg;</span><span></span></div>
+        <div class="wstep"><span>GW</span><span>50&deg;</span></div>
+        <div class="wstep"><span>SW</span><span>56&deg;</span></div>
+        <div class="wstep"><span>LW</span><span>60&deg;</span></div>
+        <div class="wnote">Even steps off the PW, no hole.</div>
+      </div>
+    </div>
+    <p class="body" style="margin-top:16px;">There's a bonus: the new wedges use <strong>wedge-flex shafts</strong> (firmer and more controlled on the half- and three-quarter shots that matter around the green) and the <strong>same grips as the irons</strong>. Old wedges had softer regular shafts and different stock grips. Now the whole set &mdash; long irons through lob wedge &mdash; feels consistent in your hands, which is one of the quiet keys to repeatable contact.</p>
+  </section>
+
+  <section>
+    <div class="label">What actually sends it</div>
+    <h2>Where distance really comes from.</h2>
+    <p class="body">In order of how much they matter:</p>
+    <ol class="ranked">
+      <li><div><div class="t">Hitting the center of the face</div><div class="d">The #1 factor &mdash; and it matters <em>more</em> with T100s, because the sweet spot is smaller. A flush strike beats a hard one every time. A toe or thin miss bleeds yards fast.</div></div></li>
+      <li><div><div class="t">Clubhead speed</div><div class="d">Comes from tempo and sequence &mdash; a smooth transition, using the ground in the right order &mdash; not from muscling it. This matters even more now with the heavier tour shaft: smooth wins.</div></div></li>
+      <li><div><div class="t">Loft</div><div class="d">Already built into the club. Set the moment you pick which club to pull.</div></div></li>
+      <li><div><div class="t">Ball speed</div><div class="d">The <em>result</em> of a centered strike plus clubhead speed. Get those two right and it takes care of itself.</div></div></li>
+    </ol>
+    <div class="weak-note"><strong>"Getting stronger"</strong> is real, but it's near the bottom of this list and it's slow. Swinging <em>harder</em> for yards usually wrecks contact &mdash; and an off-center T100 loses distance fast. You end up shorter <em>and</em> more crooked. The opposite of the goal.</div>
+  </section>
+
+  <section>
+    <div class="label">Why the pros choose these</div>
+    <h2>"Weaker" lofts win tournaments.</h2>
+    <p class="body">The T100 is the most-played iron on the PGA Tour and the DP World Tour. The best ball-strikers on Earth pick these tour lofts <strong>on purpose</strong>.</p>
+    <p class="body">A 33&deg; 7-iron launches higher, spins more, and <strong>stops on the green</strong>. A jacked distance 7-iron flown 165 can't hold a firm Sunday pin &mdash; it lands hot and skips off the back. Into greens, control beats raw yards, and control is what saves shots.</p>
+  </section>
+
+  <section>
+    <div class="label">Where to put your energy now</div>
+    <h2>Start with tempo &mdash; here's what that even means.</h2>
+    <p class="body">Tempo is the <em>rhythm</em> of your swing &mdash; how the timing of the backswing relates to the downswing. It's not the same as speed. A swing can be quick or slow and still have great tempo; what matters is that it's <strong>smooth, balanced, and the same every time.</strong></p>
+    <p class="body">Here's the cool part: nearly every great player shares one thing &mdash; their backswing takes about <strong>three times as long</strong> as their downswing. A 3-to-1 feel. Long and unhurried going back, then a free, accelerating move through the ball.</p>
+    <div class="analogy">
+      <span class="label">Think of it like</span>
+      <p>A song with a steady beat. You can't rush the chorus and still have it sound right &mdash; it has its own timing. A golf swing is the same: find the beat, then repeat the beat. A simple cue is counting <strong>"one&hellip;two&hellip;three"</strong> going back and <strong>"one"</strong> coming down.</p>
+    </div>
+    <p class="body" style="margin-top:22px;">Five simple ways to build it:</p>
+    <div class="drills">
+      <div class="drill"><div class="dname">Hold your finish</div><div class="ddesc">After every shot, freeze your finish for three full seconds &mdash; balanced, weight on your lead foot, buckle to the target. If you can't hold it, you swung too hard. This one drill trains tempo and balance at once, and it's the easiest thing to self-check on the range or the course.</div></div>
+      <div class="drill"><div class="dname">Feet together</div><div class="ddesc">Hit easy shots with your feet almost touching. You literally can't overswing without losing your balance, so your body finds a smooth tempo &mdash; and the center of the face &mdash; on its own. A great warm-up before every session.</div></div>
+      <div class="drill"><div class="dname">Swing at 80%</div><div class="ddesc">Practice your stock shots at about three-quarter effort. Most players hit it the same distance with better contact &mdash; proof that smooth beats hard. Owning a "smooth 7-iron" you can trust under pressure is worth more than a hero swing.</div></div>
+      <div class="drill"><div class="dname">Count it, or use a metronome</div><div class="ddesc">Say the beat out loud, or use a free tempo app set to that 3-to-1 ratio. Syncing to an outside beat builds a repeatable rhythm faster than just <em>trying</em> to feel smooth.</div></div>
+      <div class="drill"><div class="dname">The swoosh drill</div><div class="ddesc">Flip a club upside down and hold it by the head. Swing and listen: the loudest "swoosh" should come <em>at or just past</em> where the ball would be &mdash; not at the top. That means you're saving your speed for impact instead of throwing it away early. It's how speed and tempo work together.</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The short list</div>
+    <h2>What matters most right now.</h2>
+    <p class="body">The gear is dialed in. Here's where the real gains are this season &mdash; roughly in order of payoff:</p>
+    <ol class="ranked">
+      <li><div><div class="t">Center-face contact</div><div class="d">Spray a little foot powder on the face, or use impact tape, and look at where you're actually striking it. Tightening that pattern adds more distance and consistency than anything else &mdash; and it's the direct fix for "it feels shorter."</div></div></li>
+      <li><div><div class="t">Learn your real numbers</div><div class="d">Spend a session on a launch monitor and write down your <em>carry</em> distance for every club with the new setup. A yardage chart turns "I lost distance" into facts you can trust over a shot. Re-check it every few weeks &mdash; as you grow and your tempo sharpens, the numbers climb on their own.</div></div></li>
+      <li><div><div class="t">Wedges and the short game</div><div class="d">With the new gap wedge and matched shafts, learn your partial-swing carries &mdash; full, three-quarter, and half with each wedge. Shots from inside 100 yards and around the green are where rounds are actually won. It's the highest payoff per hour of practice, full stop.</div></div></li>
+      <li><div><div class="t">Tempo and balance</div><div class="d">Use the drills above. A repeatable, balanced swing is what makes good contact <em>repeatable</em> when it counts &mdash; it's the foundation everything else sits on, and it's free.</div></div></li>
+      <li><div><div class="t">Speed &mdash; as its own project</div><div class="d">If you want more raw distance, build it with structured speed training, kept separate from hitting irons. Don't chase yards by swinging your irons harder; that just costs you contact. Let real speed work &mdash; plus getting older and taller &mdash; do that job.</div></div></li>
+    </ol>
+    <div class="takeaway">
+      <span class="label">If you do one thing</span>
+      <p>Spend a session learning your real carry numbers and checking your strike pattern. The day those new numbers feel normal is the day the new clubs stop feeling like a downgrade &mdash; because they never were one.</p>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="label">What to do with this</div>
+    <h2>Don't chase the number. Chase your number.</h2>
+    <p class="body">Learn your real T100 carries, trust your gaps, and pull the club the shot needs &mdash; whatever number is on the bottom. Speed will come from cleaner tempo and from simply getting older and taller; the distance shows up on its own.</p>
+    <p class="punch">The control you're building right now is the hard part. And you're already holding it.</p>
+  </section>
+
+</div>
+</body>
+</html>
